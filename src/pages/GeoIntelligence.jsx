@@ -1,5 +1,14 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { CDRContext } from "../context/CDRContext";
+import { motion } from "framer-motion";
+import { MapPin, Layers, Smartphone, ExternalLink } from "lucide-react";
+import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+
+const fadeUp = {
+  initial: { opacity: 0, y: 14 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+};
 
 function GeoIntelligence() {
   const { cdrData } = useContext(CDRContext);
@@ -15,7 +24,6 @@ function GeoIntelligence() {
     if (location && location !== "0" && location !== "-") {
       locationCounts[location] = (locationCounts[location] || 0) + 1;
     }
-
     if (cgi && cgi !== "---" && cgi !== "-") {
       cgiCounts[cgi] = (cgiCounts[cgi] || 0) + 1;
     }
@@ -30,137 +38,206 @@ function GeoIntelligence() {
     .slice(0, 10);
 
   const uniqueLocations = Object.keys(locationCounts).length;
-  const mostFrequentLocation = topLocations.length > 0 ? topLocations[0][0] : "Unknown";
+  const mostFrequentLocation =
+    topLocations.length > 0 ? topLocations[0][0] : "Unknown";
   const mostFrequentCGI = topCGIs.length > 0 ? topCGIs[0][0] : "Unknown";
 
+  // Parse coordinates for map markers
+  const markers = useMemo(() => {
+    const maxCount = topLocations.length > 0 ? topLocations[0][1] : 1;
+    return topLocations
+      .map(([loc, count]) => {
+        const parts = loc.split("/");
+        if (parts.length === 2) {
+          const lat = parseFloat(parts[0]);
+          const lng = parseFloat(parts[1]);
+          if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+            return { lat, lng, count, ratio: count / maxCount };
+          }
+        }
+        return null;
+      })
+      .filter(Boolean);
+  }, [topLocations]);
+
+  const mapCenter = markers.length > 0
+    ? [markers[0].lat, markers[0].lng]
+    : [22.5, 78.9]; // Default: India center
+
+  const kpis = [
+    {
+      icon: MapPin,
+      label: "Unique Coordinates",
+      value: uniqueLocations,
+      color: "#3b5fab",
+      bg: "rgba(59, 95, 171, 0.08)",
+    },
+    {
+      icon: Layers,
+      label: "Peak Coordinates",
+      value: mostFrequentLocation,
+      isMonospace: true,
+      color: "#c18833",
+      bg: "rgba(193, 136, 51, 0.08)",
+    },
+    {
+      icon: Smartphone,
+      label: "Peak Cell Tower",
+      value: mostFrequentCGI,
+      isMonospace: true,
+      color: "#23356e",
+      bg: "rgba(35, 53, 110, 0.12)",
+    },
+  ];
+
   return (
-    <div style={{ maxWidth: "1200px", width: "100%", margin: "0 auto", paddingBottom: "40px" }}>
+    <motion.div
+      className="mx-auto w-full max-w-[1200px] pb-10"
+      initial="initial"
+      animate="animate"
+    >
       {/* Header */}
-      <div style={{ marginBottom: "35px" }}>
-        <h1
-          style={{
-            fontSize: "32px",
-            fontWeight: "700",
-            fontFamily: "var(--font-heading)",
-            marginBottom: "8px",
-          }}
-        >
+      <motion.div variants={fadeUp} className="mb-8">
+        <h1 className="mb-1 text-[30px] font-bold text-text">
           Geo Intelligence Center
         </h1>
-        <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
-          Cellular base transceiver station (BTS) coordinates and cell location area mappings.
+        <p className="text-sm text-text-muted">
+          Cellular base transceiver station (BTS) coordinates and cell location
+          area mappings.
         </p>
-      </div>
+      </motion.div>
 
-      {/* Empty State */}
       {records.length === 0 ? (
-        <div className="glass-card" style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>
-          No geolocation data loaded. Please upload a CDR to analyze cellular coordinates.
+        <div className="glass-card p-10 text-center text-text-muted">
+          No geolocation data loaded. Please upload a CDR to analyze cellular
+          coordinates.
         </div>
       ) : (
         <>
-          {/* KPI Cards */}
-          <div
+          {/* KPIs */}
+          <motion.div
+            variants={fadeUp}
+            className="mb-8 grid gap-5"
             style={{
-              display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "20px",
-              marginBottom: "30px",
             }}
           >
-            <div className="glass-card" style={{ padding: "20px", display: "flex", alignItems: "center", gap: "16px" }}>
-              <div style={{ width: "42px", height: "42px", borderRadius: "10px", backgroundColor: "rgba(59, 130, 246, 0.05)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(59, 130, 246, 0.15)" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-              </div>
-              <div>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: "500" }}>Unique Coordinates</span>
-                <h2 style={{ fontSize: "22px", fontWeight: "700", fontFamily: "var(--font-heading)", marginTop: "2px" }}>
-                  {uniqueLocations}
+            {kpis.map((kpi, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ y: -3, scale: 1.015 }}
+                className="glass-card flex items-center gap-4 p-5"
+              >
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border"
+                  style={{
+                    backgroundColor: kpi.bg,
+                    borderColor: `${kpi.color}25`,
+                  }}
+                >
+                  <kpi.icon size={20} color={kpi.color} strokeWidth={2.2} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="text-xs font-medium text-text-muted">
+                    {kpi.label}
+                  </span>
+                  <h2
+                    className={`mt-0.5 truncate ${kpi.isMonospace ? "font-mono text-[14px] font-bold" : "text-xl font-bold text-text"}`}
+                    style={kpi.isMonospace ? { color: kpi.color } : undefined}
+                  >
+                    {kpi.value}
+                  </h2>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Dark Map */}
+          {markers.length > 0 && (
+            <motion.div
+              variants={fadeUp}
+              className="glass-card mb-8 overflow-hidden p-0"
+              style={{ borderRadius: 16 }}
+            >
+              <div className="px-6 pt-5 pb-3">
+                <h2 className="flex items-center gap-2 text-lg font-bold text-text">
+                  <MapPin size={18} color="#c18833" />
+                  Cell Tower Geo Plot
                 </h2>
               </div>
-            </div>
+              <div style={{ height: 420 }}>
+                <MapContainer
+                  center={mapCenter}
+                  zoom={10}
+                  scrollWheelZoom={true}
+                  style={{ height: "100%", width: "100%" }}
+                  zoomControl={false}
+                >
+                  <TileLayer
+                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    attribution=""
+                  />
+                  {markers.map((m, idx) => (
+                    <CircleMarker
+                      key={idx}
+                      center={[m.lat, m.lng]}
+                      radius={6 + m.ratio * 14}
+                      pathOptions={{
+                        color: "#3b5fab",
+                        fillColor: "#c18833",
+                        fillOpacity: 0.6 + m.ratio * 0.3,
+                        weight: 2,
+                      }}
+                    >
+                      <Popup>
+                        <div style={{ fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: "#0c162d" }}>
+                          <strong>{m.lat.toFixed(4)}, {m.lng.toFixed(4)}</strong>
+                          <br />
+                          Events: {m.count}
+                        </div>
+                      </Popup>
+                    </CircleMarker>
+                  ))}
+                </MapContainer>
+              </div>
+            </motion.div>
+          )}
 
-            <div className="glass-card" style={{ padding: "20px", display: "flex", alignItems: "center", gap: "16px" }}>
-              <div style={{ width: "42px", height: "42px", borderRadius: "10px", backgroundColor: "rgba(6, 182, 212, 0.05)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(6, 182, 212, 0.15)" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" strokeWidth="2.5">
-                  <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
-                  <line x1="9" y1="3" x2="9" y2="18" />
-                  <line x1="15" y1="6" x2="15" y2="21" />
-                </svg>
-              </div>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: "500" }}>Peak Coordinates</span>
-                <h2 style={{ fontSize: "15px", fontWeight: "700", marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "var(--accent-cyan)", fontFamily: "monospace" }}>
-                  {mostFrequentLocation}
-                </h2>
-              </div>
-            </div>
-
-            <div className="glass-card" style={{ padding: "20px", display: "flex", alignItems: "center", gap: "16px" }}>
-              <div style={{ width: "42px", height: "42px", borderRadius: "10px", backgroundColor: "rgba(139, 92, 246, 0.05)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(139, 92, 246, 0.15)" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-purple)" strokeWidth="2.5">
-                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                  <line x1="12" y1="18" x2="12.01" y2="18" />
-                </svg>
-              </div>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: "500" }}>Peak Cell tower</span>
-                <h2 style={{ fontSize: "15px", fontWeight: "700", marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "var(--accent-purple)", fontFamily: "monospace" }}>
-                  {mostFrequentCGI}
-                </h2>
-              </div>
-            </div>
-          </div>
-
-          {/* Grids for tables */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(450px, 1fr))", gap: "25px" }}>
-            {/* Top coordinates with search maps trigger */}
-            <div className="glass-card" style={{ padding: "24px" }}>
-              <h2 style={{ fontSize: "18px", fontWeight: "600", fontFamily: "var(--font-heading)", marginBottom: "20px" }}>
-                🛰️ Peak Visited Coordinates
+          {/* Tables */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Coordinates Table */}
+            <motion.div variants={fadeUp} className="glass-card p-6">
+              <h2 className="mb-5 text-lg font-bold text-text">
+                Peak Visited Coordinates
               </h2>
-              <div className="custom-table-container">
-                <table className="custom-table">
+              <div className="overflow-x-auto">
+                <table className="ct-table">
                   <thead>
                     <tr>
                       <th>Coordinates (Lat/Long)</th>
-                      <th>Events Count</th>
-                      <th>Investigation</th>
+                      <th>Events</th>
+                      <th>Investigate</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {topLocations.map(([location, count], index) => {
+                    {topLocations.map(([location, count], idx) => {
                       const searchUrl = `https://www.google.com/maps/search/?api=1&query=${location.replace("/", ",")}`;
                       return (
-                        <tr key={index}>
-                          <td style={{ fontFamily: "monospace", fontSize: "13px", color: "var(--text-main)" }}>
+                        <tr key={idx}>
+                          <td className="font-mono text-[13px] text-text">
                             {location}
                           </td>
-                          <td style={{ fontWeight: "700" }}>{count}</td>
+                          <td className="font-bold">{count}</td>
                           <td>
                             <a
                               href={searchUrl}
                               target="_blank"
                               rel="noreferrer"
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "6px",
-                                textDecoration: "none",
-                                color: "var(--primary)",
-                                fontSize: "12px",
-                                fontWeight: "600",
-                              }}
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold transition-colors hover:brightness-125"
+                              style={{ color: "#3b5fab" }}
                             >
                               Maps
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                                <polyline points="15 3 21 3 21 9" />
-                                <line x1="10" y1="14" x2="21" y2="3" />
-                              </svg>
+                              <ExternalLink size={11} />
                             </a>
                           </td>
                         </tr>
@@ -169,15 +246,15 @@ function GeoIntelligence() {
                   </tbody>
                 </table>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Top CGI towers table */}
-            <div className="glass-card" style={{ padding: "24px" }}>
-              <h2 style={{ fontSize: "18px", fontWeight: "600", fontFamily: "var(--font-heading)", marginBottom: "20px" }}>
-                📡 Top CGI Cells
+            {/* CGI Table */}
+            <motion.div variants={fadeUp} className="glass-card p-6">
+              <h2 className="mb-5 text-lg font-bold text-text">
+                Top CGI Cells
               </h2>
-              <div className="custom-table-container">
-                <table className="custom-table">
+              <div className="overflow-x-auto">
+                <table className="ct-table">
                   <thead>
                     <tr>
                       <th>CGI Identifier</th>
@@ -185,22 +262,25 @@ function GeoIntelligence() {
                     </tr>
                   </thead>
                   <tbody>
-                    {topCGIs.map(([cgi, count], index) => (
-                      <tr key={index}>
-                        <td style={{ fontFamily: "monospace", fontSize: "13px", color: "var(--accent-purple)", fontWeight: "600" }}>
+                    {topCGIs.map(([cgi, count], idx) => (
+                      <tr key={idx}>
+                        <td
+                          className="font-mono text-[13px] font-semibold"
+                          style={{ color: "#23356e" }}
+                        >
                           {cgi}
                         </td>
-                        <td style={{ fontWeight: "700" }}>{count}</td>
+                        <td className="font-bold">{count}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </div>
+            </motion.div>
           </div>
         </>
       )}
-    </div>
+    </motion.div>
   );
 }
 

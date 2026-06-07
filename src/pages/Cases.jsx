@@ -1,5 +1,12 @@
 import { useContext } from "react";
 import { CDRContext } from "../context/CDRContext";
+import { motion } from "framer-motion";
+import { FolderOpen, Save, FileSearch, Crosshair } from "lucide-react";
+
+const fadeUp = {
+  initial: { opacity: 0, y: 14 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+};
 
 function Cases() {
   const { cdrData } = useContext(CDRContext);
@@ -17,9 +24,7 @@ function Cases() {
     let contact = row[3];
     if (!contact) return;
     contact = contact.replace(/'/g, "").trim();
-
     if (!/^\d{5,15}$/.test(contact)) return;
-
     contactCounts[contact] = (contactCounts[contact] || 0) + 1;
   });
 
@@ -41,166 +46,164 @@ function Cases() {
   )[0] || ["Unknown", 0];
 
   let riskLevel = "Low";
-  let riskColor = "var(--success)";
-  let riskBg = "var(--success-glow)";
+  let riskColor = "#2d8a5e";
+  let riskBg = "rgba(45, 138, 94, 0.1)";
 
   if (totalRecords > 500) {
     riskLevel = "Critical";
-    riskColor = "var(--danger)";
-    riskBg = "var(--danger-glow)";
+    riskColor = "#c93c3c";
+    riskBg = "rgba(201, 60, 60, 0.1)";
   } else if (totalRecords > 200) {
     riskLevel = "Suspicious";
-    riskColor = "var(--warning)";
-    riskBg = "var(--warning-glow)";
+    riskColor = "#c18833";
+    riskBg = "rgba(193, 136, 51, 0.1)";
   }
 
+  const dossierFields = [
+    {
+      label: "Target Suspect Number",
+      value: targetNumber,
+      mono: true,
+      color: "#3b5fab",
+    },
+    { label: "Total Event Footprints", value: `${totalRecords} events` },
+    { label: "Associated Contacts", value: `${uniqueContacts} unique nodes` },
+    { label: "Associated Cell Towers", value: `${uniqueTowers} towers` },
+    {
+      label: "Primary Connected Node",
+      value: topContact[0],
+      sub: `(${topContact[1]} interactions)`,
+      mono: true,
+    },
+    {
+      label: "Primary Active Cell Tower",
+      value: topTower[0],
+      sub: `(${topTower[1]} events)`,
+      mono: true,
+    },
+  ];
+
   return (
-    <div style={{ maxWidth: "1200px", width: "100%", margin: "0 auto", paddingBottom: "40px" }}>
+    <motion.div
+      className="mx-auto w-full max-w-[1200px] pb-10"
+      initial="initial"
+      animate="animate"
+    >
       {/* Header */}
-      <div style={{ marginBottom: "35px" }}>
-        <h1
-          style={{
-            fontSize: "32px",
-            fontWeight: "700",
-            fontFamily: "var(--font-heading)",
-            marginBottom: "8px",
-          }}
-        >
+      <motion.div variants={fadeUp} className="mb-8">
+        <h1 className="mb-1 text-[30px] font-bold text-text">
           Investigation Cases
         </h1>
-        <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
-          Automated case dossiers compiled from uploaded telecom records and cell telemetry indicators.
+        <p className="text-sm text-text-muted">
+          Automated case dossiers compiled from uploaded telecom records and cell
+          telemetry indicators.
         </p>
-      </div>
+      </motion.div>
 
-      {/* Empty State */}
       {records.length === 0 ? (
-        <div className="glass-card" style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>
-          No active cases. Please ingest a telecom dataset in the Upload Center to initialize a case dossier.
+        <div className="glass-card p-10 text-center text-text-muted">
+          No active cases. Please ingest a telecom dataset in the Upload Center
+          to initialize a case dossier.
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "25px", alignItems: "start" }}>
-          {/* Dossier details card */}
-          <div className="glass-card" style={{ padding: "30px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px" }}>
+        <div
+          className="grid items-start gap-6"
+          style={{ gridTemplateColumns: "1.5fr 1fr" }}
+        >
+          {/* Dossier Card */}
+          <motion.div variants={fadeUp} className="glass-card overflow-hidden">
+            {/* Gold header bar */}
+            <div
+              className="flex items-center justify-between px-7 py-4"
+              style={{
+                background:
+                  "linear-gradient(90deg, rgba(193, 136, 51, 0.12), rgba(193, 136, 51, 0.03))",
+                borderBottom: "1px solid rgba(193, 136, 51, 0.15)",
+              }}
+            >
               <div>
-                <h2 style={{ fontSize: "20px", fontWeight: "700", fontFamily: "var(--font-heading)", color: "var(--text-main)" }}>
+                <h2 className="flex items-center gap-2 text-lg font-bold text-text">
+                  <FileSearch size={18} color="#c18833" />
                   CASE-001 / Target Dossier
                 </h2>
-                <span style={{ fontSize: "12px", color: "var(--text-subtle)", fontWeight: "500" }}>
+                <span className="text-[11px] font-medium text-text-subtle">
                   Initialized automatically on data ingestion
                 </span>
               </div>
               <span
+                className="rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase"
                 style={{
-                  display: "inline-block",
-                  padding: "6px 14px",
-                  borderRadius: "20px",
-                  fontSize: "11px",
-                  fontWeight: "700",
-                  textTransform: "uppercase",
                   backgroundColor: riskBg,
                   color: riskColor,
-                  border: `1px solid ${riskColor}33`,
+                  border: `1px solid ${riskColor}30`,
                 }}
               >
                 {riskLevel} Threat
               </span>
             </div>
 
-            <div className="custom-table-container">
-              <table className="custom-table">
+            <div className="p-7">
+              <table className="ct-table">
                 <tbody>
-                  <tr>
-                    <td style={{ fontWeight: "600", color: "var(--text-muted)", width: "30%" }}>Target Suspect Number</td>
-                    <td style={{ fontFamily: "monospace", fontSize: "14px", color: "var(--accent-cyan)", fontWeight: "600" }}>
-                      {targetNumber}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: "600", color: "var(--text-muted)" }}>Total Event Footprints</td>
-                    <td style={{ fontWeight: "700" }}>{totalRecords} events</td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: "600", color: "var(--text-muted)" }}>Associated Contacts</td>
-                    <td>{uniqueContacts} unique nodes</td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: "600", color: "var(--text-muted)" }}>Associated Cell Towers</td>
-                    <td>{uniqueTowers} towers</td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: "600", color: "var(--text-muted)" }}>Primary Connected Node</td>
-                    <td style={{ fontFamily: "monospace", color: "var(--text-main)" }}>
-                      {topContact[0]} <span style={{ color: "var(--text-subtle)", fontWeight: "500" }}>({topContact[1]} interactions)</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: "600", color: "var(--text-muted)" }}>Primary Active Cell Tower</td>
-                    <td style={{ fontFamily: "monospace", color: "var(--text-main)", fontSize: "13px" }}>
-                      {topTower[0]} <span style={{ color: "var(--text-subtle)", fontWeight: "500" }}>({topTower[1]} events)</span>
-                    </td>
-                  </tr>
+                  {dossierFields.map((field, idx) => (
+                    <tr key={idx}>
+                      <td className="w-[35%] font-semibold text-text-muted">
+                        {field.label}
+                      </td>
+                      <td>
+                        <span
+                          className={
+                            field.mono
+                              ? "font-mono text-[13px] font-bold"
+                              : "font-semibold text-text"
+                          }
+                          style={field.color ? { color: field.color } : undefined}
+                        >
+                          {field.value}
+                        </span>
+                        {field.sub && (
+                          <span className="ml-2 text-xs text-text-subtle">
+                            {field.sub}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Side panel for annotations */}
-          <div className="glass-card" style={{ padding: "24px" }}>
-            <h3 style={{ fontSize: "16px", fontWeight: "600", fontFamily: "var(--font-heading)", marginBottom: "15px" }}>
+          {/* Annotations Panel */}
+          <motion.div variants={fadeUp} className="glass-card p-6">
+            <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-text">
+              <Crosshair size={16} color="#3b5fab" />
               Investigator Annotations
             </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+            <div className="flex flex-col gap-4">
               <textarea
+                id="case-annotations"
                 placeholder="Enter investigation logs, subject aliases, or physical address annotations..."
-                rows="6"
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  borderRadius: "10px",
-                  border: "1px solid var(--border-main)",
-                  outline: "none",
-                  backgroundColor: "rgba(6, 8, 19, 0.4)",
-                  color: "var(--text-main)",
-                  fontSize: "13px",
-                  resize: "none",
-                  fontFamily: "var(--font-sans)",
-                }}
-                onFocus={(e) => (e.target.style.borderColor = "var(--primary)")}
-                onBlur={(e) => (e.target.style.borderColor = "var(--border-main)")}
+                rows="7"
+                className="w-full resize-none rounded-xl border border-border bg-dark/60 p-3.5 text-[13px] text-text outline-none transition-colors focus:border-accent"
+                style={{ fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
               />
               <button
+                id="save-dossier"
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[13px] font-bold text-white transition-all hover:brightness-110"
                 style={{
-                  backgroundColor: "var(--primary)",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 16px",
-                  borderRadius: "8px",
-                  fontWeight: "600",
-                  fontSize: "13px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px",
+                  backgroundColor: "#3b5fab",
+                  boxShadow: "0 4px 15px rgba(59, 95, 171, 0.3)",
                 }}
-                onMouseOver={(e) => (e.target.style.filter = "brightness(1.1)")}
-                onMouseOut={(e) => (e.target.style.filter = "none")}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                  <polyline points="17 21 17 13 7 13 7 21" />
-                  <polyline points="7 3 7 8 15 8" />
-                </svg>
+                <Save size={14} />
                 Save Dossier Logs
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 

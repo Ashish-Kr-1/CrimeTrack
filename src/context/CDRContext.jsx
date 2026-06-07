@@ -46,12 +46,320 @@ const parseDateTime = (dateStr, timeStr) => {
   return isNaN(d.getTime()) ? null : d;
 };
 
+const parseCoords = (latLongStr) => {
+  if (!latLongStr || latLongStr === "-") return null;
+  const parts = latLongStr.split("/");
+  if (parts.length === 2) {
+    const lat = parseFloat(parts[0]);
+    const lng = parseFloat(parts[1]);
+    if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+      return [lat, lng];
+    }
+  }
+  return null;
+};
+
+const generateBehavioralNarrative = (target, features, circles, start, end) => {
+  let narrative = `Target SIM ${target} was operational over an active period of ${features.active_days} days (from ${start || "N/A"} to ${end || "N/A"}), generating a total of ${features.total_records} activity records. `;
+  
+  narrative += `The device telemetry revealed a footprint of ${features.unique_imei_count} distinct hardware device identifiers (IMEIs). This represents a device swap rate of ${features.device_swaps_per_month.toFixed(1)} swaps/month. Coordinated hardware transitions of this frequency are highly indicative of structured attempts to bypass terminal-based blacklisting and geo-fencing systems. `;
+
+  if (features.bank_sender_count >= 5) {
+    narrative += `A critical telemetry alert was triggered due to bank aggregation: the SIM card received SMS alerts and notifications from ${features.bank_sender_count} separate financial entities. In high-security investigations, a single prepaid subscriber holding 5 or more distinct active bank accounts on one SIM is a hallmark of financial mule accounts. `;
+  } else if (features.bank_sender_count > 0) {
+    narrative += `The SIM registered active banking notifications from ${features.bank_sender_count} distinct financial institutions. `;
+  }
+
+  if (features.upi_burst_sms_count > 0) {
+    narrative += `Furthermore, the system logged ${features.upi_burst_sms_count} outgoing SMS transactions to UPI registration gateway short-codes. This signature indicates batch activation of UPI apps (GPay, PhonePe, Paytm) to bind bank accounts on a newly swapped device terminal. `;
+  }
+
+  if (features.voice_silence_fraction_pct > 80) {
+    narrative += `Social footprint analysis detected total voice call cessation (voice-silent fraction: ${features.voice_silence_fraction_pct.toFixed(1)}%). The SIM card ceased voice activity after an initial "warming" phase, transitioning into an exclusive receiver for incoming text notifications and verification codes. `;
+  }
+
+  if (features.personal_contact_count <= 2) {
+    narrative += `The subscriber's personal network footprint was extremely sparse, listing only ${features.personal_contact_count} personal communication partners, confirming a near-zero social footprint. This represents an inorganic, transaction-only profile rather than retail usage. `;
+  } else {
+    narrative += `The subscriber maintained regular communication with a social circle of ${features.personal_contact_count} contacts. `;
+  }
+
+  if (features.high_risk_circle_ratio_pct > 0) {
+    narrative += `Geospatial logs place the target in active roaming circles, with ${features.high_risk_circle_ratio_pct.toFixed(1)}% of all telemetric events originating from circles historically flagged as cyber-fraud operational circles (e.g. Bihar/Jharkhand). `;
+  } else {
+    narrative += `Activity was mapped entirely within standard nominal circles. `;
+  }
+
+  return narrative;
+};
+
+const generateRecommendations = (target, features, classification) => {
+  const recs = [];
+  let id = 1;
+
+  if (classification === "HIGHLY_SUSPECT_FINANCIAL_MULE") {
+    recs.push({
+      id: id++,
+      title: "Initiate Urgent Financial Freeze",
+      description: `Notify the bank fraud departments (associated with ${features.bank_sender_count} identified bank codes) under Section 91 CrPC to freeze all UPI handles and bank accounts linked with SIM ${target}.`,
+      urgency: "CRITICAL",
+      category: "FINANCIAL",
+      action: "Freeze Accounts"
+    });
+  }
+
+  if (features.unique_imei_count >= 4) {
+    recs.push({
+      id: id++,
+      title: "CEIR Hardware Blocklist",
+      description: `Submit the ${features.unique_imei_count} suspected IMEIs to the Central Equipment Identity Register (CEIR) database to block the physical handsets from registering on national networks.`,
+      urgency: "HIGH",
+      category: "HARDWARE",
+      action: "Block IMEIs"
+    });
+    recs.push({
+      id: id++,
+      title: "IMEI History Analysis",
+      description: `Request TSPs to supply CDRs for all other SIM cards that have historically registered on the primary IMEIs detected in this case. This will reveal the wider network of operators.`,
+      urgency: "HIGH",
+      category: "LINKED_CASES",
+      action: "Trace Handsets"
+    });
+  }
+
+  if (features.upi_burst_sms_count > 0) {
+    recs.push({
+      id: id++,
+      title: "UPI Gateway Audit",
+      description: `Requisition transaction records from NPCI (National Payments Corporation of India) for UPI bindings initiated from this MSISDN to extract IP addresses, device signatures, and destination account transfers.`,
+      urgency: "HIGH",
+      category: "TRANSACTIONAL",
+      action: "Request NPCI Logs"
+    });
+  }
+
+  if (features.high_risk_circle_ratio_pct > 0) {
+    recs.push({
+      id: id++,
+      title: "Locational Surveillance Overlap",
+      description: `Cross-reference tower logs (CGI coordinates) in Bihar/Jharkhand circle during peak active hours. Request local field intelligence to investigate specific cell coverage nodes.`,
+      urgency: "MEDIUM",
+      category: "GEOSPATIAL",
+      action: "CGI Audit"
+    });
+  }
+
+  if (features.personal_contact_count > 0) {
+    recs.push({
+      id: id++,
+      title: "Associate Interrogation",
+      description: `Subpoena call records and investigate the top ${Math.min(3, features.personal_contact_count)} personal contacts. Key associate nodes showing frequent voice calls represent potential co-conspirators.`,
+      urgency: "MEDIUM",
+      category: "SOCIAL",
+      action: "Summon Associates"
+    });
+  }
+
+  if (recs.length === 0) {
+    recs.push({
+      id: id++,
+      title: "Standard Monitoring",
+      description: "Maintain baseline watch on the target MSISDN. Run re-evaluation in 14 days to check for new cell tower hops or IMSI changes.",
+      urgency: "LOW",
+      category: "MONITORING",
+      action: "Set Alert"
+    });
+  }
+
+  return recs;
+};
+
+const generateRelationshipGraphData = (targetNum, records, topContacts, topCGIs) => {
+  const nodes = [
+    { id: targetNum, label: targetNum, type: "target", val: 24, info: "Suspect SIM Target" }
+  ];
+  const links = [];
+  const addedNodes = new Set([targetNum]);
+
+  // Unique IMEIs
+  const uniqueImeis = new Set();
+  records.forEach(r => {
+    if (r.IMEI && r.IMEI !== "-" && r.IMEI !== "Unknown") {
+      uniqueImeis.add(r.IMEI);
+    }
+  });
+  uniqueImeis.forEach(imei => {
+    const id = `IMEI:${imei}`;
+    if (!addedNodes.has(id)) {
+      nodes.push({
+        id,
+        label: `IMEI: ${imei.slice(-6)}`,
+        type: "imei",
+        val: 16,
+        info: `Handset ID: ${imei}`
+      });
+      addedNodes.add(id);
+    }
+    links.push({
+      source: targetNum,
+      target: id,
+      type: "hardware",
+      label: "Used Hardware"
+    });
+  });
+
+  // Unique Banks
+  const detectedBanks = new Set();
+  records.forEach(r => {
+    const bp = r["B Party No"];
+    if (bp) {
+      BANK_KEYWORDS.forEach(kw => {
+        if (bp.toUpperCase().includes(kw)) {
+          detectedBanks.add(kw);
+        }
+      });
+    }
+  });
+  detectedBanks.forEach(bank => {
+    const id = `BANK:${bank}`;
+    if (!addedNodes.has(id)) {
+      nodes.push({
+        id,
+        label: bank,
+        type: "bank",
+        val: 18,
+        info: `Financial Institution: ${bank}`
+      });
+      addedNodes.add(id);
+    }
+    links.push({
+      source: targetNum,
+      target: id,
+      type: "financial",
+      label: "Receives Alerts"
+    });
+  });
+
+  // Top contacts
+  topContacts.forEach(([contact, count]) => {
+    const id = `CONTACT:${contact}`;
+    const isUpi = UPI_GATEWAY_NUMBERS.has(contact);
+    const isBank = BANK_KEYWORDS.some(kw => contact.toUpperCase().includes(kw));
+    if (isUpi || isBank) return;
+
+    if (!addedNodes.has(id)) {
+      nodes.push({
+        id,
+        label: contact.slice(-4),
+        type: "contact",
+        val: 14,
+        info: `Associate Node: ${contact}`
+      });
+      addedNodes.add(id);
+    }
+    links.push({
+      source: targetNum,
+      target: id,
+      type: "associate",
+      label: `${count} Interactions`
+    });
+  });
+
+  // Top locations
+  topCGIs.forEach(([cgi, count]) => {
+    const id = `CGI:${cgi}`;
+    if (!addedNodes.has(id)) {
+      nodes.push({
+        id,
+        label: cgi.slice(-6),
+        type: "location",
+        val: 12,
+        info: `Cell Tower: ${cgi}`
+      });
+      addedNodes.add(id);
+    }
+    links.push({
+      source: targetNum,
+      target: id,
+      type: "geospatial",
+      label: `${count} Hops`
+    });
+  });
+
+  return { nodes, links };
+};
+
+const generateReplayEvents = (records) => {
+  const events = [];
+  
+  records.forEach((rec, idx) => {
+    const dateStr = rec["Date"];
+    const timeStr = rec["Time"];
+    const bParty = rec["B Party No"] || "Unknown";
+    const callType = rec["Call Type"] || "Unknown";
+    const service = rec["Service Type"] || "Unknown";
+    const imei = rec["IMEI"] || "Unknown";
+    const cgi = rec["First CGI"] || "Unknown";
+    const latLong = rec["First CGI Lat/Long"];
+    const roam = rec["Roam Nw"] || "Unknown";
+
+    const dt = parseDateTime(dateStr, timeStr);
+    if (!dt) return;
+
+    let type = "SMS";
+    let details = "";
+    let isAnomaly = false;
+
+    const isUpi = UPI_GATEWAY_NUMBERS.has(bParty);
+    const isBank = BANK_KEYWORDS.some(kw => bParty.toUpperCase().includes(kw));
+
+    if (isUpi) {
+      type = "UPI_REG";
+      details = `Outgoing SMS to UPI Verification Gateway: ${bParty}`;
+      isAnomaly = true;
+    } else if (isBank) {
+      type = "FINANCIAL";
+      details = `Incoming Financial Notification (Sender: ${bParty})`;
+      isAnomaly = true;
+    } else if (callType === "IN" || callType === "OUT" || service === "Voice") {
+      type = "VOICE";
+      details = `${callType === "IN" ? "Incoming" : "Outgoing"} voice call with B-Party: ${bParty} (${rec["Dur(s)"]}s)`;
+    } else {
+      type = "SMS";
+      details = `${callType === "SMT" ? "Incoming" : "Outgoing"} SMS from/to B-Party: ${bParty}`;
+    }
+
+    const prevRec = idx > 0 ? records[idx - 1] : null;
+    if (prevRec && prevRec.IMEI && rec.IMEI && prevRec.IMEI !== rec.IMEI) {
+      isAnomaly = true;
+      details += ` [DEVICE SWAP: Handset changed from ${prevRec.IMEI} to ${rec.IMEI}]`;
+    }
+
+    events.push({
+      id: idx + 1,
+      timestamp: dt,
+      timeLabel: `${dateStr} ${timeStr}`,
+      type,
+      direction: (callType === "IN" || callType === "SMT") ? "INCOMING" : "OUTGOING",
+      bParty,
+      cgi,
+      coordinates: parseCoords(latLong),
+      imei,
+      roam,
+      details,
+      isAnomaly
+    });
+  });
+
+  events.sort((a, b) => a.timestamp - b.timestamp);
+  return events;
+};
+
 export function CDRProvider({ children }) {
   const [cdrData, setCdrData] = useState([]);
   const [diagnosticReport, setDiagnosticReport] = useState(null);
 
   const processCDRData = (rows) => {
-    // rows includes header row at index 0, so records start from index 1
     if (!rows || rows.length <= 1) {
       setDiagnosticReport(null);
       return;
@@ -107,7 +415,6 @@ export function CDRProvider({ children }) {
       const dateStr = rec["Date"];
       const timeStr = rec["Time"];
       
-      // Update simple counters
       if (callType) callTypes[callType] = (callTypes[callType] || 0) + 1;
       if (svcType) serviceTypes[svcType] = (serviceTypes[svcType] || 0) + 1;
       if (imei) imeis[imei] = (imeis[imei] || 0) + 1;
@@ -126,7 +433,6 @@ export function CDRProvider({ children }) {
         bPartyTypes[bParty][callType] = (bPartyTypes[bParty][callType] || 0) + 1;
       }
 
-      // Parse dates
       const dt = parseDateTime(dateStr, timeStr);
       if (dt) {
         if (!minDate || dt < minDate) minDate = dt;
@@ -151,10 +457,8 @@ export function CDRProvider({ children }) {
       }
     });
 
-    // Sort device timeline
     deviceTimeline.sort((a, b) => a.timestamp - b.timestamp);
 
-    // Group timeline into device usage intervals (operational phases)
     const deviceIntervals = [];
     if (deviceTimeline.length > 0) {
       let currentInterval = {
@@ -184,7 +488,6 @@ export function CDRProvider({ children }) {
       deviceIntervals.push(currentInterval);
     }
 
-    // Convert dates to display strings
     const formatDate = (d) => {
       if (!d) return null;
       const yr = d.getFullYear();
@@ -196,7 +499,6 @@ export function CDRProvider({ children }) {
       return `${yr}-${mo}-${dy} ${hr}:${mi}:${sc}`;
     };
 
-    // Calculate active days
     let activeDays = 1;
     if (minDate && maxDate) {
       const diffMs = maxDate - minDate;
@@ -216,7 +518,6 @@ export function CDRProvider({ children }) {
     features.unique_imei_count = numImeis;
     features.device_swap_frequency = numImeis / (activeDays / 30.0);
 
-    // Financial Features
     const bankSenders = new Set();
     let upiBurstCount = 0;
     const outgoingPersonalContacts = new Set();
@@ -233,7 +534,6 @@ export function CDRProvider({ children }) {
         upiBurstCount += (types["SMO"] || 0);
       }
       if (!isBank && !isUpi) {
-        // Real personal number (10-digit)
         if (/^\d{10}$/.test(num)) {
           outgoingPersonalContacts.add(num);
         }
@@ -247,7 +547,6 @@ export function CDRProvider({ children }) {
     const totalUniqueContacts = Object.keys(bParties).length;
     features.bank_sender_ratio = totalUniqueContacts ? bankSenders.size / totalUniqueContacts : 0;
 
-    // Voice Cessation
     features.voice_silence_fraction = 0.0;
     if (lastVoiceDate && minDate && maxDate) {
       const silenceMs = maxDate - lastVoiceDate;
@@ -257,7 +556,6 @@ export function CDRProvider({ children }) {
       features.voice_silence_fraction = 1.0;
     }
 
-    // High risk circles
     let riskCircleEvents = 0;
     Object.keys(roamingNetworks).forEach((k) => {
       if (HIGH_RISK_CIRCLES.has(k)) {
@@ -340,7 +638,6 @@ export function CDRProvider({ children }) {
       }
     });
 
-    // Classification
     let classification = "NORMAL_USER";
     let confidence = "LOW";
     if (score >= 100) {
@@ -357,7 +654,6 @@ export function CDRProvider({ children }) {
     const maxPoints = rules.reduce((sum, r) => sum + r.points, 0);
     const suspicionNormalized = Math.round((Math.min(score / maxPoints, 1.0)) * 10000) / 10000;
 
-    // Build operational phase display items
     const phaseMap = {
       0: "Testing / Line Warm-up Phase",
       1: "Device Handoff / Transit Phase",
@@ -373,6 +669,54 @@ export function CDRProvider({ children }) {
       event_count: interval.count
     }));
 
+    // Calculate features as percentage numbers for easy display
+    const fVector = {
+      total_records: totalRecords,
+      active_days: features.active_days,
+      sms_ratio_pct: Math.round(features.sms_ratio * 10000) / 100,
+      voice_ratio_pct: Math.round(features.voice_ratio * 10000) / 100,
+      bank_sender_count: features.bank_sender_count,
+      bank_sender_ratio_pct: Math.round(features.bank_sender_ratio * 10000) / 100,
+      unique_imei_count: features.unique_imei_count,
+      device_swaps_per_month: Math.round(features.device_swap_frequency * 100) / 100,
+      upi_burst_sms_count: features.upi_burst_sms_count,
+      personal_contact_count: features.personal_contact_count,
+      voice_silence_fraction_pct: Math.round(features.voice_silence_fraction * 10000) / 100,
+      active_circles: Object.keys(roamingNetworks),
+      high_risk_circle_ratio_pct: Math.round(features.high_risk_circle_ratio * 10000) / 100
+    };
+
+    const topContacts = Object.entries(bParties)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 15);
+
+    const topCGIs = Object.entries(cgiCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10);
+
+    const behavioralNarrative = generateBehavioralNarrative(
+      targetNum,
+      fVector,
+      fVector.active_circles,
+      formatDate(minDate),
+      formatDate(maxDate)
+    );
+
+    const recommendations = generateRecommendations(
+      targetNum,
+      fVector,
+      classification
+    );
+
+    const relationshipGraph = generateRelationshipGraphData(
+      targetNum,
+      records,
+      topContacts,
+      topCGIs
+    );
+
+    const replayEvents = generateReplayEvents(records);
+
     const report = {
       target_phone: targetNum,
       active_period: {
@@ -385,27 +729,18 @@ export function CDRProvider({ children }) {
       suspicion_score: suspicionNormalized,
       raw_heuristic_score: score,
       max_possible_score: maxPoints,
-      feature_vector: {
-        total_records: totalRecords,
-        sms_ratio_pct: Math.round(features.sms_ratio * 10000) / 100,
-        voice_ratio_pct: Math.round(features.voice_ratio * 10000) / 100,
-        bank_sender_count: features.bank_sender_count,
-        bank_sender_ratio_pct: Math.round(features.bank_sender_ratio * 10000) / 100,
-        unique_imei_count: features.unique_imei_count,
-        device_swaps_per_month: Math.round(features.device_swap_frequency * 100) / 100,
-        upi_burst_sms_count: features.upi_burst_sms_count,
-        personal_contact_count: features.personal_contact_count,
-        voice_silence_fraction_pct: Math.round(features.voice_silence_fraction * 10000) / 100,
-        active_circles: Object.keys(roamingNetworks),
-        high_risk_circle_ratio_pct: Math.round(features.high_risk_circle_ratio * 10000) / 100
-      },
+      feature_vector: fVector,
       triggered_indicators: triggeredRules,
       operational_phases: phases,
       risk_summary: {
         red_flags_count: triggeredRules.filter(r => r.severity === "CRITICAL").length,
         yellow_flags_count: triggeredRules.filter(r => r.severity !== "CRITICAL").length,
         recommended_action: classification === "HIGHLY_SUSPECT_FINANCIAL_MULE" ? "REFER TO LEO / FREEZE ACCOUNTS" : "MONITOR AND RE-EVALUATE"
-      }
+      },
+      behavioral_narrative: behavioralNarrative,
+      automated_recommendations: recommendations,
+      relationship_graph: relationshipGraph,
+      replay_events: replayEvents
     };
 
     setDiagnosticReport(report);

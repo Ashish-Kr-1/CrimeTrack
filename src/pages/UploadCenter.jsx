@@ -1,8 +1,16 @@
 import { useState, useContext } from "react";
 import { CDRContext } from "../context/CDRContext";
+import { motion } from "framer-motion";
+import { UploadCloud, FileText, CheckCircle2, Loader, Shield } from "lucide-react";
+
+const fadeUp = {
+  initial: { opacity: 0, y: 14 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+};
 
 function UploadCenter() {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   const { setCdrData } = useContext(CDRContext);
 
   const [uploads, setUploads] = useState([
@@ -26,10 +34,8 @@ function UploadCenter() {
     },
   ]);
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
+  const processFile = (file) => {
     if (!file) return;
-
     setSelectedFile(file);
 
     const now = new Date();
@@ -51,139 +57,136 @@ function UploadCenter() {
       const rows = text
         .split("\n")
         .map((row) => row.split(","))
-        .filter(row => row.length > 1);
+        .filter((row) => row.length > 1);
 
-      // Simple detection of titles
-      // Check if first line contains column headers or meta titles
       let dataStartIdx = 0;
       for (let i = 0; i < Math.min(10, rows.length); i++) {
-        if (rows[i].some(cell => cell.includes("Target No") || cell.includes("B Party No") || cell.includes("Call Type"))) {
+        if (
+          rows[i].some(
+            (cell) =>
+              cell.includes("Target No") ||
+              cell.includes("B Party No") ||
+              cell.includes("Call Type")
+          )
+        ) {
           dataStartIdx = i;
           break;
         }
       }
-      
+
       const actualData = rows.slice(dataStartIdx);
       setCdrData(actualData);
     };
     reader.readAsText(file);
   };
 
+  const handleFileUpload = (e) => {
+    processFile(e.target.files[0]);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    processFile(file);
+  };
+
   return (
-    <div style={{ maxWidth: "1200px", width: "100%", margin: "0 auto" }}>
+    <motion.div
+      className="mx-auto w-full max-w-[1200px]"
+      initial="initial"
+      animate="animate"
+    >
       {/* Header */}
-      <div style={{ marginBottom: "35px" }}>
-        <h1
-          style={{
-            fontSize: "32px",
-            fontWeight: "700",
-            fontFamily: "var(--font-heading)",
-            marginBottom: "8px",
-          }}
-        >
+      <motion.div variants={fadeUp} className="mb-8">
+        <h1 className="mb-1 text-[30px] font-bold text-text">
           Data Ingestion & Upload Center
         </h1>
-        <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
-          Load raw Call Detail Records (CDR) and cell tower telemetry logs to generate automated heuristics reports.
+        <p className="text-sm text-text-muted">
+          Load raw Call Detail Records (CDR) and cell tower telemetry logs to
+          generate automated heuristics reports.
         </p>
-      </div>
+      </motion.div>
 
       {/* Upload Zone */}
-      <div
-        className="glass-card"
+      <motion.div
+        variants={fadeUp}
+        className="glass-card relative mb-8 cursor-pointer overflow-hidden"
         style={{
-          border: "2px dashed var(--border-hover)",
-          padding: "50px 30px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          cursor: "pointer",
-          backgroundColor: "rgba(12, 16, 32, 0.4)",
-          marginBottom: "35px",
+          border: isDragging
+            ? "2px solid #3b5fab"
+            : "2px dashed rgba(30, 46, 82, 0.7)",
+          boxShadow: isDragging
+            ? "0 0 30px rgba(59, 95, 171, 0.15)"
+            : undefined,
         }}
         onClick={() => document.getElementById("fileInput").click()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={handleDrop}
       >
-        <div
-          style={{
-            width: "60px",
-            height: "60px",
-            borderRadius: "50%",
-            backgroundColor: "rgba(59, 130, 246, 0.08)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: "20px",
-            border: "1px solid rgba(59, 130, 246, 0.2)",
-          }}
-        >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="17 8 12 3 7 8" />
-            <line x1="12" y1="3" x2="12" y2="15" />
-          </svg>
-        </div>
+        {/* Scan line */}
+        <div className="scan-overlay pointer-events-none absolute inset-0" />
 
-        <h3 style={{ fontSize: "18px", fontWeight: "600", marginBottom: "8px" }}>
-          Drag & drop raw file here, or <span style={{ color: "var(--primary)" }}>browse files</span>
-        </h3>
-        <p style={{ color: "var(--text-subtle)", fontSize: "13px", marginBottom: "0" }}>
-          Supported file formats: **CSV**, **XLSX**, or **TXT** (Airtel CDR standard layouts)
-        </p>
-
-        <input
-          type="file"
-          id="fileInput"
-          style={{ display: "none" }}
-          onChange={handleFileUpload}
-          accept=".csv,.xlsx,.txt"
-        />
-
-        {selectedFile && (
-          <div
+        <div className="flex flex-col items-center justify-center px-8 py-14">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border"
             style={{
-              marginTop: "20px",
-              backgroundColor: "rgba(16, 185, 129, 0.08)",
-              border: "1px solid rgba(16, 185, 129, 0.2)",
-              padding: "8px 16px",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              color: "var(--success)",
-              fontSize: "13px",
-              fontWeight: "600",
+              backgroundColor: "rgba(59, 95, 171, 0.08)",
+              borderColor: "rgba(59, 95, 171, 0.2)",
             }}
           >
-            <span
+            <UploadCloud size={30} color="#3b5fab" strokeWidth={1.8} />
+          </motion.div>
+
+          <h3 className="mb-2 text-lg font-bold text-text">
+            Drag & drop raw file here, or{" "}
+            <span className="text-accent">browse files</span>
+          </h3>
+          <p className="text-[13px] text-text-subtle">
+            Supported file formats: CSV, XLSX, or TXT (Airtel CDR standard
+            layouts)
+          </p>
+
+          <input
+            type="file"
+            id="fileInput"
+            className="hidden"
+            onChange={handleFileUpload}
+            accept=".csv,.xlsx,.txt"
+          />
+
+          {selectedFile && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-5 flex items-center gap-2 rounded-lg border px-4 py-2 text-[13px] font-semibold"
               style={{
-                display: "inline-block",
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%",
-                backgroundColor: "var(--success)",
+                backgroundColor: "rgba(45, 138, 94, 0.08)",
+                borderColor: "rgba(45, 138, 94, 0.2)",
+                color: "#2d8a5e",
               }}
-            />
-            Loaded: {selectedFile.name}
-          </div>
-        )}
-      </div>
+            >
+              <CheckCircle2 size={14} />
+              Loaded: {selectedFile.name}
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
 
       {/* Recent Uploads Table */}
-      <div className="glass-card" style={{ padding: "24px" }}>
-        <h2
-          style={{
-            fontSize: "18px",
-            fontWeight: "600",
-            fontFamily: "var(--font-heading)",
-            marginBottom: "20px",
-          }}
-        >
+      <motion.div variants={fadeUp} className="glass-card p-6">
+        <h2 className="mb-5 flex items-center gap-2 text-lg font-bold text-text">
+          <Shield size={18} color="#3b5fab" />
           Recent Audited Uploads
         </h2>
 
-        <div className="custom-table-container">
-          <table className="custom-table">
+        <div className="overflow-x-auto">
+          <table className="ct-table">
             <thead>
               <tr>
                 <th>File Name</th>
@@ -193,42 +196,45 @@ function UploadCenter() {
               </tr>
             </thead>
             <tbody>
-              {uploads.map((file, index) => (
-                <tr key={index}>
-                  <td style={{ fontWeight: "600", color: "var(--text-main)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-subtle)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                      </svg>
-                      {file.fileName}
-                    </div>
-                  </td>
-                  <td style={{ color: "var(--text-muted)" }}>{file.type}</td>
-                  <td style={{ color: "var(--text-muted)" }}>{file.date}</td>
-                  <td>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        padding: "4px 10px",
-                        borderRadius: "20px",
-                        fontSize: "11px",
-                        fontWeight: "700",
-                        backgroundColor: file.status === "Completed" ? "var(--success-glow)" : "var(--warning-glow)",
-                        color: file.status === "Completed" ? "var(--success)" : "var(--warning)",
-                        border: `1px solid ${file.status === "Completed" ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)"}`,
-                      }}
-                    >
-                      {file.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {uploads.map((file, idx) => {
+                const isComplete = file.status === "Completed";
+                return (
+                  <tr key={idx}>
+                    <td className="font-semibold text-text">
+                      <div className="flex items-center gap-2.5">
+                        <FileText size={15} className="text-text-subtle" />
+                        {file.fileName}
+                      </div>
+                    </td>
+                    <td className="text-text-muted">{file.type}</td>
+                    <td className="text-text-muted">{file.date}</td>
+                    <td>
+                      <span
+                        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold"
+                        style={{
+                          backgroundColor: isComplete
+                            ? "rgba(45, 138, 94, 0.1)"
+                            : "rgba(193, 136, 51, 0.1)",
+                          color: isComplete ? "#2d8a5e" : "#c18833",
+                          border: `1px solid ${isComplete ? "rgba(45, 138, 94, 0.2)" : "rgba(193, 136, 51, 0.2)"}`,
+                        }}
+                      >
+                        {isComplete ? (
+                          <CheckCircle2 size={11} />
+                        ) : (
+                          <Loader size={11} className="animate-spin" />
+                        )}
+                        {file.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

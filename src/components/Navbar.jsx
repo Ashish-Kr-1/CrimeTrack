@@ -1,143 +1,104 @@
 import { useContext } from "react";
 import { CDRContext } from "../context/CDRContext";
+import { motion } from "framer-motion";
+import { Search, Bell, Crosshair, User, Menu } from "lucide-react";
 
-function Navbar() {
+function Navbar({ onToggleSidebar }) {
   const { diagnosticReport } = useContext(CDRContext);
 
   return (
     <div
-      style={{
-        height: "70px",
-        backgroundColor: "rgba(12, 16, 32, 0.6)",
-        border: "1px solid var(--border-main)",
-        borderRadius: "16px",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 24px",
-        marginBottom: "25px",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
-      }}
+      className="glass-card mb-6 flex h-[68px] items-center justify-between px-4 md:px-6 gap-4"
+      style={{ borderRadius: "14px" }}
     >
-      {/* Search Input Container */}
-      <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-        <svg
-          style={{ position: "absolute", left: "14px", color: "var(--text-subtle)" }}
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      {/* Left section: Hamburger Menu and Search */}
+      <div className="flex items-center gap-3 flex-1 lg:flex-none">
+        <button
+          onClick={onToggleSidebar}
+          className="rounded-lg border border-border p-2 text-text-muted hover:text-accent hover:border-border-hover lg:hidden"
         >
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-        <input
-          type="text"
-          placeholder="Search phone numbers, cells, IMEIs..."
-          style={{
-            width: "380px",
-            padding: "10px 16px 10px 40px",
-            borderRadius: "12px",
-            border: "1px solid var(--border-main)",
-            outline: "none",
-            backgroundColor: "rgba(6, 8, 19, 0.4)",
-            color: "var(--text-main)",
-            fontSize: "13px",
-            fontWeight: "500",
-            transition: "all 0.2s ease",
-            fontFamily: "var(--font-sans)",
-          }}
-          onFocus={(e) => (e.target.style.borderColor = "var(--primary)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--border-main)")}
-        />
-        <span
-          style={{
-            position: "absolute",
-            right: "12px",
-            fontSize: "10px",
-            backgroundColor: "var(--bg-surface-elevated)",
-            padding: "2px 6px",
-            borderRadius: "4px",
-            color: "var(--text-subtle)",
-            fontWeight: "600",
-            border: "1px solid var(--border-main)",
-            pointerEvents: "none",
-          }}
-        >
-          ⌘K
-        </span>
+          <Menu size={15} />
+        </button>
+
+        <div className="relative flex items-center w-full max-w-[360px]">
+          <Search
+            size={15}
+            className="absolute left-3.5 text-text-subtle"
+            strokeWidth={2.5}
+          />
+          <input
+            id="nav-search"
+            type="text"
+            placeholder="Search phone numbers, cells, IMEIs..."
+            className="w-full rounded-xl border border-border bg-dark/60 px-4 py-2.5 pl-10 text-[13px] font-medium text-text outline-none transition-colors duration-200 placeholder:text-text-subtle focus:border-accent"
+          />
+          <span className="hidden md:inline absolute right-3 rounded border border-border bg-dark-elevated px-1.5 py-0.5 text-[10px] font-semibold text-text-subtle">
+            ⌘K
+          </span>
+        </div>
       </div>
 
-      {/* Target Subject Details & User badge */}
-      <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+      {/* Right section */}
+      <div className="flex items-center gap-2 md:gap-4 shrink-0">
+        {/* Notification bell */}
+        <button
+          id="nav-notifications"
+          className="relative rounded-lg border border-border p-2 text-text-muted transition-colors hover:border-border-hover hover:text-accent"
+        >
+          <Bell size={16} strokeWidth={2} />
+          {diagnosticReport && (
+            <span
+              className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold text-white"
+              style={{ backgroundColor: "#c18833" }}
+            >
+              {diagnosticReport.risk_summary.red_flags_count}
+            </span>
+          )}
+        </button>
+
+        {/* Active Target Badge */}
         {diagnosticReport && (
-          <div
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-bold"
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              backgroundColor: "rgba(239, 68, 68, 0.08)",
-              border: "1px solid rgba(239, 68, 68, 0.2)",
-              padding: "6px 14px",
-              borderRadius: "10px",
-              fontSize: "12px",
-              fontWeight: "600",
-              color: "var(--danger)",
-              fontFamily: "var(--font-heading)",
+              backgroundColor: "rgba(193, 136, 51, 0.1)",
+              borderColor: "rgba(193, 136, 51, 0.25)",
+              color: "#c18833",
             }}
           >
-            <span
-              style={{
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%",
-                backgroundColor: "var(--danger)",
-                boxShadow: "0 0 6px var(--danger)",
-                display: "inline-block",
-              }}
-            />
-            ACTIVE TARGET: {diagnosticReport.target_phone}
-          </div>
+            <Crosshair size={13} strokeWidth={2.5} className="hidden sm:inline" />
+            <span className="relative flex h-1.5 w-1.5">
+              <span
+                className="absolute inline-flex h-full w-full rounded-full opacity-75"
+                style={{
+                  backgroundColor: "#c18833",
+                  animation: "pulse-glow 2s ease-in-out infinite",
+                }}
+              />
+              <span
+                className="relative inline-flex h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: "#c18833" }}
+              />
+            </span>
+            <span className="font-mono">
+              <span className="hidden md:inline">TARGET: </span>
+              {diagnosticReport.target_phone}
+            </span>
+          </motion.div>
         )}
 
-        {/* User profile */}
+        {/* User badge */}
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            padding: "6px 12px",
-            backgroundColor: "rgba(59, 130, 246, 0.05)",
-            border: "1px solid rgba(59, 130, 246, 0.15)",
-            borderRadius: "12px",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-          }}
+          id="nav-user"
+          className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-border px-3 py-1.5 transition-all hover:border-border-hover"
         >
-          <div
-            style={{
-              width: "24px",
-              height: "24px",
-              borderRadius: "50%",
-              backgroundColor: "var(--primary)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "11px",
-              fontWeight: "700",
-              color: "white",
-            }}
-          >
-            A
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-navy text-[11px] font-bold text-white">
+            <User size={13} />
           </div>
-          <span style={{ fontSize: "13px", fontWeight: "600", color: "var(--text-main)" }}>
-            Forensic Analyst
+          <span className="hidden sm:inline text-[13px] font-semibold text-text">
+            Analyst
           </span>
         </div>
       </div>
