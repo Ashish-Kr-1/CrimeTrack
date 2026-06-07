@@ -31,11 +31,9 @@ function Sidebar({ isOpen, onClose }) {
       }`}
       style={{
         width: "var(--sidebar-width, 260px)",
-        background: "linear-gradient(180deg, rgba(10, 29, 36, 0.98) 0%, rgba(6, 15, 20, 0.98) 100%)",
+        background: "#f7f9f9",
         borderRight: "1px solid var(--color-border)",
         transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        backdropFilter: "blur(24px)",
-        WebkitBackdropFilter: "blur(24px)",
       }}
     >
       {/* ── Top section ── */}
@@ -48,8 +46,8 @@ function Sidebar({ isOpen, onClose }) {
               width: 38,
               height: 38,
               borderRadius: 10,
-              background: "linear-gradient(135deg, var(--color-accent) 0%, #0097b2 100%)",
-              boxShadow: "0 0 20px rgba(0, 212, 245, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
+              background: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
+              boxShadow: "0 0 20px rgba(108, 92, 231, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -76,7 +74,7 @@ function Sidebar({ isOpen, onClose }) {
                 fontWeight: 700,
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
-                color: "var(--color-text-subtle)",
+                color: "var(--color-text-muted)",
                 marginTop: 1,
               }}
             >
@@ -122,24 +120,24 @@ function Sidebar({ isOpen, onClose }) {
                     fontSize: 13,
                     fontWeight: isActive ? 600 : 500,
                     letterSpacing: "-0.01em",
-                    color: isActive ? "var(--color-accent)" : "var(--color-text-muted)",
+                    color: isActive ? "#6c5ce7" : "var(--color-text-secondary)",
                     backgroundColor: isActive
-                      ? "rgba(0, 212, 245, 0.09)"
+                      ? "rgba(108, 92, 231, 0.10)"
                       : "transparent",
-                    border: `1px solid ${isActive ? "rgba(0, 212, 245, 0.18)" : "transparent"}`,
+                    border: `1px solid ${isActive ? "rgba(108, 92, 231, 0.20)" : "transparent"}`,
                     transition: "all 0.18s cubic-bezier(0.4, 0, 0.2, 1)",
                     cursor: "pointer",
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.04)";
-                      e.currentTarget.style.color = "var(--color-text)";
+                      e.currentTarget.style.backgroundColor = "rgba(108, 92, 231, 0.05)";
+                      e.currentTarget.style.color = "#6c5ce7";
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) {
                       e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "var(--color-text-muted)";
+                      e.currentTarget.style.color = "var(--color-text-secondary)";
                     }
                   }}
                 >
@@ -154,8 +152,8 @@ function Sidebar({ isOpen, onClose }) {
                         height: "68%",
                         width: 3,
                         borderRadius: "0 3px 3px 0",
-                        background: "linear-gradient(180deg, var(--color-accent), var(--color-accent-light))",
-                        boxShadow: "0 0 10px var(--color-accent)",
+                        background: "linear-gradient(180deg, #6c5ce7, #a29bfe)",
+                        boxShadow: "0 0 10px rgba(108, 92, 231, 0.5)",
                       }}
                       transition={{ type: "spring", stiffness: 400, damping: 32 }}
                     />
@@ -191,7 +189,7 @@ function Sidebar({ isOpen, onClose }) {
                 position: "absolute",
                 inset: 0,
                 borderRadius: "50%",
-                backgroundColor: "var(--color-success)",
+                backgroundColor: "#00b894",
                 opacity: 0.5,
                 animation: "pulse-glow 2.2s ease-in-out infinite",
               }}
@@ -201,7 +199,7 @@ function Sidebar({ isOpen, onClose }) {
                 position: "absolute",
                 inset: 1,
                 borderRadius: "50%",
-                backgroundColor: "var(--color-success)",
+                backgroundColor: "#00b894",
               }}
             />
           </div>
@@ -219,7 +217,7 @@ function Sidebar({ isOpen, onClose }) {
               <Wifi size={11} />
               Secure Sandbox
             </span>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-success)" }}>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#00b894" }}>
               Online
             </span>
           </div>

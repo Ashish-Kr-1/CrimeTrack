@@ -80,7 +80,7 @@ function RiskCenter() {
       const d = payload[0].payload;
       return (
         <div style={{
-          background: "var(--color-dark-surface)",
+          background: "rgba(255, 255, 255, 0.95)",
           border: "1px solid var(--color-border)",
           borderRadius: 10,
           padding: "10px 14px",
@@ -97,7 +97,7 @@ function RiskCenter() {
 
   return (
     <motion.div
-      className="page-container"
+      className="page-container theme-risk"
       initial="initial"
       animate="animate"
     >
@@ -212,7 +212,7 @@ function RiskCenter() {
             </div>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={chartData} barCategoryGap="28%">
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(22, 45, 54, 0.8)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 0, 0, 0.08)" vertical={false} />
                 <XAxis
                   dataKey="name"
                   stroke="transparent"

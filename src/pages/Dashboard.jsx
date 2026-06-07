@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ShieldAlert,
   FileText,
-  Users,
   Smartphone,
   MessageSquare,
   Octagon,
@@ -28,8 +27,6 @@ import {
   Terminal,
   AlertTriangle
 } from "lucide-react";
-import ForceGraph2D from "react-force-graph-2d";
-import { forceCollide } from "d3-force";
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -85,41 +82,22 @@ function Dashboard() {
   // Chronological Replay Player States
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeEventIndex, setActiveEventIndex] = useState(0);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1); // 0.5, 1, 2, 5
+  const [playbackSpeed, setPlaybackSpeed] = useState(1); // 1, 2, 5, 10, 20
 
-  const graphContainerRef = useRef();
-  const graphRef = useRef();
   const mapContainerRef = useRef();
-  const [graphDimensions, setGraphDimensions] = useState({ width: 600, height: 400 });
-
-  useEffect(() => {
-    if (graphRef.current) {
-      graphRef.current.d3Force("charge").strength(-300);
-      graphRef.current.d3Force("link").distance(110);
-      graphRef.current.d3Force("collision", forceCollide(node => node.val + 8));
-      graphRef.current.d3ReheatSimulation();
-    }
-  }, [rightTab, diagnosticReport]);
-
-  // Handle Resize for Force Graph
-  useEffect(() => {
-    if (!graphContainerRef.current) return;
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        setGraphDimensions({
-          width: entry.contentRect.width || 600,
-          height: 400
-        });
-      }
-    });
-    resizeObserver.observe(graphContainerRef.current);
-    return () => resizeObserver.disconnect();
-  }, [rightTab]);
 
   // Replay timeline events
   const replayEvents = useMemo(() => {
     return diagnosticReport?.replay_events || [];
   }, [diagnosticReport]);
+
+  const narrativeBlocks = useMemo(() => {
+    if (!diagnosticReport?.behavioral_narrative) return [];
+    return diagnosticReport.behavioral_narrative
+      .split(/\.\s+/)
+      .filter(Boolean)
+      .map((s) => s.trim() + (s.endsWith(".") ? "" : "."));
+  }, [diagnosticReport?.behavioral_narrative]);
 
   // Replay timer loop
   useEffect(() => {
@@ -188,8 +166,8 @@ function Dashboard() {
   }
 
   const isMule = diagnosticReport.classification === "HIGHLY_SUSPECT_FINANCIAL_MULE";
-  const statusColor = isMule ? "#ff6b4a" : "#00e5ff";
-  const statusGlow = isMule ? "rgba(255, 107, 74, 0.12)" : "rgba(0, 229, 255, 0.12)";
+  const statusColor = isMule ? "#d63031" : "#6c5ce7";
+  const statusGlow = isMule ? "rgba(214, 48, 49, 0.10)" : "rgba(108, 92, 231, 0.10)";
 
   // Replay coordinates details
   const activeEvent = replayEvents[activeEventIndex];
@@ -206,66 +184,11 @@ function Dashboard() {
     return replayEvents.map(e => e.coordinates).filter(Boolean);
   }, [replayEvents]);
 
-  // Custom node canvas renderer for Force Graph
-  const nodeCanvasObject = useCallback((node, ctx, globalScale) => {
-    const size = node.val || 10;
-    const fontSize = Math.max(9 / globalScale, 4.5);
 
-    // Node outer glow
-    ctx.beginPath();
-    ctx.arc(node.x, node.y, size + 3, 0, 2 * Math.PI);
-    if (node.type === "target") {
-      ctx.fillStyle = "rgba(255, 107, 74, 0.25)";
-    } else if (node.type === "bank") {
-      ctx.fillStyle = "rgba(0, 229, 255, 0.2)";
-    } else if (node.type === "imei") {
-      ctx.fillStyle = "rgba(136, 174, 183, 0.2)";
-    } else if (node.type === "location") {
-      ctx.fillStyle = "rgba(18, 72, 84, 0.2)";
-    } else {
-      ctx.fillStyle = "rgba(0, 229, 255, 0.2)";
-    }
-    ctx.fill();
-
-    // Node core circle
-    ctx.beginPath();
-    ctx.arc(node.x, node.y, size, 0, 2 * Math.PI);
-    if (node.type === "target") {
-      ctx.fillStyle = "#ff6b4a"; // Coral Orange
-    } else if (node.type === "bank") {
-      ctx.fillStyle = "#00e5ff"; // Neon Cyan
-    } else if (node.type === "imei") {
-      ctx.fillStyle = "#88aeb7"; // Light Teal-Muted
-    } else if (node.type === "location") {
-      ctx.fillStyle = "#124854"; // Teal-Navy
-    } else {
-      ctx.fillStyle = "#00e5ff"; // Neon Cyan
-    }
-    ctx.fill();
-    ctx.strokeStyle = "rgba(240, 249, 255, 0.25)";
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-
-    // Text label
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#f0f9ff";
-    ctx.font = `${node.type === "target" ? "bold " : ""}${fontSize}px "SF Pro", -apple-system, BlinkMacSystemFont, sans-serif`;
-    ctx.fillText(node.label, node.x, node.y + size + fontSize + 2.5);
-  }, []);
-
-  const linkCanvasObject = useCallback((link, ctx) => {
-    ctx.beginPath();
-    ctx.moveTo(link.source.x, link.source.y);
-    ctx.lineTo(link.target.x, link.target.y);
-    ctx.strokeStyle = "rgba(139, 157, 131, 0.25)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  }, []);
 
   return (
     <motion.div
-      className="page-container"
+      className="page-container theme-dashboard"
       variants={stagger}
       initial="initial"
       animate="animate"
@@ -309,7 +232,7 @@ function Dashboard() {
             padding: "10px 18px",
             borderRadius: 14,
             border: "1px solid var(--color-border)",
-            background: "rgba(10, 29, 36, 0.6)",
+            background: "rgba(255, 255, 255, 0.6)",
             backdropFilter: "blur(12px)",
           }}
         >
@@ -334,20 +257,20 @@ function Dashboard() {
       </motion.div>
 
       {/* Main Multi-Panel HUD Layout */}
-      <div className="grid lg:grid-cols-12" style={{ gap: 18 }}>
+      <div className="grid lg:grid-cols-12 lg:min-h-0" style={{ gap: 24 }}>
         {/* ========================================================
             LEFT COLUMN: AI INVESTIGATOR ASSISTANT (40% width)
             ======================================================== */}
-        <div className="lg:col-span-5 flex flex-col" style={{ gap: 18 }}>
+        <div className="lg:col-span-5 flex flex-col lg:min-h-0" style={{ gap: 24 }}>
           {/* Dossier Overview Card */}
-          <motion.div variants={fadeUp} className="glass-card border border-border p-6 relative overflow-hidden">
+          <motion.div variants={fadeUp} className="glass-card border border-border p-6 relative overflow-hidden" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div className="scan-overlay pointer-events-none absolute inset-0" />
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold tracking-wider uppercase text-text-muted flex items-center gap-2">
-                <Sparkles size={14} className="text-accent" />
+            <div className="flex items-center justify-between" style={{ borderBottom: "1px solid var(--color-border-subtle)", paddingBottom: 12 }}>
+              <h2 className="text-xs font-extrabold tracking-wider uppercase text-text-muted flex items-center gap-2">
+                <Sparkles size={13} className="text-accent" />
                 INTELLIGENT DIAGNOSTIC PROFILE
               </h2>
-              <span className="text-xs font-mono text-text-subtle">
+              <span className="text-[11px] font-mono text-text-subtle">
                 Confidence: <strong className="text-text">{diagnosticReport.confidence_level}</strong>
               </span>
             </div>
@@ -356,7 +279,7 @@ function Dashboard() {
             <div className="flex items-center gap-6">
               <div className="relative h-20 w-20 shrink-0">
                 <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="#1e2e52" strokeWidth="8" />
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="8" />
                   <circle
                     cx="50"
                     cy="50"
@@ -379,11 +302,11 @@ function Dashboard() {
               </div>
 
               <div>
-                <div className="text-xs font-semibold text-text-subtle">ANOMALY LEVEL DETECTED</div>
-                <div className="text-base font-bold text-text mt-0.5">
+                <div className="text-[10px] font-extrabold tracking-wider text-text-subtle uppercase">ANOMALY LEVEL DETECTED</div>
+                <div className="text-lg font-extrabold text-text mt-0.5">
                   {diagnosticReport.raw_heuristic_score} pts scored
                 </div>
-                <p className="text-[11px] leading-relaxed text-text-muted mt-1">
+                <p className="text-[12.5px] leading-relaxed text-text-muted mt-2">
                   Target triggers {diagnosticReport.triggered_indicators.length} behavioral heuristics warnings.
                   Risk classification suggests an active telemetry signature.
                 </p>
@@ -392,7 +315,10 @@ function Dashboard() {
           </motion.div>
 
           {/* AI Workspace Panel Tabs */}
-          <motion.div variants={fadeUp} className="glass-card flex-1 flex flex-col overflow-hidden" style={{ minHeight: 500 }}>
+          <motion.div
+            variants={fadeUp}
+            className="glass-card flex-1 flex flex-col overflow-hidden h-[560px] lg:h-auto lg:min-h-0"
+          >
             {/* Tabs Header */}
             <div className="tab-bar">
               {[
@@ -411,7 +337,13 @@ function Dashboard() {
             </div>
 
             {/* Tab Contents */}
-            <div className="p-6 pb-12 flex-1 overflow-y-auto">
+            <div
+              className="flex-1 overflow-y-auto"
+              style={{
+                padding: leftTab === "narrative" ? "32px" : "24px",
+                paddingBottom: leftTab === "narrative" ? "32px" : "24px",
+              }}
+            >
               <AnimatePresence mode="wait">
                 {leftTab === "narrative" && (
                   <motion.div
@@ -419,7 +351,7 @@ function Dashboard() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex flex-col gap-6"
+                    className="flex flex-col gap-6 pb-8"
                   >
                     {/* Quick Stats Grid */}
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -440,36 +372,66 @@ function Dashboard() {
                     </div>
 
                     <div>
-                      <h3 className="text-xs font-bold text-accent uppercase tracking-wider mb-2">
+                      <h3
+                        className="text-xs font-bold text-accent uppercase tracking-wider"
+                        style={{ marginBottom: "20px" }}
+                      >
                         Behavioral Narrative Overview
                       </h3>
-                      <p className="text-[13px] leading-relaxed text-text-muted font-sans whitespace-pre-line">
-                        {highlightNarrativeText(diagnosticReport.behavioral_narrative)}
-                      </p>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                        {narrativeBlocks.map((block, idx) => (
+                          <p
+                            key={idx}
+                            className="text-[13.5px] text-text-muted font-sans"
+                            style={{
+                              lineHeight: "1.8",
+                              maxWidth: "70ch",
+                              margin: 0,
+                            }}
+                          >
+                            {highlightNarrativeText(block)}
+                          </p>
+                        ))}
+                      </div>
                     </div>
 
-                    <div className="border-t border-border pt-5 mt-2">
-                      <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">
+                    <div className="border-t border-border pt-6 mt-4">
+                      <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider" style={{ marginBottom: "20px" }}>
                         Operational Lifecycle Phases
                       </h3>
-                      <div className="flex flex-col gap-3.5">
+                      <div className="flex flex-col" style={{ gap: "16px" }}>
                         {diagnosticReport.operational_phases.map((phase, idx) => (
                           <div
                             key={idx}
-                            className="bg-dark-surface/40 border border-border rounded-xl p-4 text-[12px]"
+                            className="bg-white/40 border border-border rounded-xl"
+                            style={{ padding: "20px" }}
                           >
-                            <div className="flex items-center justify-between font-semibold mb-1">
-                              <span className="text-text">{phase.phase}</span>
-                              <span className="text-text-subtle font-mono text-[10px]">
-                                {phase.event_count} logs
-                              </span>
-                            </div>
-                            <div className="text-text-muted font-mono text-[10.5px]">
-                              IMEI: <span style={{ color: "#00e5ff" }}>{phase.imei || "Unknown"}</span>
-                            </div>
-                            <div className="text-[10px] text-text-subtle mt-1 flex justify-between">
-                              <span>From: {phase.start}</span>
-                              <span>To: {phase.end}</span>
+                            <div className="flex flex-col gap-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[13px] font-bold text-text">{phase.phase}</span>
+                                <span
+                                  className="rounded px-2 py-0.5 font-mono text-[10px]"
+                                  style={{
+                                    backgroundColor: "rgba(108, 92, 231, 0.08)",
+                                    border: "1px solid rgba(108, 92, 231, 0.15)",
+                                    color: "var(--primary, #6c5ce7)",
+                                    fontWeight: 700
+                                  }}
+                                >
+                                  {phase.event_count} logs
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center justify-between text-[11px] text-text-muted border-t border-border-subtle pt-2.5 mt-0.5">
+                                <div className="font-mono">
+                                  IMEI: <span style={{ color: "#6c5ce7", fontWeight: 600 }}>{phase.imei || "Unknown"}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-text-subtle font-mono">
+                                  <span>From: {phase.start}</span>
+                                  <span style={{ opacity: 0.5 }}>•</span>
+                                  <span>To: {phase.end}</span>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -484,7 +446,7 @@ function Dashboard() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex flex-col gap-3"
+                    className="flex flex-col gap-4 pb-8"
                   >
                     <h3 className="text-xs font-bold text-accent uppercase tracking-wider mb-1">
                       Triggered Threat Heuristics
@@ -492,27 +454,28 @@ function Dashboard() {
                     {diagnosticReport.triggered_indicators.map((rule, idx) => {
                       const rColor =
                         rule.severity === "CRITICAL"
-                          ? "#ff6b4a"
+                          ? "#d63031"
                           : rule.severity === "HIGH"
-                            ? "#00e5ff"
-                            : "#88aeb7";
+                            ? "#6c5ce7"
+                            : "#95a5a6";
                       const rBg =
                         rule.severity === "CRITICAL"
-                          ? "rgba(255, 107, 74, 0.08)"
+                          ? "rgba(214, 48, 49, 0.08)"
                           : rule.severity === "HIGH"
-                            ? "rgba(0, 229, 255, 0.08)"
-                            : "rgba(136, 174, 183, 0.08)";
+                            ? "rgba(108, 92, 231, 0.08)"
+                            : "rgba(149, 165, 166, 0.08)";
                       return (
                         <div
                           key={idx}
-                          className="border border-border bg-dark/30 rounded-lg p-3 text-left"
+                          className="border border-border bg-white/30 rounded-xl text-left"
+                          style={{ padding: "16px 20px" }}
                         >
-                          <div className="flex justify-between items-center mb-1">
+                          <div className="flex justify-between items-center gap-4 mb-2">
                             <span className="text-xs font-bold text-text">
                               {rule.code.replace(/_/g, " ")}
                             </span>
                             <span
-                              className="rounded-full px-2 py-0.5 text-[9px] font-bold font-mono"
+                              className="shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold font-mono"
                               style={{
                                 backgroundColor: rBg,
                                 color: rColor,
@@ -537,7 +500,7 @@ function Dashboard() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex flex-col gap-4"
+                    className="flex flex-col gap-4 pb-8"
                   >
                     <h3 className="text-xs font-bold text-accent uppercase tracking-wider mb-1">
                       Actionable Next Investigation Steps
@@ -554,14 +517,17 @@ function Dashboard() {
                       return (
                         <div
                           key={rec.id}
-                          className="border border-border bg-dark/40 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden"
-                          style={{ borderLeft: `4px solid ${badgeColor}` }}
+                          className="border border-border bg-white/40 rounded-xl flex flex-col gap-3 relative overflow-hidden"
+                          style={{
+                            borderLeft: `4px solid ${badgeColor}`,
+                            padding: "18px 20px 18px 24px"
+                          }}
                         >
                           <div>
-                            <div className="flex justify-between items-start mb-1.5">
+                            <div className="flex justify-between items-start gap-4 mb-2">
                               <h4 className="text-xs font-bold text-text">{rec.title}</h4>
                               <span
-                                className="rounded px-1.5 py-0.5 text-[8.5px] font-bold font-mono"
+                                className="shrink-0 rounded px-1.5 py-0.5 text-[8.5px] font-bold font-mono"
                                 style={{
                                   backgroundColor: badgeBg,
                                   color: badgeColor,
@@ -601,14 +567,16 @@ function Dashboard() {
         {/* ========================================================
             RIGHT COLUMN: VISUAL ANALYTICS STUDIO (60% width)
             ======================================================== */}
-        <div className="lg:col-span-7 flex flex-col" style={{ gap: 18 }}>
+        <div className="lg:col-span-7 flex flex-col lg:min-h-0" style={{ gap: 24 }}>
           {/* Main Visualizer Container */}
-          <motion.div variants={fadeUp} className="glass-card flex-1 flex flex-col overflow-hidden">
+          <motion.div
+            variants={fadeUp}
+            className="glass-card flex-1 flex flex-col overflow-hidden h-[560px] lg:h-auto lg:min-h-0"
+          >
             {/* Viz Panel Tabs */}
             <div className="tab-bar">
               {[
                 { id: "replay",  icon: Activity, label: "Chronological Replay" },
-                { id: "network", icon: Users,    label: "Relationship Network" },
                 { id: "heatmap", icon: MapPin,   label: "Geospatial Heatmap" },
               ].map((tab) => (
                 <button
@@ -623,7 +591,7 @@ function Dashboard() {
             </div>
 
             {/* Tab Workspace */}
-            <div className="flex-1 overflow-hidden flex flex-col">
+            <div className="flex-1 overflow-hidden flex flex-col lg:overflow-visible">
               <AnimatePresence mode="wait">
                 {/* 1. CHRONOLOGICAL REPLAY PLAYER */}
                 {rightTab === "replay" && (
@@ -632,7 +600,7 @@ function Dashboard() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex-1 flex flex-col overflow-hidden"
+                    className="flex-1 flex flex-col overflow-hidden lg:overflow-visible"
                   >
                     {/* Media Controller Bar */}
                     <div
@@ -642,7 +610,7 @@ function Dashboard() {
                         alignItems: "center",
                         justifyContent: "space-between",
                         gap: 12,
-                        background: "rgba(10, 29, 36, 0.5)",
+                        background: "var(--color-bg-subtle)",
                         borderBottom: "1px solid var(--color-border)",
                         padding: "10px 18px",
                         flexShrink: 0,
@@ -687,7 +655,7 @@ function Dashboard() {
 
                       {/* Speed buttons */}
                       <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                        {[0.5, 1, 2, 5].map((speed) => (
+                        {[1, 2, 5, 10, 20].map((speed) => (
                           <button
                             key={speed}
                             onClick={() => setPlaybackSpeed(speed)}
@@ -725,7 +693,7 @@ function Dashboard() {
                     </div>
 
                     {/* Map on Top; HUD at the Bottom */}
-                    <div className="flex-1 flex flex-col gap-4 overflow-y-auto p-5">
+                    <div className="flex-1 flex flex-col gap-6 overflow-y-auto p-6 lg:overflow-visible">
                       {/* Mini Replay Tracking Map */}
                       <div ref={mapContainerRef} className="rounded-xl border border-border overflow-hidden relative shrink-0" style={{ height: 400 }}>
                         {activeCoordinates ? (
@@ -778,21 +746,22 @@ function Dashboard() {
                       {/* Live HUD Diagnostics */}
                       <div
                         style={{
-                          background: "rgba(10, 29, 36, 0.4)",
+                          background: "var(--color-surface-elevated)",
                           border: "1px solid var(--color-border)",
                           borderRadius: 14,
-                          padding: "16px 18px",
+                          padding: "24px",
                           flexShrink: 0,
+                          boxShadow: "var(--shadow-sm)",
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
-                          <Terminal size={12} color="var(--color-accent)" />
-                          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+                          <Terminal size={14} color="var(--primary, #6c5ce7)" />
+                          <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>
                             Telemetry Monitor
                           </span>
                         </div>
 
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: 12 }}>
+                        <div className="grid grid-cols-2 md:grid-cols-5" style={{ gap: "20px 24px" }}>
                           {[
                             { label: "Timestamp",      value: activeEvent?.timeLabel || "N/A",  color: "var(--color-text)" },
                             { label: "IMEI",            value: activeEvent?.imei     || "N/A",  color: "var(--color-accent)" },
@@ -800,8 +769,8 @@ function Dashboard() {
                             { label: "Roaming Circle",  value: activeEvent?.roam     || "N/A",  color: "var(--color-text)" },
                             { label: "Counterparty",    value: activeEvent?.bParty   || "N/A",  color: "var(--color-text)",  mono: true },
                           ].map((item) => (
-                            <div key={item.label}>
-                              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 3 }}>
+                            <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>
                                 {item.label}
                               </span>
                               <span
@@ -811,7 +780,7 @@ function Dashboard() {
                                   color: item.color,
                                   fontFamily: item.mono ? "var(--font-mono)" : "inherit",
                                   wordBreak: "break-all",
-                                  display: "block",
+                                  lineHeight: 1.4,
                                 }}
                                 title={item.value}
                               >
@@ -821,11 +790,11 @@ function Dashboard() {
                           ))}
                         </div>
 
-                        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--color-border)" }}>
-                          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 3 }}>
+                        <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--color-border-subtle)" }}>
+                          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 6 }}>
                             Log Analysis
                           </span>
-                          <p style={{ fontSize: 12, lineHeight: 1.6, color: "var(--color-text-muted)" }}>
+                          <p style={{ fontSize: 12.5, lineHeight: 1.7, color: "var(--color-text-muted)" }}>
                             {activeEvent?.details || "No events processed."}
                           </p>
                         </div>
@@ -833,19 +802,19 @@ function Dashboard() {
                     </div>
 
                     {/* Scrolling Running Logs (Bottom) */}
-                    <div className="h-[180px] border-t border-border bg-dark/20 flex flex-col shrink-0">
-                      <div className="bg-dark-surface/30 border-b border-border px-5 py-2.5 text-[10px] font-bold text-text-subtle uppercase tracking-wider flex items-center justify-between">
+                    <div className="h-[280px] mt-6 border-t border-border bg-white/20 flex flex-col shrink-0">
+                      <div className="bg-white/30 border-b border-border px-6 py-3.5 text-[10px] font-bold text-text-subtle uppercase tracking-wider flex items-center justify-between">
                         <span>Event Stream Log</span>
-                        <span className="font-mono text-accent">Active Log ID: {activeEvent?.id}</span>
+                        <span className="font-mono text-[10px]" style={{ color: "var(--primary, #6c5ce7)" }}>Active Log ID: {activeEvent?.id}</span>
                       </div>
 
-                      <div ref={logListRef} className="flex-1 overflow-y-auto p-3 scrollbar-thin">
-                        <div className="flex flex-col gap-1">
+                      <div ref={logListRef} className="flex-1 overflow-y-auto p-0 scrollbar-thin">
+                        <div className="flex flex-col">
                           {replayEvents.map((evt, idx) => {
                             const isActive = idx === activeEventIndex;
-                            let evtColor = "#00e5ff";
-                            if (evt.type === "UPI_REG" || evt.type === "FINANCIAL") evtColor = "#ff6b4a";
-                            if (evt.type === "VOICE") evtColor = "#88aeb7";
+                            let evtColor = "#6c5ce7";
+                            if (evt.type === "UPI_REG" || evt.type === "FINANCIAL") evtColor = "#d63031";
+                            if (evt.type === "VOICE") evtColor = "#636e72";
 
                             return (
                               <div
@@ -855,13 +824,13 @@ function Dashboard() {
                                   setActiveEventIndex(idx);
                                   setIsPlaying(false);
                                 }}
-                                className={`flex items-center gap-3 p-2 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
-                                  isActive
-                                    ? "bg-accent/15 border border-accent/40"
-                                    : "border border-transparent hover:bg-dark-elevated text-text-muted"
-                                }`}
+                                className={`flex items-center gap-6 border-b border-border-subtle transition-all cursor-pointer`}
+                                style={{
+                                  padding: "16px 16px",
+                                  backgroundColor: isActive ? "rgba(108, 92, 231, 0.10)" : "transparent",
+                                }}
                               >
-                                <span className="shrink-0 w-[120px] text-text-subtle text-[10.5px]">
+                                <span className="shrink-0 w-[140px] text-text-subtle text-[11px] font-mono">
                                   {evt.timeLabel}
                                 </span>
                                 <span
@@ -875,7 +844,7 @@ function Dashboard() {
                                 >
                                   {evt.type}
                                 </span>
-                                <span className="flex-1 truncate text-text">
+                                <span className="flex-1 truncate text-text text-[11.5px]" style={{ fontWeight: isActive ? 600 : 400 }}>
                                   {evt.details}
                                 </span>
                                 {evt.isAnomaly && (
@@ -893,59 +862,7 @@ function Dashboard() {
                   </motion.div>
                 )}
 
-                {/* 2. INTERACTIVE RELATIONSHIP NETWORK */}
-                {rightTab === "network" && (
-                  <motion.div
-                    key="network"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex-1 flex flex-col overflow-hidden p-5"
-                  >
-                    <div className="bg-dark/40 border border-border rounded-xl p-3.5 mb-3 flex items-center justify-between text-xs text-text-muted">
-                      <span>Interactive Link Matrix showing Target SIM usage overlaps. Double-click to zoom. Drag to arrange nodes.</span>
-                      <div className="flex gap-4">
-                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#ff6b4a" }} /> Suspect</span>
-                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#88aeb7" }} /> Device</span>
-                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#00e5ff" }} /> Bank</span>
-                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#124854" }} /> Tower</span>
-                      </div>
-                    </div>
-                    <div ref={graphContainerRef} className="flex-1 rounded-xl border border-border overflow-hidden bg-dark" style={{ height: 450 }}>
-                      <ForceGraph2D
-                        ref={graphRef}
-                        graphData={diagnosticReport.relationship_graph}
-                        width={graphDimensions.width}
-                        height={450}
-                        backgroundColor="#082229"
-                        nodeCanvasObject={nodeCanvasObject}
-                        linkColor={() => "rgba(0, 229, 255, 0.15)"}
-                        linkWidth={1.2}
-                        linkDirectionalParticles={2}
-                        linkDirectionalParticleWidth={1.2}
-                        linkDirectionalParticleSpeed={0.005}
-                        linkDirectionalParticleColor={() => "#ff6b4a"}
-                        cooldownTicks={60}
-                        d3AlphaDecay={0.04}
-                        d3VelocityDecay={0.3}
-                        enableZoomInteraction={true}
-                        enablePanInteraction={true}
-                        nodeLabel={(node) => {
-                          return `<div style="background:#0b2d35;border:1px solid #153c45;padding:8px 12px;border-radius:6px;font-family:sans-serif;color:#f0f9ff;font-size:12px;">
-                            <strong style="color:#00e5ff;text-transform:uppercase;">${node.type} Node</strong><br/>
-                            Details: ${node.info || node.id}<br/>
-                            ${node.count ? `Interactions: ${node.count}` : ""}
-                          </div>`;
-                        }}
-                        linkLabel={(link) => {
-                          return `<div style="background:#0b2d35;border:1px solid #153c45;padding:6px 10px;border-radius:6px;font-family:sans-serif;color:#f0f9ff;font-size:11px;">
-                            Relationship: <strong>${link.label || link.type}</strong>
-                          </div>`;
-                        }}
-                      />
-                    </div>
-                  </motion.div>
-                )}
+
 
                 {/* 3. GEOSPATIAL ACTIVITY MAP */}
                 {rightTab === "heatmap" && (
@@ -954,11 +871,11 @@ function Dashboard() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex-1 flex flex-col overflow-hidden p-5"
+                    className="flex-1 flex flex-col overflow-hidden p-5 lg:overflow-visible"
                   >
-                    <div className="bg-dark/40 border border-border rounded-xl p-3.5 mb-3 flex items-center justify-between text-xs text-text-muted">
+                    <div className="bg-white/40 border border-border rounded-xl p-3.5 mb-3 flex items-center justify-between text-xs text-text-muted">
                       <span>Full Geospatial plotting of cell sectors visited by target SIM card.</span>
-                      <span className="font-mono text-accent">Total Locations Tracked: {allCoordinates.length} nodes</span>
+                      <span className="font-mono" style={{ color: "var(--primary, #6c5ce7)" }}>Total Locations Tracked: {allCoordinates.length} nodes</span>
                     </div>
 
                     <div className="flex-1 rounded-xl border border-border overflow-hidden" style={{ height: 550 }}>
@@ -976,9 +893,9 @@ function Dashboard() {
                           />
                           {replayEvents.map((e, idx) => {
                             if (!e.coordinates) return null;
-                            let evtColor = "#00e5ff";
-                            if (e.type === "UPI_REG" || e.type === "FINANCIAL") evtColor = "#ff6b4a";
-                            if (e.type === "VOICE") evtColor = "#88aeb7";
+                            let evtColor = "#6c5ce7";
+                            if (e.type === "UPI_REG" || e.type === "FINANCIAL") evtColor = "#d63031";
+                            if (e.type === "VOICE") evtColor = "#636e72";
 
                             return (
                               <CircleMarker
@@ -1005,7 +922,7 @@ function Dashboard() {
                           })}
                         </MapContainer>
                       ) : (
-                        <div className="h-full w-full bg-dark/90 flex flex-col items-center justify-center text-center p-4">
+                        <div className="h-full w-full bg-white/60 flex flex-col items-center justify-center text-center p-4">
                           <MapPin size={36} className="text-text-subtle mb-2" />
                           <span className="text-sm font-bold text-text-subtle">NO LOCATION COORDINATES LOADED</span>
                         </div>

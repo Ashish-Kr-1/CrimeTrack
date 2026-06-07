@@ -69,30 +69,30 @@ function GeoIntelligence() {
       icon: MapPin,
       label: "Unique Coordinates",
       value: uniqueLocations,
-      color: "#00e5ff",
-      bg: "rgba(0, 229, 255, 0.08)",
+      color: "#0984e3",
+      bg: "rgba(9, 132, 227, 0.08)",
     },
     {
       icon: Layers,
       label: "Peak Coordinates",
       value: mostFrequentLocation,
       isMonospace: true,
-      color: "#ff6b4a",
-      bg: "rgba(255, 107, 74, 0.08)",
+      color: "#e17055",
+      bg: "rgba(225, 112, 85, 0.08)",
     },
     {
       icon: Smartphone,
       label: "Peak Cell Tower",
       value: mostFrequentCGI,
       isMonospace: true,
-      color: "#88aeb7",
-      bg: "rgba(136, 174, 183, 0.12)",
+      color: "#636e72",
+      bg: "rgba(99, 110, 114, 0.08)",
     },
   ];
 
   return (
     <motion.div
-      className="page-container"
+      className="page-container theme-geo"
       initial="initial"
       animate="animate"
     >
@@ -177,7 +177,7 @@ function GeoIntelligence() {
               className="glass-card"
               style={{ padding: 0, overflow: "hidden", marginBottom: 24 }}
             >
-              <div style={{ padding: "18px 22px", borderBottom: "1px solid var(--color-border)", background: "rgba(10, 29, 36, 0.3)" }}>
+              <div style={{ padding: "18px 22px", borderBottom: "1px solid var(--color-border)", background: "rgba(255,255,255,0.4)" }}>
                 <h2 style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 700, color: "var(--color-text)" }}>
                   <MapPin size={18} color="var(--color-accent)" />
                   Cell Tower Geo Plot
@@ -201,8 +201,8 @@ function GeoIntelligence() {
                       center={[m.lat, m.lng]}
                       radius={6 + m.ratio * 14}
                       pathOptions={{
-                        color: "#ff6b4a",
-                        fillColor: "#00e5ff",
+                        color: "#e17055",
+                        fillColor: "#0984e3",
                         fillOpacity: 0.6 + m.ratio * 0.3,
                         weight: 2,
                       }}
@@ -288,7 +288,7 @@ function GeoIntelligence() {
                     {topCGIs.map(([cgi, count], idx) => (
                       <tr key={idx}>
                         <td
-                          style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600, color: "var(--color-accent)" }}
+                          style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600, color: "#0984e3" }}
                         >
                           {cgi}
                         </td>

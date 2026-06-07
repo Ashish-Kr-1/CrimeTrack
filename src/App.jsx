@@ -22,29 +22,18 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "var(--color-dark)" }}>
+    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#decbb7" }}>
 
-      {/* ── Ambient Background ── */}
+      {/* ── Ambient Background — warm subtle radials ── */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background: [
-            "radial-gradient(ellipse 70% 60% at 12% 20%, rgba(0,212,245,0.045) 0%, transparent 70%)",
-            "radial-gradient(ellipse 55% 50% at 88% 75%, rgba(255,107,74,0.035) 0%, transparent 70%)",
-            "radial-gradient(ellipse 40% 40% at 50% 50%, rgba(18,72,84,0.06) 0%, transparent 70%)",
+            "radial-gradient(ellipse 70% 60% at 12% 20%, rgba(108,92,231,0.04) 0%, transparent 70%)",
+            "radial-gradient(ellipse 55% 50% at 88% 75%, rgba(225,112,85,0.03) 0%, transparent 70%)",
+            "radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,184,148,0.03) 0%, transparent 70%)",
           ].join(", "),
-        }}
-      />
-
-      {/* ── Subtle grid ── */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 opacity-[0.025]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(0,212,245,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,245,0.6) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
         }}
       />
 
@@ -62,7 +51,7 @@ function App() {
             transition={{ duration: 0.2 }}
             onClick={() => setSidebarOpen(false)}
             className="fixed inset-0 z-40 lg:hidden"
-            style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}
+            style={{ background: "rgba(0,0,0,0.35)", backdropFilter: "blur(4px)" }}
           />
         )}
       </AnimatePresence>

@@ -54,7 +54,7 @@ function Navbar({ onToggleSidebar }) {
             placeholder="Search numbers, IMEIs, cells…"
             style={{
               width: "100%",
-              background: "rgba(6, 15, 20, 0.6)",
+              background: "rgba(255, 255, 255, 0.6)",
               border: "1px solid var(--color-border)",
               borderRadius: "var(--radius-md)",
               color: "var(--color-text)",
@@ -75,26 +75,6 @@ function Navbar({ onToggleSidebar }) {
               e.target.style.boxShadow = "none";
             }}
           />
-          <span
-            className="hide-mobile"
-            style={{
-              position: "absolute",
-              right: 11,
-              top: "50%",
-              transform: "translateY(-50%)",
-              background: "var(--color-dark-elevated)",
-              border: "1px solid var(--color-border)",
-              borderRadius: 5,
-              padding: "2px 6px",
-              fontSize: 10,
-              fontWeight: 700,
-              color: "var(--color-text-subtle)",
-              letterSpacing: "0.02em",
-              lineHeight: 1.4,
-            }}
-          >
-            ⌘K
-          </span>
         </div>
       </div>
 
@@ -118,14 +98,14 @@ function Navbar({ onToggleSidebar }) {
                 width: 16,
                 height: 16,
                 borderRadius: "50%",
-                background: "var(--color-gold)",
+                background: "#d63031",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: 9,
                 fontWeight: 800,
-                color: "var(--color-dark)",
-                boxShadow: "0 0 8px var(--color-gold-glow)",
+                color: "#fff",
+                boxShadow: "0 0 8px rgba(214, 48, 49, 0.3)",
               }}
             >
               {diagnosticReport.risk_summary.red_flags_count}
@@ -145,12 +125,12 @@ function Navbar({ onToggleSidebar }) {
               gap: 7,
               padding: "6px 12px",
               borderRadius: "var(--radius-md)",
-              background: "rgba(255, 107, 74, 0.1)",
-              border: "1px solid rgba(255, 107, 74, 0.25)",
+              background: "rgba(214, 48, 49, 0.08)",
+              border: "1px solid rgba(214, 48, 49, 0.22)",
               fontSize: 12,
               fontWeight: 700,
               letterSpacing: "-0.01em",
-              color: "var(--color-gold)",
+              color: "#d63031",
             }}
           >
             <Crosshair size={13} strokeWidth={2.5} />
@@ -161,7 +141,7 @@ function Navbar({ onToggleSidebar }) {
                   position: "absolute",
                   inset: 0,
                   borderRadius: "50%",
-                  backgroundColor: "var(--color-gold)",
+                  backgroundColor: "#d63031",
                   opacity: 0.6,
                   animation: "pulse-glow 2s ease-in-out infinite",
                 }}
@@ -171,7 +151,7 @@ function Navbar({ onToggleSidebar }) {
                   position: "absolute",
                   inset: 1,
                   borderRadius: "50%",
-                  backgroundColor: "var(--color-gold)",
+                  backgroundColor: "#d63031",
                 }}
               />
             </span>
@@ -201,7 +181,7 @@ function Navbar({ onToggleSidebar }) {
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = "var(--color-border-hover)";
-            e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+            e.currentTarget.style.background = "rgba(0,0,0,0.04)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = "var(--color-border)";
@@ -213,7 +193,7 @@ function Navbar({ onToggleSidebar }) {
               width: 26,
               height: 26,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, var(--color-navy-light), var(--color-navy))",
+              background: "linear-gradient(135deg, #6c5ce7, #a29bfe)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

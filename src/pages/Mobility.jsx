@@ -140,34 +140,30 @@ function Mobility() {
       icon: Radio,
       label: "Unique Towers",
       value: uniqueTowers,
-      color: "#00e5ff",
-      bg: "rgba(0, 229, 255, 0.08)",
+      color: "#00b894",
+      bg: "rgba(0, 184, 148, 0.08)",
     },
     {
       icon: Globe,
       label: "Primary Cell Tower",
       value: mostUsedTower,
       isMonospace: true,
-      color: "#ff6b4a",
-      bg: "rgba(255, 107, 74, 0.08)",
+      color: "#e17055",
+      bg: "rgba(225, 112, 85, 0.08)",
     },
     {
       icon: Clock,
       label: "Last Logged Activity",
       value: lastActivity,
-      color: "#00e5ff",
-      bg: "rgba(0, 229, 255, 0.08)",
+      color: "#00b894",
+      bg: "rgba(0, 184, 148, 0.08)",
     },
   ];
 
   return (
-    <motion.div
-      className="mx-auto w-full max-w-[1400px] pb-10"
-      initial="initial"
-      animate="animate"
-    >
-      {/* Header */}
-      <motion.div variants={fadeUp} className="mb-6">
+    <motion.div className="page-container theme-mobility" initial="initial" animate="animate">
+  {/* Header */}
+  <motion.div variants={fadeUp} className="page-header mb-6">
         <h1 className="mb-1 text-[30px] font-bold text-text">
           Mobility Tracker & Georeferencing
         </h1>
@@ -199,8 +195,8 @@ function Mobility() {
                 <div
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border"
                   style={{
-                    backgroundColor: kpi.bg,
-                    borderColor: `${kpi.color}25`,
+                    backgroundColor: 'var(--primary-transparent-18)',
+                    borderColor: 'rgba(0,184,148,0.25)',
                   }}
                 >
                   <kpi.icon size={20} color={kpi.color} strokeWidth={2.2} />
@@ -211,7 +207,7 @@ function Mobility() {
                   </span>
                   <h2
                     className={`mt-0.5 truncate text-text ${kpi.isMonospace ? "font-mono text-[13px] font-bold" : "text-xl font-bold"}`}
-                    style={kpi.isMonospace ? { color: kpi.color } : undefined}
+                    style={kpi.isMonospace ? { color: '#e17055', } : undefined}
                   >
                     {kpi.value}
                   </h2>
@@ -250,7 +246,7 @@ function Mobility() {
                         {idx !== timelineHops.length - 1 && (
                           <div
                             className="absolute left-[24px] top-10 bottom-[-24px] w-[1px]"
-                            style={{ backgroundColor: "rgba(0, 229, 255, 0.2)" }}
+                            style={{ backgroundColor: "rgba(0, 184, 148, 0.2)" }}
                           />
                         )}
 
@@ -258,10 +254,10 @@ function Mobility() {
                         <div
                           className="z-10 flex h-[20px] w-[20px] shrink-0 items-center justify-center rounded-full text-[9px] font-bold font-mono"
                           style={{
-                            backgroundColor: isSelected ? "#ff6b4a" : "#124854",
-                            color: isSelected ? "#082229" : "#e9f1f8",
-                            border: `2px solid ${isSelected ? "#ff6b4a" : "rgba(0, 229, 255, 0.4)"}`,
-                            boxShadow: isSelected ? "0 0 10px rgba(255, 107, 74, 0.5)" : "none",
+                            backgroundColor: isSelected ? "#e17055" : "rgba(0, 184, 148, 0.15)",
+                            color: isSelected ? "#fff" : "#00b894",
+                            border: `2px solid ${isSelected ? "#e17055" : "rgba(0, 184, 148, 0.4)"}`,
+                            boxShadow: isSelected ? "0 0 10px rgba(225, 112, 85, 0.3)" : "none",
                           }}
                         >
                           {hop.seqNumber}
@@ -300,13 +296,13 @@ function Mobility() {
             <div className="lg:col-span-7 flex flex-col gap-6">
               {/* Georeferencing Tracker Map */}
               <motion.div variants={fadeUp} className="glass-card overflow-hidden" style={{ borderRadius: 16 }}>
-                <div className="px-6 pt-5 pb-3 border-b border-border bg-dark-surface/40 flex items-center justify-between">
+                <div className="px-6 pt-5 pb-3 border-b border-border bg-white/40 flex items-center justify-between">
                   <h2 className="flex items-center gap-2 text-md font-bold text-text">
-                    <MapPin size={16} color="#ff6b4a" />
+                    <MapPin size={16} color="#e17055" />
                     Georeferencing Path Overlay
                   </h2>
                   {activeHop && (
-                    <span className="text-[10px] font-mono font-bold text-accent">
+                    <span className="text-[10px] font-mono font-bold" style={{ color: "#00b894" }}>
                       Active: Hop #{activeHop.seqNumber}
                     </span>
                   )}
@@ -329,7 +325,7 @@ function Mobility() {
                       {polylinePath.length > 1 && (
                         <Polyline
                           positions={polylinePath}
-                          pathOptions={{ color: "#00e5ff", weight: 3, opacity: 0.6 }}
+                          pathOptions={{ color: "#00b894", weight: 3, opacity: 0.6 }}
                         />
                       )}
                       {/* Numbered tower markers */}
@@ -356,7 +352,7 @@ function Mobility() {
                       {activeHop && <MapController center={[activeHop.lat, activeHop.lng]} />}
                     </MapContainer>
                   ) : (
-                    <div className="h-full w-full bg-dark/80 flex flex-col items-center justify-center text-center p-4">
+                    <div className="h-full w-full bg-white/60 flex flex-col items-center justify-center text-center p-4">
                       <MapPin size={28} className="text-text-subtle mb-2 animate-pulse" />
                       <span className="text-xs font-bold text-text-subtle">GPS SIGNAL LOST</span>
                       <span className="text-[10px] text-text-subtle/80 mt-1 max-w-[200px]">
@@ -370,7 +366,7 @@ function Mobility() {
               {/* Top Cellular Anchors Table */}
               <motion.div variants={fadeUp} className="glass-card p-6">
                 <h2 className="mb-5 flex items-center gap-2 text-md font-bold text-text">
-                  <Radio size={16} color="#ff6b4a" />
+                  <Radio size={16} color="#e17055" />
                   Top Transceiver Anchors
                 </h2>
                 <div className="overflow-x-auto font-sans">
@@ -386,7 +382,7 @@ function Mobility() {
                         <tr key={idx}>
                           <td
                             className="font-mono text-[13px] font-semibold"
-                            style={{ color: "#00e5ff" }}
+                            style={{ color: "#00b894" }}
                           >
                             {tower}
                           </td>

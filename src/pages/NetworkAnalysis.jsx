@@ -172,15 +172,15 @@ function NetworkAnalysis() {
       label: "Target Suspect",
       value: targetNumber,
       isMonospace: true,
-      color: "#ff6b4a", // Coral Orange
-      bg: "rgba(255, 107, 74, 0.08)",
+      color: "#e17055", // Coral Orange
+      bg: "rgba(225, 112, 85, 0.08)",
     },
     {
       icon: Users,
       label: "Total Connections",
       value: totalContacts,
-      color: "#00e5ff", // Neon Cyan
-      bg: "rgba(0, 229, 255, 0.08)",
+      color: "#6c5ce7", // Indigo
+      bg: "rgba(108, 92, 231, 0.08)",
     },
     {
       icon: Star,
@@ -188,8 +188,8 @@ function NetworkAnalysis() {
       value: strongestContact,
       sub: `${strongestCount} interactions`,
       isMonospace: true,
-      color: "#ff6b4a", // Coral Orange
-      bg: "rgba(255, 107, 74, 0.08)",
+      color: "#e17055", // Coral Orange
+      bg: "rgba(225, 112, 85, 0.08)",
     },
   ];
 
@@ -228,13 +228,9 @@ function NetworkAnalysis() {
   }, [selectedNode]);
 
   return (
-    <motion.div
-      className="mx-auto w-full max-w-[1400px] pb-10"
-      initial="initial"
-      animate="animate"
-    >
-      {/* Header */}
-      <motion.div variants={fadeUp} className="mb-6">
+    <motion.div className="page-container theme-network" initial="initial" animate="animate">
+  {/* Header */}
+  <motion.div variants={fadeUp} className="page-header mb-6">
         <h1 className="mb-1 text-[30px] font-bold text-text">
           Link Analysis & Social Network Mapping
         </h1>
@@ -301,14 +297,14 @@ function NetworkAnalysis() {
             >
               {/* Force Graph Card */}
               <div className="glass-card overflow-hidden flex flex-col" style={{ borderRadius: 16 }}>
-                <div className="px-6 pt-5 pb-3 border-b border-border bg-dark-surface/40 flex items-center justify-between flex-wrap gap-3">
+                <div className="px-6 pt-5 pb-3 border-b border-border bg-white/40 flex items-center justify-between flex-wrap gap-3">
                   <h2 className="flex items-center gap-2 text-md font-bold text-text">
-                    <Network size={16} color="#00e5ff" />
+                    <Network size={16} color="#e17055" />
                     Contact Network Canvas
                   </h2>
 
                   {/* Label Mode Toggle */}
-                  <div className="flex border border-border rounded-lg overflow-hidden bg-dark">
+                  <div className="flex border border-border rounded-lg overflow-hidden bg-white/50">
                     <button
                       onClick={() => setLabelMode("full")}
                       className={`px-3 py-1 text-[11px] font-bold transition-all ${
@@ -333,19 +329,19 @@ function NetworkAnalysis() {
                 </div>
 
                 {/* Legend */}
-                <div className="px-6 py-3 bg-dark/40 border-b border-border flex flex-wrap gap-4 text-[11px] text-text-muted justify-between">
+                <div className="px-6 py-3 bg-white/30 border-b border-border flex flex-wrap gap-4 text-[11px] text-text-muted justify-between">
                   <div className="flex gap-4">
                     <span className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#ff6b4a" }} /> Target Suspect
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#e17055" }} /> Target Suspect
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#ff6b4a" }} /> Critical ({`>=30`} calls)
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#e17055" }} /> Critical ({`>=30`} calls)
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#00e5ff" }} /> Suspicious ({`15-29`} calls)
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#6c5ce7" }} /> Suspicious ({`15-29`} calls)
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#124854" }} /> Nominal ({`<15`} calls)
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#95a5a6" }} /> Nominal ({`<15`} calls)
                     </span>
                   </div>
                   <span className="text-[10px] text-text-subtle italic">Click nodes to inspect intelligence dossier.</span>
@@ -386,7 +382,7 @@ function NetworkAnalysis() {
                 </div>
 
                 {/* Simulation Parameters Sliders */}
-                <div className="p-5 border-t border-border bg-dark-surface/40 flex flex-col gap-4">
+                <div className="p-5 border-t border-border bg-white/30 flex flex-col gap-4">
                   <h3 className="text-xs font-bold text-text flex items-center gap-1.5 uppercase tracking-wider">
                     <Sliders size={13} className="text-accent" />
                     Interactive D3 Force Parameters
@@ -466,7 +462,7 @@ function NetworkAnalysis() {
                     <div className="w-full border-t border-border mt-6 pt-5 text-left flex flex-col gap-3">
                       <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider block">Network Aggregates</span>
                       <div className="grid grid-cols-2 gap-3.5 text-xs">
-                        <div className="bg-dark/40 border border-border p-2.5 rounded-lg">
+                        <div className="bg-white/40 border border-border p-2.5 rounded-lg">
                           <div className="text-[9px] text-text-muted font-bold">AVG LINK WEIGHT</div>
                           <div className="text-md font-bold text-text mt-0.5">
                             {topContacts.length > 0
@@ -474,7 +470,7 @@ function NetworkAnalysis() {
                               : 0}
                           </div>
                         </div>
-                        <div className="bg-dark/40 border border-border p-2.5 rounded-lg">
+                        <div className="bg-white/40 border border-border p-2.5 rounded-lg">
                           <div className="text-[9px] text-text-muted font-bold">TOTAL LINKS</div>
                           <div className="text-md font-bold text-text mt-0.5">{totalContacts} nodes</div>
                         </div>
@@ -549,7 +545,7 @@ function NetworkAnalysis() {
                     </div>
 
                     {/* AI Explanation narrative */}
-                    <div className="bg-dark/40 border border-border rounded-xl p-4 flex flex-col gap-3">
+                    <div className="bg-white/30 border border-border rounded-xl p-4 flex flex-col gap-3">
                       <div>
                         <h4 className="text-[10px] font-bold text-accent uppercase tracking-wider mb-1.5 flex items-center gap-1">
                           <ShieldAlert size={12} />
@@ -577,13 +573,13 @@ function NetworkAnalysis() {
                         <div className="border-t border-border pt-4 text-xs flex flex-col gap-3">
                           <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider block">Connectivity Profile</span>
                           <div className="grid grid-cols-2 gap-3.5">
-                            <div className="bg-dark/20 border border-border p-2.5 rounded-lg">
+                            <div className="bg-white/30 border border-border p-2.5 rounded-lg">
                               <span className="text-[9px] text-text-subtle font-bold uppercase block">Calling Rank</span>
                               <span className="text-sm font-bold text-text mt-0.5">
                                 #{topContacts.findIndex(([num]) => num === selectedNode.id) + 1} of {totalContacts}
                               </span>
                             </div>
-                            <div className="bg-dark/20 border border-border p-2.5 rounded-lg">
+                            <div className="bg-white/30 border border-border p-2.5 rounded-lg">
                               <span className="text-[9px] text-text-subtle font-bold uppercase block">Activity Share</span>
                               <span className="text-sm font-mono font-bold text-accent mt-0.5">
                                 {((selectedNode.count / records.length) * 100).toFixed(1)}%
@@ -644,7 +640,7 @@ function NetworkAnalysis() {
                         <td className="font-bold">{count}</td>
                         <td>
                           <div className="flex items-center gap-2.5">
-                            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-dark-elevated">
+                            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200">
                               <div
                                 className="h-full rounded-full transition-all duration-500"
                                 style={{

@@ -73,7 +73,7 @@ function Cases() {
   ];
 
   return (
-    <motion.div className="page-container" initial="initial" animate="animate">
+    <motion.div className="page-container theme-cases" initial="initial" animate="animate">
       {/* Header */}
       <motion.div variants={fadeUp} className="page-header">
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
@@ -217,7 +217,7 @@ function Cases() {
                 style={{
                   width: "100%",
                   resize: "vertical",
-                  background: "rgba(6, 15, 20, 0.6)",
+                  background: "rgba(255, 255, 255, 0.6)",
                   border: "1px solid var(--color-border)",
                   borderRadius: 12,
                   color: "var(--color-text)",

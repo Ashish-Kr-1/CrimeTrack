@@ -1,4 +1,5 @@
 import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { CDRContext } from "../context/CDRContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -20,6 +21,7 @@ function UploadCenter() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging]     = useState(false);
   const { setCdrData }                  = useContext(CDRContext);
+  const navigate                        = useNavigate();
 
   const [uploads, setUploads] = useState([
     { fileName: "cdr_9520995378_1.csv",      type: "CDR Dataset",  status: "Completed", date: "2026-06-07 12:44:11" },
@@ -52,6 +54,7 @@ function UploadCenter() {
         }
       }
       setCdrData(rows.slice(dataStartIdx));
+      navigate("/");
     };
     reader.readAsText(file);
   };
@@ -70,7 +73,7 @@ function UploadCenter() {
   ];
 
   return (
-    <motion.div className="page-container" initial="initial" animate="animate">
+    <motion.div className="page-container theme-upload" initial="initial" animate="animate">
       {/* Header */}
       <motion.div variants={fadeUp} className="page-header">
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
@@ -110,8 +113,8 @@ function UploadCenter() {
             ? "2px solid var(--color-accent)"
             : "2px dashed var(--color-border-hover)",
           background: isDragging
-            ? "rgba(0, 212, 245, 0.05)"
-            : "rgba(10, 29, 36, 0.4)",
+            ? "rgba(0, 184, 148, 0.05)"
+            : "rgba(255, 255, 255, 0.6)",
           boxShadow: isDragging ? "0 0 40px rgba(0, 212, 245, 0.12)" : "none",
           cursor: "pointer",
           transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -140,8 +143,8 @@ function UploadCenter() {
               width: 64,
               height: 64,
               borderRadius: "50%",
-              background: "rgba(0, 212, 245, 0.08)",
-              border: "1px solid rgba(0, 212, 245, 0.2)",
+              background: "rgba(0, 184, 148, 0.08)",
+              border: "1px solid rgba(0, 184, 148, 0.2)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

@@ -1,8 +1,13 @@
-function KPIcard({ title, value, color = "var(--color-accent)", icon: Icon, sub }) {
+function KPIcard({ title, value, icon: Icon, sub }) {
   return (
     <div
       className="glass-card"
-      style={{ padding: "20px 22px", transition: "var(--transition-base)" }}
+      style={{
+        padding: "20px 22px",
+        transition: "var(--transition-base)",
+        background: `linear-gradient(135deg, rgba(var(--primary-rgb, 108, 92, 231), 0.06) 0%, rgba(var(--primary-rgb, 108, 92, 231), 0.02) 100%)`,
+        borderLeft: "3px solid var(--primary, #6c5ce7)",
+      }}
       onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
     >
@@ -15,12 +20,12 @@ function KPIcard({ title, value, color = "var(--color-accent)", icon: Icon, sub 
             width: 36,
             height: 36,
             borderRadius: 10,
-            background: `${color}18`,
-            border: `1px solid ${color}30`,
+            background: "var(--primary-transparent-18, rgba(108, 92, 231, 0.18))",
+            border: "1px solid var(--primary-transparent-30, rgba(108, 92, 231, 0.30))",
             marginBottom: 14,
           }}
         >
-          <Icon size={16} color={color} strokeWidth={2.2} />
+          <Icon size={16} color="var(--primary, #6c5ce7)" strokeWidth={2.2} />
         </div>
       )}
       <div
@@ -41,7 +46,7 @@ function KPIcard({ title, value, color = "var(--color-accent)", icon: Icon, sub 
           fontWeight: 800,
           letterSpacing: "-0.04em",
           lineHeight: 1,
-          color: color,
+          color: "var(--primary, #6c5ce7)",
           fontFamily: "var(--font-mono)",
         }}
       >
