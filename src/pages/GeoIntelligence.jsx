@@ -92,61 +92,79 @@ function GeoIntelligence() {
 
   return (
     <motion.div
-      className="mx-auto w-full max-w-[1200px] pb-10"
+      className="page-container"
       initial="initial"
       animate="animate"
     >
       {/* Header */}
-      <motion.div variants={fadeUp} className="mb-8">
-        <h1 className="mb-1 text-[30px] font-bold text-text">
+      <motion.div variants={fadeUp} className="page-header">
+        <h1 className="page-title">
           Geo Intelligence Center
         </h1>
-        <p className="text-sm text-text-muted">
+        <p className="page-subtitle">
           Cellular base transceiver station (BTS) coordinates and cell location
           area mappings.
         </p>
       </motion.div>
 
       {records.length === 0 ? (
-        <div className="glass-card p-10 text-center text-text-muted">
-          No geolocation data loaded. Please upload a CDR to analyze cellular
-          coordinates.
+        <div className="glass-card empty-state">
+          <div className="empty-state-icon">
+            <MapPin size={30} color="var(--color-accent)" strokeWidth={1.8} />
+          </div>
+          <div className="empty-state-title">No Geolocation Data Loaded</div>
+          <p className="empty-state-body">
+            Please upload a CDR to analyze cellular coordinates.
+          </p>
         </div>
       ) : (
         <>
           {/* KPIs */}
           <motion.div
             variants={fadeUp}
-            className="mb-8 grid gap-5"
             style={{
+              display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: 16,
+              marginBottom: 24,
             }}
           >
             {kpis.map((kpi, i) => (
               <motion.div
                 key={i}
-                whileHover={{ y: -3, scale: 1.015 }}
-                className="glass-card flex items-center gap-4 p-5"
+                whileHover={{ y: -3, scale: 1.012 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                className="glass-card"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  padding: "18px 20px",
+                  borderLeft: `3px solid ${kpi.color}`,
+                }}
               >
                 <div
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border"
                   style={{
-                    backgroundColor: kpi.bg,
-                    borderColor: `${kpi.color}25`,
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    background: kpi.bg,
+                    border: `1px solid ${kpi.color}30`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
                   }}
                 >
                   <kpi.icon size={20} color={kpi.color} strokeWidth={2.2} />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <span className="text-xs font-medium text-text-muted">
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", marginBottom: 3 }}>
                     {kpi.label}
-                  </span>
-                  <h2
-                    className={`mt-0.5 truncate ${kpi.isMonospace ? "font-mono text-[14px] font-bold" : "text-xl font-bold text-text"}`}
-                    style={kpi.isMonospace ? { color: kpi.color } : undefined}
-                  >
+                  </div>
+                  <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1, color: kpi.color, fontFamily: kpi.isMonospace ? "var(--font-mono)" : "var(--font-sans)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {kpi.value}
-                  </h2>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -156,12 +174,12 @@ function GeoIntelligence() {
           {markers.length > 0 && (
             <motion.div
               variants={fadeUp}
-              className="glass-card mb-8 overflow-hidden p-0"
-              style={{ borderRadius: 16 }}
+              className="glass-card"
+              style={{ padding: 0, overflow: "hidden", marginBottom: 24 }}
             >
-              <div className="px-6 pt-5 pb-3">
-                <h2 className="flex items-center gap-2 text-lg font-bold text-text">
-                  <MapPin size={18} color="#ff6b4a" />
+              <div style={{ padding: "18px 22px", borderBottom: "1px solid var(--color-border)", background: "rgba(10, 29, 36, 0.3)" }}>
+                <h2 style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 700, color: "var(--color-text)" }}>
+                  <MapPin size={18} color="var(--color-accent)" />
                   Cell Tower Geo Plot
                 </h2>
               </div>
@@ -204,13 +222,16 @@ function GeoIntelligence() {
           )}
 
           {/* Tables */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 18 }}>
             {/* Coordinates Table */}
-            <motion.div variants={fadeUp} className="glass-card p-6">
-              <h2 className="mb-5 text-lg font-bold text-text">
-                Peak Visited Coordinates
-              </h2>
-              <div className="overflow-x-auto">
+            <motion.div variants={fadeUp} className="glass-card" style={{ padding: "22px 24px" }}>
+              <div className="section-header">
+                <div className="section-title">
+                  <MapPin size={16} className="section-title-icon" />
+                  Peak Visited Coordinates
+                </div>
+              </div>
+              <div style={{ overflowX: "auto" }}>
                 <table className="ct-table">
                   <thead>
                     <tr>
@@ -224,20 +245,19 @@ function GeoIntelligence() {
                       const searchUrl = `https://www.google.com/maps/search/?api=1&query=${location.replace("/", ",")}`;
                       return (
                         <tr key={idx}>
-                          <td className="font-mono text-[13px] text-text">
+                          <td style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--color-text)" }}>
                             {location}
                           </td>
-                          <td className="font-bold">{count}</td>
+                          <td style={{ fontWeight: 700 }}>{count}</td>
                           <td>
                             <a
                               href={searchUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold transition-colors hover:brightness-125"
-                              style={{ color: "#00e5ff" }}
+                              style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: "var(--color-accent)", textDecoration: "none" }}
                             >
                               Maps
-                              <ExternalLink size={11} />
+                              <ExternalLink size={12} />
                             </a>
                           </td>
                         </tr>
@@ -249,11 +269,14 @@ function GeoIntelligence() {
             </motion.div>
 
             {/* CGI Table */}
-            <motion.div variants={fadeUp} className="glass-card p-6">
-              <h2 className="mb-5 text-lg font-bold text-text">
-                Top CGI Cells
-              </h2>
-              <div className="overflow-x-auto">
+            <motion.div variants={fadeUp} className="glass-card" style={{ padding: "22px 24px" }}>
+              <div className="section-header">
+                <div className="section-title flex justify-between">
+                  <Layers size={16} className="section-title-icon" />
+                  Top CGI Cells
+                </div>
+              </div>
+              <div style={{ overflowX: "auto" }}>
                 <table className="ct-table">
                   <thead>
                     <tr>
@@ -265,12 +288,11 @@ function GeoIntelligence() {
                     {topCGIs.map(([cgi, count], idx) => (
                       <tr key={idx}>
                         <td
-                          className="font-mono text-[13px] font-semibold"
-                          style={{ color: "#00e5ff" }}
+                          style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600, color: "var(--color-accent)" }}
                         >
                           {cgi}
                         </td>
-                        <td className="font-bold">{count}</td>
+                        <td style={{ fontWeight: 700 }}>{count}</td>
                       </tr>
                     ))}
                   </tbody>
