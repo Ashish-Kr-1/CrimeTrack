@@ -158,39 +158,26 @@ function Dashboard() {
   /* ── Empty State ── */
   if (!diagnosticReport || records.length === 0) {
     return (
-      <div className="mx-auto max-w-[900px] pt-12 text-center">
+      <div style={{ maxWidth: 860, margin: "0 auto", paddingTop: 40 }}>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass-card flex flex-col items-center gap-5 px-10 py-16"
+          className="glass-card empty-state"
         >
-          <div
-            className="flex h-20 w-20 items-center justify-center rounded-full border"
-            style={{
-              backgroundColor: "rgba(0, 229, 255, 0.06)",
-              borderColor: "rgba(0, 229, 255, 0.18)",
-              boxShadow: "0 0 35px rgba(0, 229, 255, 0.08)",
-            }}
-          >
-            <ShieldAlert size={36} color="#00e5ff" strokeWidth={1.8} />
+          <div className="empty-state-icon">
+            <ShieldAlert size={32} color="var(--color-accent)" strokeWidth={1.8} />
           </div>
-          <h2 className="text-2xl font-bold text-text">
-            Forensic Intelligence Engine Offline
-          </h2>
-          <p className="max-w-md text-sm leading-relaxed text-text-muted">
-            No active suspect datasets loaded. Upload a standard Call Detail Record
-            (CDR) file in the Ingestion Center to generate behavioral narrative profiles,
+          <div className="empty-state-title">Forensic Intelligence Engine Offline</div>
+          <p className="empty-state-body">
+            No active suspect datasets loaded. Upload a standard Call Detail Record (CDR)
+            file in the Ingestion Center to generate behavioral narrative profiles,
             explainable threat matrices, and link diagrams.
           </p>
           <button
             id="goto-upload"
             onClick={() => navigate("/upload")}
-            className="mt-2 flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all hover:brightness-110"
-            style={{
-              backgroundColor: "#00e5ff",
-              color: "#082229",
-              boxShadow: "0 4px 18px rgba(0, 229, 255, 0.35)",
-            }}
+            className="btn btn-primary"
+            style={{ marginTop: 8, padding: "12px 28px", fontSize: 14 }}
           >
             Go to Upload Center
             <ChevronRight size={16} />
@@ -278,51 +265,68 @@ function Dashboard() {
 
   return (
     <motion.div
-      className="mx-auto w-full max-w-[1400px] pb-10"
+      className="page-container"
       variants={stagger}
       initial="initial"
       animate="animate"
     >
-      {/* Target Suspect Info Header */}
-      <motion.div variants={fadeUp} className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      {/* ── Header ── */}
+      <motion.div variants={fadeUp} style={{ marginBottom: 22, display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-text">
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+            <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.03em", color: "var(--color-text)", lineHeight: 1.2 }}>
               Investigative Workspace
             </h1>
             <span
-              className="rounded-full px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase"
               style={{
-                backgroundColor: statusGlow,
+                padding: "3px 10px",
+                borderRadius: 999,
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                background: statusGlow,
                 color: statusColor,
-                border: `1px solid ${statusColor}35`,
+                border: `1px solid ${statusColor}40`,
+                flexShrink: 0,
               }}
             >
-              Target active
+              Target Active
             </span>
           </div>
-          <p className="text-xs text-text-muted mt-0.5">
+          <p style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 2 }}>
             Telecom telemetry dossier on target ID:{" "}
-            <strong className="text-text font-mono text-[13px]">{diagnosticReport.target_phone}</strong>
+            <strong style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)", fontSize: 13 }}>{diagnosticReport.target_phone}</strong>
           </p>
         </div>
 
-        {/* Global Verdict Card */}
-        <div className="flex items-center gap-4 rounded-xl border border-border bg-dark-surface/40 px-4 py-2.5">
-          <div className="text-right">
-            <span className="text-[10px] font-bold text-text-subtle uppercase block tracking-wider">
-              AI CLASSIFICATION
+        {/* Verdict card */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 18,
+            padding: "10px 18px",
+            borderRadius: 14,
+            border: "1px solid var(--color-border)",
+            background: "rgba(10, 29, 36, 0.6)",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          <div style={{ textAlign: "right" }}>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 3 }}>
+              AI Classification
             </span>
-            <span className="text-xs font-bold text-text">
+            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text)", lineHeight: 1 }}>
               {diagnosticReport.classification.replace(/_/g, " ")}
             </span>
           </div>
-          <div className="h-8 w-[1px] bg-border" />
-          <div className="text-center">
-            <span className="text-[10px] font-bold text-text-subtle uppercase block tracking-wider">
-              RISK RATE
+          <div style={{ width: 1, height: 32, background: "var(--color-border)" }} />
+          <div style={{ textAlign: "center" }}>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 3 }}>
+              Risk Score
             </span>
-            <span className="text-xs font-bold font-mono" style={{ color: statusColor }}>
+            <span style={{ fontSize: 20, fontWeight: 800, fontFamily: "var(--font-mono)", color: statusColor, letterSpacing: "-0.04em", lineHeight: 1 }}>
               {(diagnosticReport.suspicion_score * 100).toFixed(0)}%
             </span>
           </div>
@@ -330,11 +334,11 @@ function Dashboard() {
       </motion.div>
 
       {/* Main Multi-Panel HUD Layout */}
-      <div className="grid gap-6 lg:gap-8 lg:grid-cols-12">
+      <div className="grid lg:grid-cols-12" style={{ gap: 18 }}>
         {/* ========================================================
             LEFT COLUMN: AI INVESTIGATOR ASSISTANT (40% width)
             ======================================================== */}
-        <div className="lg:col-span-5 flex flex-col gap-6 lg:gap-8">
+        <div className="lg:col-span-5 flex flex-col" style={{ gap: 18 }}>
           {/* Dossier Overview Card */}
           <motion.div variants={fadeUp} className="glass-card border border-border p-6 relative overflow-hidden">
             <div className="scan-overlay pointer-events-none absolute inset-0" />
@@ -388,39 +392,22 @@ function Dashboard() {
           </motion.div>
 
           {/* AI Workspace Panel Tabs */}
-          <motion.div variants={fadeUp} className="glass-card border border-border flex-1 flex flex-col min-h-[500px] overflow-hidden">
+          <motion.div variants={fadeUp} className="glass-card flex-1 flex flex-col overflow-hidden" style={{ minHeight: 500 }}>
             {/* Tabs Header */}
-            <div className="flex border-b border-border bg-dark-surface/30 px-3 pt-2 gap-1.5">
-              <button
-                onClick={() => setLeftTab("narrative")}
-                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all border-t border-x ${
-                  leftTab === "narrative"
-                    ? "border-border bg-dark-surface text-accent font-extrabold"
-                    : "border-transparent text-text-muted hover:text-text hover:bg-dark-elevated/20"
-                }`}
-              >
-                Behavioral Narrative
-              </button>
-              <button
-                onClick={() => setLeftTab("heuristics")}
-                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all border-t border-x ${
-                  leftTab === "heuristics"
-                    ? "border-border bg-dark-surface text-accent font-extrabold"
-                    : "border-transparent text-text-muted hover:text-text hover:bg-dark-elevated/20"
-                }`}
-              >
-                Threat Matrix
-              </button>
-              <button
-                onClick={() => setLeftTab("recommendations")}
-                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all border-t border-x ${
-                  leftTab === "recommendations"
-                    ? "border-border bg-dark-surface text-accent font-extrabold"
-                    : "border-transparent text-text-muted hover:text-text hover:bg-dark-elevated/20"
-                }`}
-              >
-                Next Actions
-              </button>
+            <div className="tab-bar">
+              {[
+                { id: "narrative",       label: "Behavioral Narrative" },
+                { id: "heuristics",     label: "Threat Matrix" },
+                { id: "recommendations",label: "Next Actions" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setLeftTab(tab.id)}
+                  className={`tab-item${leftTab === tab.id ? " active" : ""}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
             {/* Tab Contents */}
@@ -434,36 +421,22 @@ function Dashboard() {
                     exit={{ opacity: 0 }}
                     className="flex flex-col gap-6"
                   >
-                    {/* Diagnostic Quick Stats Grid */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-dark-surface/40 border border-border rounded-xl p-4 flex flex-col justify-between">
-                        <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider">Operational Span</span>
-                        <div className="text-sm font-bold text-text mt-0.5 flex items-baseline gap-1">
-                          <span className="text-lg text-accent">{diagnosticReport.feature_vector.active_days || "N/A"}</span>
-                          <span className="text-xs text-text-muted">days</span>
+                    {/* Quick Stats Grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      {[
+                        { label: "Operational Span",   value: diagnosticReport.feature_vector.active_days || "N/A",           unit: "days",     color: "var(--color-accent)" },
+                        { label: "Hardware Fleet",     value: diagnosticReport.feature_vector.unique_imei_count || "N/A",    unit: "IMEIs",    color: "#c084fc" },
+                        { label: "Financial Accounts", value: diagnosticReport.feature_vector.bank_sender_count || "N/A",    unit: "banks",    color: "var(--color-gold)" },
+                        { label: "UPI Aggregations",   value: diagnosticReport.feature_vector.upi_burst_sms_count || "0",   unit: "bindings", color: "var(--color-gold)" },
+                      ].map((s) => (
+                        <div key={s.label} className="stat-mini">
+                          <span className="stat-mini-label">{s.label}</span>
+                          <div style={{ display: "flex", alignItems: "baseline", gap: 5, marginTop: 4 }}>
+                            <span className="stat-mini-value" style={{ color: s.color }}>{s.value}</span>
+                            <span className="stat-mini-sub">{s.unit}</span>
+                          </div>
                         </div>
-                      </div>
-                      <div className="bg-dark-surface/40 border border-border rounded-xl p-4 flex flex-col justify-between">
-                        <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider">Hardware Fleet</span>
-                        <div className="text-sm font-bold text-text mt-0.5 flex items-baseline gap-1">
-                          <span className="text-lg text-purple-400 font-mono">{diagnosticReport.feature_vector.unique_imei_count || "N/A"}</span>
-                          <span className="text-xs text-text-muted">IMEIs</span>
-                        </div>
-                      </div>
-                      <div className="bg-dark-surface/40 border border-border rounded-xl p-4 flex flex-col justify-between">
-                        <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider">Financial Accounts</span>
-                        <div className="text-sm font-bold text-text mt-0.5 flex items-baseline gap-1">
-                          <span className="text-lg text-gold font-mono">{diagnosticReport.feature_vector.bank_sender_count || "N/A"}</span>
-                          <span className="text-xs text-text-muted">banks</span>
-                        </div>
-                      </div>
-                      <div className="bg-dark-surface/40 border border-border rounded-xl p-4 flex flex-col justify-between">
-                        <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider">UPI Aggregations</span>
-                        <div className="text-sm font-bold text-text mt-0.5 flex items-baseline gap-1">
-                          <span className="text-lg text-gold font-mono">{diagnosticReport.feature_vector.upi_burst_sms_count || "0"}</span>
-                          <span className="text-xs text-text-muted">bindings</span>
-                        </div>
-                      </div>
+                      ))}
                     </div>
 
                     <div>
@@ -628,44 +601,25 @@ function Dashboard() {
         {/* ========================================================
             RIGHT COLUMN: VISUAL ANALYTICS STUDIO (60% width)
             ======================================================== */}
-        <div className="lg:col-span-7 flex flex-col gap-6 lg:gap-8">
+        <div className="lg:col-span-7 flex flex-col" style={{ gap: 18 }}>
           {/* Main Visualizer Container */}
-          <motion.div variants={fadeUp} className="glass-card border border-border flex-1 flex flex-col overflow-hidden">
+          <motion.div variants={fadeUp} className="glass-card flex-1 flex flex-col overflow-hidden">
             {/* Viz Panel Tabs */}
-            <div className="flex border-b border-border bg-dark-surface/40 px-3 pt-2 gap-1.5">
-              <button
-                onClick={() => setRightTab("replay")}
-                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all border-t border-x flex items-center gap-2 ${
-                  rightTab === "replay"
-                    ? "border-border bg-dark-surface text-accent font-extrabold"
-                    : "border-transparent text-text-muted hover:text-text hover:bg-dark-elevated/20"
-                }`}
-              >
-                <Activity size={13} />
-                Chronological Replay
-              </button>
-              <button
-                onClick={() => setRightTab("network")}
-                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all border-t border-x flex items-center gap-2 ${
-                  rightTab === "network"
-                    ? "border-border bg-dark-surface text-accent font-extrabold"
-                    : "border-transparent text-text-muted hover:text-text hover:bg-dark-elevated/20"
-                }`}
-              >
-                <Users size={13} />
-                Relationship Network
-              </button>
-              <button
-                onClick={() => setRightTab("heatmap")}
-                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all border-t border-x flex items-center gap-2 ${
-                  rightTab === "heatmap"
-                    ? "border-border bg-dark-surface text-accent font-extrabold"
-                    : "border-transparent text-text-muted hover:text-text hover:bg-dark-elevated/20"
-                }`}
-              >
-                <MapPin size={13} />
-                Geospatial Heatmap
-              </button>
+            <div className="tab-bar">
+              {[
+                { id: "replay",  icon: Activity, label: "Chronological Replay" },
+                { id: "network", icon: Users,    label: "Relationship Network" },
+                { id: "heatmap", icon: MapPin,   label: "Geospatial Heatmap" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setRightTab(tab.id)}
+                  className={`tab-item${rightTab === tab.id ? " active" : ""}`}
+                >
+                  <tab.icon size={13} />
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
             {/* Tab Workspace */}
@@ -681,69 +635,90 @@ function Dashboard() {
                     className="flex-1 flex flex-col overflow-hidden"
                   >
                     {/* Media Controller Bar */}
-                    <div className="flex flex-wrap items-center justify-between gap-4 bg-dark-surface/30 border-b border-border px-5 py-3 shrink-0">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setActiveEventIndex(0);
-                            setIsPlaying(false);
-                          }}
-                          className="p-1.5 rounded hover:bg-dark-elevated text-text-muted hover:text-text transition-colors"
-                          title="Rewind to Start"
-                        >
-                          <RotateCcw size={14} />
-                        </button>
-                        <button
-                          onClick={() => setActiveEventIndex((p) => Math.max(0, p - 1))}
-                          className="p-1.5 rounded hover:bg-dark-elevated text-text-muted hover:text-text transition-colors"
-                          title="Previous Event"
-                        >
-                          <SkipBack size={14} />
-                        </button>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 12,
+                        background: "rgba(10, 29, 36, 0.5)",
+                        borderBottom: "1px solid var(--color-border)",
+                        padding: "10px 18px",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {/* Transport controls */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        {[
+                          { action: () => { setActiveEventIndex(0); setIsPlaying(false); }, Icon: RotateCcw, title: "Rewind" },
+                          { action: () => setActiveEventIndex((p) => Math.max(0, p - 1)),          Icon: SkipBack,   title: "Prev" },
+                        ].map(({ action, Icon, title }) => (
+                          <button key={title} onClick={action} title={title} className="icon-btn" style={{ padding: 7 }}>
+                            <Icon size={13} />
+                          </button>
+                        ))}
                         <button
                           onClick={() => setIsPlaying(!isPlaying)}
-                          className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-white hover:brightness-110 transition-all shadow"
-                          title={isPlaying ? "Pause Playback" : "Play Timeline"}
+                          title={isPlaying ? "Pause" : "Play"}
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            background: "var(--color-accent)",
+                            border: "none",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            boxShadow: "0 2px 12px var(--color-accent-glow)",
+                            transition: "var(--transition-base)",
+                            flexShrink: 0,
+                          }}
                         >
-                          {isPlaying ? <Pause size={12} fill="white" /> : <Play size={12} fill="white" className="ml-0.5" />}
+                          {isPlaying
+                            ? <Pause size={13} fill="var(--color-dark)" color="var(--color-dark)" />
+                            : <Play  size={13} fill="var(--color-dark)" color="var(--color-dark)" style={{ marginLeft: 1 }} />}
                         </button>
-                        <button
-                          onClick={() => setActiveEventIndex((p) => Math.min(replayEvents.length - 1, p + 1))}
-                          className="p-1.5 rounded hover:bg-dark-elevated text-text-muted hover:text-text transition-colors"
-                          title="Next Event"
-                        >
-                          <SkipForward size={14} />
+                        <button onClick={() => setActiveEventIndex((p) => Math.min(replayEvents.length - 1, p + 1))} title="Next" className="icon-btn" style={{ padding: 7 }}>
+                          <SkipForward size={13} />
                         </button>
                       </div>
 
-                      {/* Playback speed selector */}
-                      <div className="flex items-center gap-1">
+                      {/* Speed buttons */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
                         {[0.5, 1, 2, 5].map((speed) => (
                           <button
                             key={speed}
                             onClick={() => setPlaybackSpeed(speed)}
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              playbackSpeed === speed
-                                ? "bg-accent/20 text-accent border border-accent/40"
-                                : "border border-transparent text-text-subtle hover:text-text"
-                            }`}
+                            style={{
+                              padding: "3px 8px",
+                              borderRadius: 6,
+                              fontSize: 10,
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              transition: "var(--transition-fast)",
+                              background: playbackSpeed === speed ? "var(--color-accent-dim)" : "transparent",
+                              color: playbackSpeed === speed ? "var(--color-accent)" : "var(--color-text-subtle)",
+                              border: `1px solid ${playbackSpeed === speed ? "rgba(0,212,245,0.35)" : "transparent"}`,
+                            }}
                           >
-                            {speed}x
+                            {speed}×
                           </button>
                         ))}
                       </div>
 
                       {/* Scrub Slider */}
-                      <div className="flex-1 min-w-[200px] flex items-center gap-3">
+                      <div style={{ flex: 1, minWidth: 180, display: "flex", alignItems: "center", gap: 10 }}>
                         <input
                           type="range"
                           min={0}
                           max={replayEvents.length - 1}
                           value={activeEventIndex}
                           onChange={(e) => setActiveEventIndex(parseInt(e.target.value))}
-                          className="flex-1 accent-accent cursor-pointer h-1.5 bg-dark border border-border rounded-full"
+                          style={{ flex: 1, accentColor: "var(--color-accent)", cursor: "pointer", height: 4 }}
                         />
-                        <span className="text-[11px] font-mono text-text-muted shrink-0 min-w-[65px] text-right">
+                        <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--color-text-muted)", flexShrink: 0, minWidth: 70, textAlign: "right" }}>
                           {activeEventIndex + 1} / {replayEvents.length}
                         </span>
                       </div>
@@ -800,43 +775,59 @@ function Dashboard() {
                         )}
                       </div>
 
-                      {/* Live HUD Diagnostics Screen (Shifted below Map) */}
-                      <div className="bg-dark-surface/10 border border-border rounded-xl p-4 shrink-0">
-                        <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-subtle flex items-center gap-1.5 mb-3.5">
-                          <Terminal size={12} className="text-accent" />
-                          TELEMETRY MONITOR HUD
-                        </h4>
-
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                          <div className="border-r border-border pr-2">
-                            <span className="text-[9px] font-bold text-text-subtle uppercase block">TIMESTAMP</span>
-                            <span className="text-xs font-mono font-semibold text-text">{activeEvent?.timeLabel || "N/A"}</span>
-                          </div>
-
-                          <div className="border-r border-border pr-2">
-                            <span className="text-[9px] font-bold text-text-subtle uppercase block">ACTIVE HARDWARE (IMEI)</span>
-                            <span className="text-xs font-mono font-semibold text-accent">{activeEvent?.imei || "N/A"}</span>
-                          </div>
-
-                          <div className="border-r border-border pr-2">
-                            <span className="text-[9px] font-bold text-text-subtle uppercase block">CELL ANCHOR CGI</span>
-                            <span className="text-xs font-mono font-semibold text-gold truncate block" title={activeEvent?.cgi}>{activeEvent?.cgi || "N/A"}</span>
-                          </div>
-
-                          <div className="border-r border-border pr-2">
-                            <span className="text-[9px] font-bold text-text-subtle uppercase block">ROAMING CIRCLE</span>
-                            <span className="text-xs font-semibold text-text">{activeEvent?.roam || "N/A"}</span>
-                          </div>
-
-                          <div>
-                            <span className="text-[9px] font-bold text-text-subtle uppercase block">COUNTERPARTY</span>
-                            <span className="text-xs font-mono font-semibold text-text">{activeEvent?.bParty || "N/A"}</span>
-                          </div>
+                      {/* Live HUD Diagnostics */}
+                      <div
+                        style={{
+                          background: "rgba(10, 29, 36, 0.4)",
+                          border: "1px solid var(--color-border)",
+                          borderRadius: 14,
+                          padding: "16px 18px",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
+                          <Terminal size={12} color="var(--color-accent)" />
+                          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>
+                            Telemetry Monitor
+                          </span>
                         </div>
 
-                        <div className="mt-3.5 pt-3 border-t border-border">
-                          <span className="text-[9px] font-bold text-text-subtle uppercase block">LOG ANALYSIS</span>
-                          <p className="text-[11px] leading-relaxed text-text-muted mt-0.5">{activeEvent?.details || "No events processed."}</p>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: 12 }}>
+                          {[
+                            { label: "Timestamp",      value: activeEvent?.timeLabel || "N/A",  color: "var(--color-text)" },
+                            { label: "IMEI",            value: activeEvent?.imei     || "N/A",  color: "var(--color-accent)" },
+                            { label: "Cell CGI",        value: activeEvent?.cgi      || "N/A",  color: "var(--color-gold)",   mono: true },
+                            { label: "Roaming Circle",  value: activeEvent?.roam     || "N/A",  color: "var(--color-text)" },
+                            { label: "Counterparty",    value: activeEvent?.bParty   || "N/A",  color: "var(--color-text)",  mono: true },
+                          ].map((item) => (
+                            <div key={item.label}>
+                              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 3 }}>
+                                {item.label}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: 12,
+                                  fontWeight: 600,
+                                  color: item.color,
+                                  fontFamily: item.mono ? "var(--font-mono)" : "inherit",
+                                  wordBreak: "break-all",
+                                  display: "block",
+                                }}
+                                title={item.value}
+                              >
+                                {item.value}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--color-border)" }}>
+                          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 3 }}>
+                            Log Analysis
+                          </span>
+                          <p style={{ fontSize: 12, lineHeight: 1.6, color: "var(--color-text-muted)" }}>
+                            {activeEvent?.details || "No events processed."}
+                          </p>
                         </div>
                       </div>
                     </div>

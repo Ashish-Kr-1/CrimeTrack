@@ -10,51 +10,98 @@ import {
   Network,
   FolderOpen,
   Wifi,
+  ChevronRight,
 } from "lucide-react";
 
 const navItems = [
-  { to: "/upload", icon: UploadCloud, label: "Upload Center" },
-  { to: "/", icon: LayoutDashboard, label: "Dashboard", end: true },
-  { to: "/risk", icon: AlertTriangle, label: "Risk Center" },
-  { to: "/mobility", icon: Clock, label: "Mobility Tracker" },
-  { to: "/geo", icon: MapPin, label: "Geo Intelligence" },
-  { to: "/network", icon: Network, label: "Network Analysis" },
-  { to: "/cases", icon: FolderOpen, label: "Active Cases" },
+  { to: "/upload",  icon: UploadCloud,     label: "Upload Center",    badge: null },
+  { to: "/",        icon: LayoutDashboard, label: "Dashboard",        end: true, badge: null },
+  { to: "/risk",    icon: AlertTriangle,   label: "Risk Center",      badge: null },
+  { to: "/mobility",icon: Clock,           label: "Mobility Tracker", badge: null },
+  { to: "/geo",     icon: MapPin,          label: "Geo Intelligence", badge: null },
+  { to: "/network", icon: Network,         label: "Network Analysis", badge: null },
+  { to: "/cases",   icon: FolderOpen,      label: "Active Cases",     badge: null },
 ];
 
 function Sidebar({ isOpen, onClose }) {
   return (
     <div
-      className={`fixed inset-y-0 left-0 z-50 flex w-[270px] shrink-0 flex-col justify-between border-r border-border bg-dark-surface p-6 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col lg:static lg:translate-x-0 ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       }`}
+      style={{
+        width: "var(--sidebar-width, 260px)",
+        background: "linear-gradient(180deg, rgba(10, 29, 36, 0.98) 0%, rgba(6, 15, 20, 0.98) 100%)",
+        borderRight: "1px solid var(--color-border)",
+        transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+      }}
     >
-      {/* Brand */}
-      <div>
-        <div className="mb-10 px-2 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      {/* ── Top section ── */}
+      <div style={{ padding: "24px 20px 12px" }}>
+
+        {/* Brand */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px" }}>
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 10,
+              background: "linear-gradient(135deg, var(--color-accent) 0%, #0097b2 100%)",
+              boxShadow: "0 0 20px rgba(0, 212, 245, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Shield size={18} color="white" strokeWidth={2.5} />
+          </div>
+          <div>
             <div
-              className="flex h-9 w-9 items-center justify-center rounded-lg"
               style={{
-                background: "linear-gradient(135deg, #00e5ff, #124854)",
-                boxShadow: "0 0 18px rgba(0, 229, 255, 0.45)",
+                fontSize: 15,
+                fontWeight: 800,
+                letterSpacing: "-0.02em",
+                color: "var(--color-text)",
+                lineHeight: 1.2,
               }}
             >
-              <Shield size={18} color="white" strokeWidth={2.5} />
+              CrimeTrack
             </div>
-            <div>
-              <h1 className="text-[17px] font-bold tracking-wider text-text">
-                CYBER TRACKER
-              </h1>
-              <p className="text-[9px] font-semibold tracking-[0.12em] text-text-subtle">
-                INTELLIGENCE PLATFORM v2.0
-              </p>
+            <div
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--color-text-subtle)",
+                marginTop: 1,
+              }}
+            >
+              Intelligence Platform
             </div>
           </div>
         </div>
- 
+
+        {/* Nav section label */}
+        <div
+          style={{
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "var(--color-text-subtle)",
+            marginBottom: 8,
+            paddingLeft: 4,
+          }}
+        >
+          Navigation
+        </div>
+
         {/* Navigation */}
-        <nav className="flex flex-col gap-1.5">
+        <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -65,37 +112,65 @@ function Sidebar({ isOpen, onClose }) {
             >
               {({ isActive }) => (
                 <div
-                  className="relative flex items-center gap-3 rounded-xl px-4 py-3 text-[13.5px] font-medium transition-all duration-200"
                   style={{
-                    color: isActive ? "#00e5ff" : "#88aeb7",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "9px 12px",
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: isActive ? 600 : 500,
+                    letterSpacing: "-0.01em",
+                    color: isActive ? "var(--color-accent)" : "var(--color-text-muted)",
                     backgroundColor: isActive
-                      ? "rgba(0, 229, 255, 0.1)"
+                      ? "rgba(0, 212, 245, 0.09)"
                       : "transparent",
-                    border: isActive
-                      ? "1px solid rgba(0, 229, 255, 0.2)"
-                      : "1px solid transparent",
+                    border: `1px solid ${isActive ? "rgba(0, 212, 245, 0.18)" : "transparent"}`,
+                    transition: "all 0.18s cubic-bezier(0.4, 0, 0.2, 1)",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.04)";
+                      e.currentTarget.style.color = "var(--color-text)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "var(--color-text-muted)";
+                    }
                   }}
                 >
+                  {/* Active indicator */}
                   {isActive && (
                     <motion.div
                       layoutId="sidebar-indicator"
-                      className="absolute left-0 top-[15%] h-[70%] w-[3px] rounded-r-sm"
                       style={{
-                        backgroundColor: "#00e5ff",
-                        boxShadow: "0 0 10px #00e5ff",
+                        position: "absolute",
+                        left: 0,
+                        top: "16%",
+                        height: "68%",
+                        width: 3,
+                        borderRadius: "0 3px 3px 0",
+                        background: "linear-gradient(180deg, var(--color-accent), var(--color-accent-light))",
+                        boxShadow: "0 0 10px var(--color-accent)",
                       }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 350,
-                        damping: 30,
-                      }}
+                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
                     />
                   )}
+
                   <item.icon
-                    size={18}
+                    size={16}
                     strokeWidth={isActive ? 2.5 : 2}
+                    style={{ flexShrink: 0 }}
                   />
-                  {item.label}
+                  <span style={{ flex: 1 }}>{item.label}</span>
+
+                  {isActive && (
+                    <ChevronRight size={12} style={{ opacity: 0.5 }} />
+                  )}
                 </div>
               )}
             </NavLink>
@@ -103,25 +178,52 @@ function Sidebar({ isOpen, onClose }) {
         </nav>
       </div>
 
-      {/* System Status Footer */}
-      <div className="flex items-center gap-2.5 border-t border-border pt-5">
-        <span className="relative flex h-2 w-2">
-          <span
-            className="absolute inline-flex h-full w-full rounded-full opacity-75"
-            style={{
-              backgroundColor: "#2d8a5e",
-              animation: "pulse-glow 2s ease-in-out infinite",
-            }}
-          />
-          <span
-            className="relative inline-flex h-2 w-2 rounded-full"
-            style={{ backgroundColor: "#2d8a5e" }}
-          />
-        </span>
-        <span className="flex items-center gap-1.5 text-xs font-medium text-text-muted">
-          <Wifi size={12} />
-          Secure Sandbox Online
-        </span>
+      {/* ── Bottom status ── */}
+      <div style={{ marginTop: "auto", padding: "16px 20px 20px" }}>
+        {/* Thin divider */}
+        <div style={{ height: 1, background: "var(--color-border)", marginBottom: 16 }} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Pulse dot */}
+          <div style={{ position: "relative", width: 8, height: 8, flexShrink: 0 }}>
+            <span
+              style={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: "50%",
+                backgroundColor: "var(--color-success)",
+                opacity: 0.5,
+                animation: "pulse-glow 2.2s ease-in-out infinite",
+              }}
+            />
+            <span
+              style={{
+                position: "absolute",
+                inset: 1,
+                borderRadius: "50%",
+                backgroundColor: "var(--color-success)",
+              }}
+            />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: "var(--color-text-secondary)",
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              <Wifi size={11} />
+              Secure Sandbox
+            </span>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-success)" }}>
+              Online
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -8,99 +8,232 @@ function Navbar({ onToggleSidebar }) {
 
   return (
     <div
-      className="glass-card mb-6 flex h-[68px] items-center justify-between px-4 md:px-6 gap-4"
-      style={{ borderRadius: "14px" }}
+      className="glass-card"
+      style={{
+        height: "var(--navbar-height, 64px)",
+        marginBottom: 20,
+        borderRadius: "var(--radius-xl)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 18px",
+        gap: 16,
+        flexShrink: 0,
+      }}
     >
-      {/* Left section: Hamburger Menu and Search */}
-      <div className="flex items-center gap-3 flex-1">
+      {/* ── Left: Hamburger + Search ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
+
+        {/* Mobile menu toggle */}
         <button
           onClick={onToggleSidebar}
-          className="rounded-lg border border-border p-2 text-text-muted hover:text-accent hover:border-border-hover lg:hidden"
+          className="icon-btn lg:hidden"
+          aria-label="Toggle sidebar"
+          style={{ flexShrink: 0 }}
         >
-          <Menu size={15} />
+          <Menu size={16} />
         </button>
 
-        <div className="relative flex items-center w-full max-w-[360px]">
+        {/* Search bar */}
+        <div style={{ position: "relative", flex: 1, maxWidth: 380 }}>
           <Search
-            size={15}
-            className="absolute left-3.5 text-text-subtle"
+            size={14}
+            style={{
+              position: "absolute",
+              left: 13,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "var(--color-text-subtle)",
+              flexShrink: 0,
+            }}
             strokeWidth={2.5}
           />
           <input
             id="nav-search"
             type="text"
-            placeholder="               Search phone numbers, cells, IMEIs..."
-            className="w-full rounded-xl border border-border bg-dark/60 px-4 py-2.5 pl-10 text-[13px] font-medium text-text outline-none transition-colors duration-200 placeholder:text-text-subtle focus:border-accent"
+            placeholder="Search numbers, IMEIs, cells…"
+            style={{
+              width: "100%",
+              background: "rgba(6, 15, 20, 0.6)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-md)",
+              color: "var(--color-text)",
+              fontFamily: "var(--font-sans)",
+              fontSize: 13,
+              fontWeight: 500,
+              letterSpacing: "-0.01em",
+              padding: "9px 46px 9px 38px",
+              outline: "none",
+              transition: "var(--transition-base)",
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = "var(--color-accent)";
+              e.target.style.boxShadow = "0 0 0 3px var(--color-accent-dim)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "var(--color-border)";
+              e.target.style.boxShadow = "none";
+            }}
           />
-          <span className="hidden md:inline absolute right-3 rounded border border-border bg-dark-elevated px-1.5 py-0.5 text-[10px] font-semibold text-text-subtle">
+          <span
+            className="hide-mobile"
+            style={{
+              position: "absolute",
+              right: 11,
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "var(--color-dark-elevated)",
+              border: "1px solid var(--color-border)",
+              borderRadius: 5,
+              padding: "2px 6px",
+              fontSize: 10,
+              fontWeight: 700,
+              color: "var(--color-text-subtle)",
+              letterSpacing: "0.02em",
+              lineHeight: 1.4,
+            }}
+          >
             ⌘K
           </span>
         </div>
       </div>
 
-      {/* Right section */}
-      <div className="flex items-center gap-2 md:gap-4 shrink-0">
+      {/* ── Right: Actions ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+
         {/* Notification bell */}
         <button
           id="nav-notifications"
-          className="relative rounded-lg border border-border p-2 text-text-muted transition-colors hover:border-border-hover hover:text-accent"
+          className="icon-btn"
+          aria-label="Notifications"
+          style={{ position: "relative" }}
         >
           <Bell size={16} strokeWidth={2} />
           {diagnosticReport && (
             <span
-              className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold text-dark"
-              style={{ backgroundColor: "#ff6b4a" }}
+              style={{
+                position: "absolute",
+                top: -3,
+                right: -3,
+                width: 16,
+                height: 16,
+                borderRadius: "50%",
+                background: "var(--color-gold)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 9,
+                fontWeight: 800,
+                color: "var(--color-dark)",
+                boxShadow: "0 0 8px var(--color-gold-glow)",
+              }}
             >
               {diagnosticReport.risk_summary.red_flags_count}
             </span>
           )}
         </button>
 
-        {/* Active Target Badge */}
+        {/* Active target badge */}
         {diagnosticReport && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.88 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-bold"
+            transition={{ type: "spring", stiffness: 350, damping: 28 }}
             style={{
-              backgroundColor: "rgba(255, 107, 74, 0.1)",
-              borderColor: "rgba(255, 107, 74, 0.25)",
-              color: "#ff6b4a",
+              display: "flex",
+              alignItems: "center",
+              gap: 7,
+              padding: "6px 12px",
+              borderRadius: "var(--radius-md)",
+              background: "rgba(255, 107, 74, 0.1)",
+              border: "1px solid rgba(255, 107, 74, 0.25)",
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: "-0.01em",
+              color: "var(--color-gold)",
             }}
           >
-            <Crosshair size={13} strokeWidth={2.5} className="hidden sm:inline" />
-            <span className="relative flex h-1.5 w-1.5">
+            <Crosshair size={13} strokeWidth={2.5} />
+            {/* Pulse dot */}
+            <span style={{ position: "relative", width: 6, height: 6, flexShrink: 0 }}>
               <span
-                className="absolute inline-flex h-full w-full rounded-full opacity-75"
                 style={{
-                  backgroundColor: "#ff6b4a",
+                  position: "absolute",
+                  inset: 0,
+                  borderRadius: "50%",
+                  backgroundColor: "var(--color-gold)",
+                  opacity: 0.6,
                   animation: "pulse-glow 2s ease-in-out infinite",
                 }}
               />
               <span
-                className="relative inline-flex h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: "#ff6b4a" }}
+                style={{
+                  position: "absolute",
+                  inset: 1,
+                  borderRadius: "50%",
+                  backgroundColor: "var(--color-gold)",
+                }}
               />
             </span>
-            <span className="font-mono">
-              <span className="hidden md:inline">TARGET: </span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
+              <span className="hide-mobile" style={{ opacity: 0.7 }}>TARGET: </span>
               {diagnosticReport.target_phone}
             </span>
           </motion.div>
         )}
 
+        {/* Divider */}
+        <div style={{ width: 1, height: 28, background: "var(--color-border)", flexShrink: 0 }} />
+
         {/* User badge */}
-        <div
+        <button
           id="nav-user"
-          className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-border px-3 py-1.5 transition-all hover:border-border-hover"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 9,
+            padding: "6px 12px 6px 6px",
+            borderRadius: "var(--radius-md)",
+            border: "1px solid var(--color-border)",
+            background: "transparent",
+            cursor: "pointer",
+            transition: "var(--transition-base)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "var(--color-border-hover)";
+            e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "var(--color-border)";
+            e.currentTarget.style.background = "transparent";
+          }}
         >
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-navy text-[11px] font-bold text-white">
-            <User size={13} />
+          <div
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, var(--color-navy-light), var(--color-navy))",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <User size={13} color="white" />
           </div>
-          <span className="hidden sm:inline text-[13px] font-semibold text-text">
+          <span
+            className="hide-mobile"
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: "var(--color-text)",
+              letterSpacing: "-0.01em",
+            }}
+          >
             Analyst
           </span>
-        </div>
+        </button>
       </div>
     </div>
   );
