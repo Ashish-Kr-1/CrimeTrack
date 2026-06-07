@@ -1,3 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-main: #060813;
+  --bg-surface: #0c1020;
+  --bg-surface-hover: #141a30;
+  --bg-surface-elevated: #1a223f;
+  
+  --border-main: #1b2444;
+  --border-hover: #293663;
+  
+  --primary: #3b82f6;
+  --primary-rgb: 59, 130, 246;
+  --primary-hover: #60a5fa;
+  
+  --accent-cyan: #06b6d4;
+  --accent-purple: #8b5cf6;
+  
+  --success: #10b981;
+  --success-glow: rgba(16, 185, 129, 0.15);
+  
+  --warning: #f59e0b;
+  --warning-glow: rgba(245, 158, 11, 0.15);
+  
+  --danger: #ef4444;
+  --danger-glow: rgba(239, 68, 68, 0.15);
+  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  
+  --font-sans: 'Inter', sans-serif;
+  --font-heading: 'Space Grotesk', sans-serif;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -9,9 +44,114 @@ body,
 #root {
   width: 100%;
   height: 100%;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  overflow: hidden;
 }
 
-body {
-  overflow-x: hidden;
-  font-family: Arial, sans-serif;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-main);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* Scrollbar width for non-webkit browsers */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-main) var(--bg-main);
+}
+
+/* Utility Styles */
+.glass-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-main);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(59, 130, 246, 0.05);
+}
+
+.neon-border-primary {
+  border-color: var(--primary);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+}
+
+.neon-border-danger {
+  border-color: var(--danger);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+}
+
+.glow-text {
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+/* Table Style */
+.custom-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.custom-table th {
+  padding: 14px 16px;
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-main);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  font-family: var(--font-heading);
+}
+
+.custom-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-main);
+  color: var(--text-main);
+  transition: background-color 0.2s ease;
+}
+
+.custom-table tbody tr:hover td {
+  background-color: var(--bg-surface-hover);
+}
+
+/* Navigation Link active line glow */
+.nav-link-glow {
+  position: relative;
+}
+.nav-link-glow::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  height: 70%;
+  width: 3px;
+  background-color: var(--primary);
+  box-shadow: 0 0 8px var(--primary);
+  border-radius: 0 2px 2px 0;
 }
