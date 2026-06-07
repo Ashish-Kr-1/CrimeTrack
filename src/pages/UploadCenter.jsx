@@ -114,10 +114,10 @@ function UploadCenter() {
         className="glass-card relative mb-8 cursor-pointer overflow-hidden"
         style={{
           border: isDragging
-            ? "2px solid #3b5fab"
-            : "2px dashed rgba(30, 46, 82, 0.7)",
+            ? "2px solid #00e5ff"
+            : "2px dashed rgba(21, 60, 69, 0.7)",
           boxShadow: isDragging
-            ? "0 0 30px rgba(59, 95, 171, 0.15)"
+            ? "0 0 30px rgba(0, 229, 255, 0.15)"
             : undefined,
         }}
         onClick={() => document.getElementById("fileInput").click()}
@@ -136,11 +136,11 @@ function UploadCenter() {
             whileHover={{ scale: 1.05 }}
             className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border"
             style={{
-              backgroundColor: "rgba(59, 95, 171, 0.08)",
-              borderColor: "rgba(59, 95, 171, 0.2)",
+              backgroundColor: "rgba(0, 229, 255, 0.08)",
+              borderColor: "rgba(0, 229, 255, 0.2)",
             }}
           >
-            <UploadCloud size={30} color="#3b5fab" strokeWidth={1.8} />
+            <UploadCloud size={30} color="#00e5ff" strokeWidth={1.8} />
           </motion.div>
 
           <h3 className="mb-2 text-lg font-bold text-text">
@@ -181,7 +181,7 @@ function UploadCenter() {
       {/* Recent Uploads Table */}
       <motion.div variants={fadeUp} className="glass-card p-6">
         <h2 className="mb-5 flex items-center gap-2 text-lg font-bold text-text">
-          <Shield size={18} color="#3b5fab" />
+          <Shield size={18} color="#00e5ff" />
           Recent Audited Uploads
         </h2>
 
@@ -213,10 +213,10 @@ function UploadCenter() {
                         className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold"
                         style={{
                           backgroundColor: isComplete
-                            ? "rgba(45, 138, 94, 0.1)"
-                            : "rgba(193, 136, 51, 0.1)",
-                          color: isComplete ? "#2d8a5e" : "#c18833",
-                          border: `1px solid ${isComplete ? "rgba(45, 138, 94, 0.2)" : "rgba(193, 136, 51, 0.2)"}`,
+                            ? "rgba(0, 229, 255, 0.1)"
+                            : "rgba(255, 107, 74, 0.1)",
+                          color: isComplete ? "#00e5ff" : "#ff6b4a",
+                          border: `1px solid ${isComplete ? "rgba(0, 229, 255, 0.2)" : "rgba(255, 107, 74, 0.2)"}`,
                         }}
                       >
                         {isComplete ? (

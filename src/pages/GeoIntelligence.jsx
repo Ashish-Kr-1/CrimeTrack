@@ -69,24 +69,24 @@ function GeoIntelligence() {
       icon: MapPin,
       label: "Unique Coordinates",
       value: uniqueLocations,
-      color: "#3b5fab",
-      bg: "rgba(59, 95, 171, 0.08)",
+      color: "#00e5ff",
+      bg: "rgba(0, 229, 255, 0.08)",
     },
     {
       icon: Layers,
       label: "Peak Coordinates",
       value: mostFrequentLocation,
       isMonospace: true,
-      color: "#c18833",
-      bg: "rgba(193, 136, 51, 0.08)",
+      color: "#ff6b4a",
+      bg: "rgba(255, 107, 74, 0.08)",
     },
     {
       icon: Smartphone,
       label: "Peak Cell Tower",
       value: mostFrequentCGI,
       isMonospace: true,
-      color: "#23356e",
-      bg: "rgba(35, 53, 110, 0.12)",
+      color: "#88aeb7",
+      bg: "rgba(136, 174, 183, 0.12)",
     },
   ];
 
@@ -161,11 +161,11 @@ function GeoIntelligence() {
             >
               <div className="px-6 pt-5 pb-3">
                 <h2 className="flex items-center gap-2 text-lg font-bold text-text">
-                  <MapPin size={18} color="#c18833" />
+                  <MapPin size={18} color="#ff6b4a" />
                   Cell Tower Geo Plot
                 </h2>
               </div>
-              <div style={{ height: 420 }}>
+              <div style={{ height: 550 }}>
                 <MapContainer
                   center={mapCenter}
                   zoom={10}
@@ -174,7 +174,7 @@ function GeoIntelligence() {
                   zoomControl={false}
                 >
                   <TileLayer
-                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                     attribution=""
                   />
                   {markers.map((m, idx) => (
@@ -183,14 +183,14 @@ function GeoIntelligence() {
                       center={[m.lat, m.lng]}
                       radius={6 + m.ratio * 14}
                       pathOptions={{
-                        color: "#3b5fab",
-                        fillColor: "#c18833",
+                        color: "#ff6b4a",
+                        fillColor: "#00e5ff",
                         fillOpacity: 0.6 + m.ratio * 0.3,
                         weight: 2,
                       }}
                     >
                       <Popup>
-                        <div style={{ fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: "#0c162d" }}>
+                        <div style={{ fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: "#082229" }}>
                           <strong>{m.lat.toFixed(4)}, {m.lng.toFixed(4)}</strong>
                           <br />
                           Events: {m.count}
@@ -234,7 +234,7 @@ function GeoIntelligence() {
                               target="_blank"
                               rel="noreferrer"
                               className="inline-flex items-center gap-1.5 text-xs font-semibold transition-colors hover:brightness-125"
-                              style={{ color: "#3b5fab" }}
+                              style={{ color: "#00e5ff" }}
                             >
                               Maps
                               <ExternalLink size={11} />
@@ -266,7 +266,7 @@ function GeoIntelligence() {
                       <tr key={idx}>
                         <td
                           className="font-mono text-[13px] font-semibold"
-                          style={{ color: "#23356e" }}
+                          style={{ color: "#00e5ff" }}
                         >
                           {cgi}
                         </td>

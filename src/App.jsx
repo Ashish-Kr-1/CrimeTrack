@@ -44,7 +44,7 @@ function App() {
       )}
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-1 flex-col overflow-y-auto p-4 md:p-5">
+      <div className="relative z-10 flex flex-1 flex-col overflow-y-auto" style={{ padding: "var(--content-padding, 20px)" }}>
         <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
         <AnimatePresence mode="wait">

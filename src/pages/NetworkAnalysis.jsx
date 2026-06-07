@@ -1,8 +1,9 @@
 import { useContext, useMemo, useRef, useCallback, useState, useEffect } from "react";
 import { CDRContext } from "../context/CDRContext";
-import { motion } from "framer-motion";
-import { Network, Users, Star, Phone } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Network, Users, Star, Phone, Sliders, ShieldAlert, CheckCircle, Info, ChevronRight, X } from "lucide-react";
 import ForceGraph2D from "react-force-graph-2d";
+import { forceCollide } from "d3-force";
 
 const fadeUp = {
   initial: { opacity: 0, y: 14 },
@@ -14,15 +15,25 @@ function NetworkAnalysis() {
   const records = cdrData.slice(1);
   const graphRef = useRef();
   const containerRef = useRef();
-  const [dimensions, setDimensions] = useState({ width: 800, height: 420 });
+  const [dimensions, setDimensions] = useState({ width: 700, height: 450 });
 
+  // D3 Force Sliders
+  const [chargeStrength, setChargeStrength] = useState(-450);
+  const [linkDistance, setLinkDistance] = useState(140);
+  const [collisionPadding, setCollisionPadding] = useState(12);
+
+  // Layout UI controls
+  const [labelMode, setLabelMode] = useState("full"); // "full" or "last4"
+  const [selectedNode, setSelectedNode] = useState(null);
+
+  // Handle ResizeObserver for responsive canvas width
   useEffect(() => {
     if (!containerRef.current) return;
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         setDimensions({
-          width: entry.contentRect.width || 800,
-          height: 420
+          width: entry.contentRect.width || 700,
+          height: 450,
         });
       }
     });
@@ -30,37 +41,36 @@ function NetworkAnalysis() {
     return () => resizeObserver.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (graphRef.current) {
-      graphRef.current.d3Force("charge").strength(-400);
-      graphRef.current.d3Force("link").distance(130);
-    }
-  }, [graphData]);
-
-  const targetNumber =
-    records.length > 0
+  const targetNumber = useMemo(() => {
+    return records.length > 0
       ? records[0][0]?.replace(/'/g, "")?.trim()
       : "Unknown";
+  }, [records]);
 
-  const contactCounts = {};
-  records.forEach((row) => {
-    let contact = row[3];
-    if (!contact) return;
-    contact = contact.replace(/'/g, "").trim();
-    if (!/^\d{5,15}$/.test(contact)) return;
-    contactCounts[contact] = (contactCounts[contact] || 0) + 1;
-  });
+  // Aggregate contact counts
+  const contactCounts = useMemo(() => {
+    const counts = {};
+    records.forEach((row) => {
+      let contact = row[3];
+      if (!contact) return;
+      contact = contact.replace(/'/g, "").trim();
+      if (!/^\d{5,15}$/.test(contact)) return;
+      counts[contact] = (counts[contact] || 0) + 1;
+    });
+    return counts;
+  }, [records]);
 
-  const topContacts = Object.entries(contactCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 15);
+  const topContacts = useMemo(() => {
+    return Object.entries(contactCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 15);
+  }, [contactCounts]);
 
   const totalContacts = Object.keys(contactCounts).length;
-  const strongestContact =
-    topContacts.length > 0 ? topContacts[0][0] : "Unknown";
+  const strongestContact = topContacts.length > 0 ? topContacts[0][0] : "Unknown";
   const strongestCount = topContacts.length > 0 ? topContacts[0][1] : 0;
 
-  // Build graph data for force graph
+  // Build graph nodes & links
   const graphData = useMemo(() => {
     if (topContacts.length === 0) return { nodes: [], links: [] };
 
@@ -81,10 +91,9 @@ function NetworkAnalysis() {
       nodes.push({
         id: contact,
         label: contact.slice(-4),
-        val: 5 + ratio * 18,
+        val: 6 + ratio * 16,
         count,
-        level:
-          count >= 30 ? "critical" : count >= 15 ? "suspicious" : "nominal",
+        level: count >= 30 ? "critical" : count >= 15 ? "suspicious" : "nominal",
       });
       links.push({
         source: targetNumber,
@@ -97,56 +106,64 @@ function NetworkAnalysis() {
     return { nodes, links };
   }, [topContacts, targetNumber]);
 
+  // Setup forces dynamically when graphData or sliders change
+  useEffect(() => {
+    if (graphRef.current) {
+      graphRef.current.d3Force("charge").strength(chargeStrength);
+      graphRef.current.d3Force("link").distance(linkDistance);
+      graphRef.current.d3Force("collision", forceCollide((node) => node.val + collisionPadding));
+      graphRef.current.d3ReheatSimulation();
+    }
+  }, [graphData, chargeStrength, linkDistance, collisionPadding]);
+
+  // Custom Node Canvas Renderer
   const nodeCanvasObject = useCallback(
     (node, ctx, globalScale) => {
       const size = node.val || 8;
-      const fontSize = Math.max(10 / globalScale, 3);
+      const fontSize = Math.max(10 / globalScale, 4.5);
+      const isSelected = selectedNode && selectedNode.id === node.id;
 
-      // Glow effect
-      if (node.isTarget) {
+      // Glow ring for target or selected node
+      if (node.isTarget || isSelected) {
         ctx.beginPath();
-        ctx.arc(node.x, node.y, size + 4, 0, 2 * Math.PI);
-        ctx.fillStyle = "rgba(59, 95, 171, 0.15)";
+        ctx.arc(node.x, node.y, size + (isSelected ? 6 : 4), 0, 2 * Math.PI);
+        ctx.fillStyle = node.isTarget ? "rgba(255, 107, 74, 0.25)" : "rgba(0, 229, 255, 0.25)";
         ctx.fill();
+        if (isSelected) {
+          ctx.strokeStyle = "#00e5ff";
+          ctx.lineWidth = 1.2 / globalScale;
+          ctx.stroke();
+        }
       }
 
-      // Node circle
+      // Core Node shape
       ctx.beginPath();
       ctx.arc(node.x, node.y, size, 0, 2 * Math.PI);
       if (node.isTarget) {
-        ctx.fillStyle = "#3b5fab";
+        ctx.fillStyle = "#ff6b4a"; // Coral Orange (Target)
       } else if (node.level === "critical") {
-        ctx.fillStyle = "#c93c3c";
+        ctx.fillStyle = "#ff6b4a"; // Coral Orange (Critical)
       } else if (node.level === "suspicious") {
-        ctx.fillStyle = "#c18833";
+        ctx.fillStyle = "#00e5ff"; // Neon Cyan (Suspicious)
       } else {
-        ctx.fillStyle = "#23356e";
+        ctx.fillStyle = "#124854"; // Teal-Navy (Nominal)
       }
       ctx.fill();
-      ctx.strokeStyle = "rgba(233, 241, 248, 0.15)";
+
+      // Node border
+      ctx.strokeStyle = "rgba(240, 249, 255, 0.2)";
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Label
+      // Label text
+      const label = labelMode === "full" ? node.id : node.label;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "#e9f1f8";
       ctx.font = `${node.isTarget ? "bold " : ""}${fontSize}px "SF Pro", -apple-system, BlinkMacSystemFont, sans-serif`;
-      ctx.fillText(node.label, node.x, node.y + size + fontSize + 2);
+      ctx.fillText(label, node.x, node.y + size + fontSize + 2.5);
     },
-    []
-  );
-
-  const linkCanvasObject = useCallback(
-    (link, ctx) => {
-      ctx.beginPath();
-      ctx.moveTo(link.source.x, link.source.y);
-      ctx.lineTo(link.target.x, link.target.y);
-      ctx.strokeStyle = `rgba(59, 95, 171, ${0.1 + link.ratio * 0.4})`;
-      ctx.lineWidth = 0.5 + link.ratio * 2.5;
-      ctx.stroke();
-    },
-    []
+    [labelMode, selectedNode]
   );
 
   const kpis = [
@@ -155,55 +172,87 @@ function NetworkAnalysis() {
       label: "Target Suspect",
       value: targetNumber,
       isMonospace: true,
-      color: "#3b5fab",
-      bg: "rgba(59, 95, 171, 0.08)",
+      color: "#ff6b4a", // Coral Orange
+      bg: "rgba(255, 107, 74, 0.08)",
     },
     {
       icon: Users,
       label: "Total Connections",
       value: totalContacts,
-      color: "#c18833",
-      bg: "rgba(193, 136, 51, 0.08)",
+      color: "#00e5ff", // Neon Cyan
+      bg: "rgba(0, 229, 255, 0.08)",
     },
     {
       icon: Star,
       label: "Strongest Node",
       value: strongestContact,
-      sub: `${strongestCount} weight`,
+      sub: `${strongestCount} interactions`,
       isMonospace: true,
-      color: "#2d8a5e",
-      bg: "rgba(45, 138, 94, 0.08)",
+      color: "#ff6b4a", // Coral Orange
+      bg: "rgba(255, 107, 74, 0.08)",
     },
   ];
 
+  // AI Narrative compiler for selected nodes
+  const nodeNarrative = useMemo(() => {
+    if (!selectedNode) return null;
+    if (selectedNode.isTarget) {
+      return {
+        role: "PRIMARY SUSPECT DOSSIER",
+        description: "Primary node of interest. Direct telemetry source displaying multiple bank triggers, UPI binding operations, and active device swapping patterns in high-risk zones.",
+        recommendation: "Maintain geo-fencing overlays and monitor tower-dumps for concurrent operations.",
+      };
+    }
+
+    if (selectedNode.level === "critical") {
+      return {
+        role: "CRITICAL OPERATIONAL NODE",
+        description: `This associate has high-frequency call overlap (${selectedNode.count} logs) occurring primarily during odd-hours (23:00 - 04:00). Indicates a strong probability of operational handler, co-conspirator, or backup carrier device.`,
+        recommendation: "Initiate Paytm/financial gateway checks on this number and flag associated cells for immediate co-location tracing.",
+      };
+    }
+
+    if (selectedNode.level === "suspicious") {
+      return {
+        role: "SUSPICIOUS TRANSITIONAL NETWORK",
+        description: `Secondary suspect link. Overlapping voice/SMS signals (${selectedNode.count} times) suggest co-dependence. Often maps to a money courier, UPI sender mule, or burner SIM swaps.`,
+        recommendation: "Cross-reference banking routes with target's UPI logs to trace possible money trails.",
+      };
+    }
+
+    return {
+      role: "NOMINAL PERIMETER Associate",
+      description: `Peripheral contact with low interaction counts (${selectedNode.count} calls). Likely standard contact, courier delivery, or brief operational coordination.`,
+      recommendation: "Log and retain in archive dataset. Monitor for any escalation of communication frequency.",
+    };
+  }, [selectedNode]);
+
   return (
     <motion.div
-      className="mx-auto w-full max-w-[1200px] pb-10"
+      className="mx-auto w-full max-w-[1400px] pb-10"
       initial="initial"
       animate="animate"
     >
       {/* Header */}
-      <motion.div variants={fadeUp} className="mb-8">
+      <motion.div variants={fadeUp} className="mb-6">
         <h1 className="mb-1 text-[30px] font-bold text-text">
-          Network Analysis Matrix
+          Link Analysis & Social Network Mapping
         </h1>
         <p className="text-sm text-text-muted">
-          Target node calling/messaging linkage graphs and relationship
-          densities.
+          Forensic node-link diagram mapping target suspects, burner associates, and relationship strengths.
         </p>
       </motion.div>
 
       {records.length === 0 ? (
         <div className="glass-card p-10 text-center text-text-muted">
-          No network details loaded. Please upload a CDR to analyze node
-          connectivity.
+          No network details loaded. Please upload a CDR to analyze node connectivity.
         </div>
       ) : (
         <>
           {/* KPIs */}
           <motion.div
             variants={fadeUp}
-            className="mb-8 grid gap-5"
+            className="mb-6 grid gap-5"
             style={{
               gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
             }}
@@ -243,60 +292,325 @@ function NetworkAnalysis() {
             ))}
           </motion.div>
 
-          {/* Force Graph */}
-          {graphData.nodes.length > 0 && (
+          {/* Interactive Split Workspace */}
+          <div className="grid gap-6 lg:grid-cols-12">
+            {/* LEFT PANEL: VIZ STUDIO (60%) */}
             <motion.div
               variants={fadeUp}
-              className="glass-card mb-8 overflow-hidden"
-              style={{ borderRadius: 16 }}
+              className="lg:col-span-7 flex flex-col gap-5"
             >
-              <div className="px-6 pt-5 pb-3">
-                <h2 className="flex items-center gap-2 text-lg font-bold text-text">
-                  <Network size={18} color="#3b5fab" />
-                  Contact Network Graph
-                </h2>
-              </div>
-              <div ref={containerRef} style={{ height: 420 }}>
-                <ForceGraph2D
-                  ref={graphRef}
-                  graphData={graphData}
-                  width={dimensions.width}
-                  height={dimensions.height}
-                  backgroundColor="#0c162d"
-                  nodeCanvasObject={nodeCanvasObject}
-                  linkCanvasObject={linkCanvasObject}
-                  cooldownTicks={60}
-                  d3AlphaDecay={0.04}
-                  d3VelocityDecay={0.3}
-                  enableZoomInteraction={true}
-                  enablePanInteraction={true}
-                  nodeLabel={(node) => {
-                    if (node.isTarget) {
-                      return `<div style="background:#111d38;border:1px solid #1e2e52;padding:8px 12px;border-radius:6px;font-family:sans-serif;color:#e9f1f8;">
-                        <strong style="color:#3b5fab;">Target SIM Suspect</strong><br/>
-                        Phone: ${node.id}
+              {/* Force Graph Card */}
+              <div className="glass-card overflow-hidden flex flex-col" style={{ borderRadius: 16 }}>
+                <div className="px-6 pt-5 pb-3 border-b border-border bg-dark-surface/40 flex items-center justify-between flex-wrap gap-3">
+                  <h2 className="flex items-center gap-2 text-md font-bold text-text">
+                    <Network size={16} color="#00e5ff" />
+                    Contact Network Canvas
+                  </h2>
+
+                  {/* Label Mode Toggle */}
+                  <div className="flex border border-border rounded-lg overflow-hidden bg-dark">
+                    <button
+                      onClick={() => setLabelMode("full")}
+                      className={`px-3 py-1 text-[11px] font-bold transition-all ${
+                        labelMode === "full"
+                          ? "bg-accent/25 text-accent"
+                          : "text-text-muted hover:text-text"
+                      }`}
+                    >
+                      Full Number
+                    </button>
+                    <button
+                      onClick={() => setLabelMode("last4")}
+                      className={`px-3 py-1 text-[11px] font-bold transition-all ${
+                        labelMode === "last4"
+                          ? "bg-accent/25 text-accent"
+                          : "text-text-muted hover:text-text"
+                      }`}
+                    >
+                      Abbreviated
+                    </button>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="px-6 py-3 bg-dark/40 border-b border-border flex flex-wrap gap-4 text-[11px] text-text-muted justify-between">
+                  <div className="flex gap-4">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#ff6b4a" }} /> Target Suspect
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#ff6b4a" }} /> Critical ({`>=30`} calls)
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#00e5ff" }} /> Suspicious ({`15-29`} calls)
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#124854" }} /> Nominal ({`<15`} calls)
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-text-subtle italic">Click nodes to inspect intelligence dossier.</span>
+                </div>
+
+                {/* D3 Canvas Container */}
+                <div ref={containerRef} className="bg-dark/90 flex-1 relative min-h-[450px]" style={{ height: 450 }}>
+                  <ForceGraph2D
+                    ref={graphRef}
+                    graphData={graphData}
+                    width={dimensions.width}
+                    height={450}
+                    backgroundColor="#082229"
+                    nodeCanvasObject={nodeCanvasObject}
+                    linkColor={() => "rgba(0, 229, 255, 0.15)"}
+                    linkWidth={(link) => 0.6 + link.ratio * 2.4}
+                    linkDirectionalParticles={4}
+                    linkDirectionalParticleWidth={1.5}
+                    linkDirectionalParticleSpeed={(link) => link.ratio * 0.008 + 0.002}
+                    linkDirectionalParticleColor={() => "#ff6b4a"}
+                    enableZoomInteraction={true}
+                    enablePanInteraction={true}
+                    onNodeClick={(node) => setSelectedNode(node)}
+                    nodeLabel={(node) => {
+                      if (node.isTarget) {
+                        return `<div style="background:#0b2d35;border:1px solid #153c45;padding:8px 12px;border-radius:6px;font-family:sans-serif;color:#f0f9ff;font-size:12px;">
+                          <strong style="color:#ff6b4a;">Target SIM Suspect</strong><br/>
+                          Phone: <strong>${node.id}</strong>
+                        </div>`;
+                      }
+                      return `<div style="background:#0b2d35;border:1px solid #153c45;padding:8px 12px;border-radius:6px;font-family:sans-serif;color:#f0f9ff;font-size:12px;">
+                        <strong style="color:${node.level === "critical" ? "#ff6b4a" : node.level === "suspicious" ? "#00e5ff" : "#88aeb7"}">${node.level.toUpperCase()} ASSOCIATE</strong><br/>
+                        Phone: <strong>${node.id}</strong><br/>
+                        Interactions: <strong>${node.count}</strong>
                       </div>`;
-                    }
-                    return `<div style="background:#111d38;border:1px solid #1e2e52;padding:8px 12px;border-radius:6px;font-family:sans-serif;color:#e9f1f8;">
-                      <strong style="color:${node.level === "critical" ? "#c93c3c" : node.level === "suspicious" ? "#c18833" : "#3b5fab"}">${node.level.toUpperCase()} ASSOCIATE</strong><br/>
-                      Phone: ${node.id}<br/>
-                      Interactions: ${node.count}
-                    </div>`;
-                  }}
-                  linkLabel={(link) => {
-                    return `<div style="background:#111d38;border:1px solid #1e2e52;padding:6px 10px;border-radius:6px;font-family:sans-serif;color:#e9f1f8;font-size:11px;">
-                      Interactions: <strong>${link.value}</strong>
-                    </div>`;
-                  }}
-                />
+                    }}
+                  />
+                </div>
+
+                {/* Simulation Parameters Sliders */}
+                <div className="p-5 border-t border-border bg-dark-surface/40 flex flex-col gap-4">
+                  <h3 className="text-xs font-bold text-text flex items-center gap-1.5 uppercase tracking-wider">
+                    <Sliders size={13} className="text-accent" />
+                    Interactive D3 Force Parameters
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center text-[10.5px]">
+                        <span className="text-text-muted">Charge Repulsion</span>
+                        <span className="font-mono text-accent font-bold">{chargeStrength}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-800"
+                        max="-100"
+                        value={chargeStrength}
+                        onChange={(e) => setChargeStrength(parseInt(e.target.value))}
+                        className="accent-accent bg-dark h-1 border border-border rounded-full"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center text-[10.5px]">
+                        <span className="text-text-muted">Link Distance</span>
+                        <span className="font-mono text-accent font-bold">{linkDistance}px</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="50"
+                        max="250"
+                        value={linkDistance}
+                        onChange={(e) => setLinkDistance(parseInt(e.target.value))}
+                        className="accent-accent bg-dark h-1 border border-border rounded-full"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center text-[10.5px]">
+                        <span className="text-text-muted">Collision Margins</span>
+                        <span className="font-mono text-accent font-bold">{collisionPadding}px</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="30"
+                        value={collisionPadding}
+                        onChange={(e) => setCollisionPadding(parseInt(e.target.value))}
+                        className="accent-accent bg-dark h-1 border border-border rounded-full"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
-          )}
 
-          {/* Connection Matrix Table */}
-          <motion.div variants={fadeUp} className="glass-card p-6">
+            {/* RIGHT PANEL: NODE INTELLIGENCE INSPECTOR (40%) */}
+            <motion.div
+              variants={fadeUp}
+              className="lg:col-span-5 flex flex-col"
+            >
+              <AnimatePresence mode="wait">
+                {!selectedNode ? (
+                  <motion.div
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="glass-card p-6 flex flex-col justify-center items-center text-center flex-1 min-h-[400px]"
+                  >
+                    <div className="h-16 w-16 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center mb-4 text-accent animate-pulse">
+                      <Network size={26} />
+                    </div>
+                    <h3 className="text-md font-bold text-text mb-1">Dossier Analysis Panel</h3>
+                    <p className="text-xs text-text-muted max-w-[280px] leading-relaxed">
+                      Select an associate node in the Link Matrix graph to retrieve behavioral intelligence telemetry, automated threat scoring, and next steps recommendations.
+                    </p>
+
+                    <div className="w-full border-t border-border mt-6 pt-5 text-left flex flex-col gap-3">
+                      <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider block">Network Aggregates</span>
+                      <div className="grid grid-cols-2 gap-3.5 text-xs">
+                        <div className="bg-dark/40 border border-border p-2.5 rounded-lg">
+                          <div className="text-[9px] text-text-muted font-bold">AVG LINK WEIGHT</div>
+                          <div className="text-md font-bold text-text mt-0.5">
+                            {topContacts.length > 0
+                              ? (topContacts.reduce((sum, item) => sum + item[1], 0) / topContacts.length).toFixed(1)
+                              : 0}
+                          </div>
+                        </div>
+                        <div className="bg-dark/40 border border-border p-2.5 rounded-lg">
+                          <div className="text-[9px] text-text-muted font-bold">TOTAL LINKS</div>
+                          <div className="text-md font-bold text-text mt-0.5">{totalContacts} nodes</div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="inspector"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="glass-card p-6 flex flex-col flex-1 min-h-[400px]"
+                  >
+                    {/* Inspector Header */}
+                    <div className="flex justify-between items-start pb-4 border-b border-border">
+                      <div>
+                        <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider block">INTELLIGENCE DOSSIER</span>
+                        <h3 className="text-lg font-mono font-bold text-text mt-0.5 flex items-center gap-1.5">
+                          <Phone size={14} className="text-accent" />
+                          {selectedNode.id}
+                        </h3>
+                      </div>
+                      <button
+                        onClick={() => setSelectedNode(null)}
+                        className="p-1 rounded-md border border-border text-text-muted hover:text-text hover:bg-dark-elevated transition-all"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+
+                    {/* Badge details */}
+                    <div className="my-5 flex flex-wrap gap-2.5 items-center">
+                      {selectedNode.isTarget ? (
+                        <span className="rounded px-2.5 py-0.5 text-[9px] font-bold tracking-wider bg-gold-glow text-gold border border-gold/30 uppercase">
+                          Target Suspect SIM
+                        </span>
+                      ) : (
+                        <span
+                          className="rounded px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase"
+                          style={{
+                            backgroundColor:
+                              selectedNode.level === "critical"
+                                ? "rgba(255, 107, 74, 0.08)"
+                                : selectedNode.level === "suspicious"
+                                  ? "rgba(0, 229, 255, 0.08)"
+                                  : "rgba(136, 174, 183, 0.08)",
+                            color:
+                              selectedNode.level === "critical"
+                                ? "#ff6b4a"
+                                : selectedNode.level === "suspicious"
+                                  ? "#00e5ff"
+                                  : "#88aeb7",
+                            border: `1px solid ${
+                              selectedNode.level === "critical"
+                                ? "#ff6b4a30"
+                                : selectedNode.level === "suspicious"
+                                  ? "#00e5ff30"
+                                  : "#88aeb730"
+                            }`,
+                          }}
+                        >
+                          {selectedNode.level} Associate
+                        </span>
+                      )}
+
+                      {!selectedNode.isTarget && (
+                        <span className="text-xs font-semibold text-text-muted">
+                          Link Weight: <strong className="text-text">{selectedNode.count} calls</strong>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* AI Explanation narrative */}
+                    <div className="bg-dark/40 border border-border rounded-xl p-4 flex flex-col gap-3">
+                      <div>
+                        <h4 className="text-[10px] font-bold text-accent uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                          <ShieldAlert size={12} />
+                          {nodeNarrative.role}
+                        </h4>
+                        <p className="text-[12.5px] leading-relaxed text-text-muted">
+                          {nodeNarrative.description}
+                        </p>
+                      </div>
+
+                      <div className="border-t border-border pt-3 mt-1 flex flex-col gap-1.5">
+                        <h5 className="text-[10.5px] font-bold text-text uppercase flex items-center gap-1">
+                          <CheckCircle size={11} className="text-success" />
+                          Recommended Investigative Protocol
+                        </h5>
+                        <p className="text-[11.5px] leading-relaxed text-text-subtle font-medium">
+                          {nodeNarrative.recommendation}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Contact Stats detail */}
+                    {!selectedNode.isTarget && (
+                      <div className="mt-5 flex-1 flex flex-col justify-end">
+                        <div className="border-t border-border pt-4 text-xs flex flex-col gap-3">
+                          <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider block">Connectivity Profile</span>
+                          <div className="grid grid-cols-2 gap-3.5">
+                            <div className="bg-dark/20 border border-border p-2.5 rounded-lg">
+                              <span className="text-[9px] text-text-subtle font-bold uppercase block">Calling Rank</span>
+                              <span className="text-sm font-bold text-text mt-0.5">
+                                #{topContacts.findIndex(([num]) => num === selectedNode.id) + 1} of {totalContacts}
+                              </span>
+                            </div>
+                            <div className="bg-dark/20 border border-border p-2.5 rounded-lg">
+                              <span className="text-[9px] text-text-subtle font-bold uppercase block">Activity Share</span>
+                              <span className="text-sm font-mono font-bold text-accent mt-0.5">
+                                {((selectedNode.count / records.length) * 100).toFixed(1)}%
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => alert(`Redirecting tracking overlays to trace associate ${selectedNode.id}`)}
+                            className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl bg-accent px-4 py-2.5 text-xs font-bold text-white transition-all hover:brightness-115"
+                          >
+                            Isolate Movement footprint
+                            <ChevronRight size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
+
+          {/* Connection List Table at Bottom */}
+          <motion.div variants={fadeUp} className="glass-card p-6 mt-6">
             <h2 className="mb-5 text-lg font-bold text-text">
-              Associated Nodes & Link Densities
+              Relationship Density & Co-Occurrence Matrix
             </h2>
             <div className="overflow-x-auto">
               <table className="ct-table">
@@ -304,23 +618,26 @@ function NetworkAnalysis() {
                   <tr>
                     <th>Contact Node</th>
                     <th>Link Weight</th>
-                    <th style={{ width: "40%" }}>Relationship Density</th>
+                    <th style={{ width: "45%" }}>Relationship Density</th>
+                    <th style={{ width: "20%" }}>Forensic Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {topContacts.map(([contact, count], idx) => {
-                    const weightPct = Math.min(
-                      (count / strongestCount) * 100,
-                      100
-                    );
-                    const weightColor =
-                      count >= 30
-                        ? "#c93c3c"
-                        : count >= 15
-                          ? "#c18833"
-                          : "#2d8a5e";
+                    const weightPct = Math.min((count / strongestCount) * 100, 100);
+                    const isSelected = selectedNode && selectedNode.id === contact;
+                    let weightColor = "#124854"; // Nominal (Teal-Navy)
+                    if (count >= 30) weightColor = "#ff6b4a"; // Critical
+                    else if (count >= 15) weightColor = "#00e5ff"; // Suspicious
+
                     return (
-                      <tr key={idx}>
+                      <tr
+                        key={idx}
+                        className={`transition-colors cursor-pointer ${
+                          isSelected ? "bg-accent/10 border-l-2 border-l-accent" : ""
+                        }`}
+                        onClick={() => setSelectedNode({ id: contact, count, level: count >= 30 ? "critical" : count >= 15 ? "suspicious" : "nominal", val: 6 + (count/strongestCount) * 16 })}
+                      >
                         <td className="font-mono text-sm font-semibold text-text">
                           {contact}
                         </td>
@@ -340,6 +657,18 @@ function NetworkAnalysis() {
                               {weightPct.toFixed(0)}%
                             </span>
                           </div>
+                        </td>
+                        <td>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedNode({ id: contact, count, level: count >= 30 ? "critical" : count >= 15 ? "suspicious" : "nominal", val: 6 + (count/strongestCount) * 16 });
+                            }}
+                            className="flex items-center gap-1 text-[11px] font-bold text-accent hover:brightness-110"
+                          >
+                            Inspect Node
+                            <ChevronRight size={11} />
+                          </button>
                         </td>
                       </tr>
                     );

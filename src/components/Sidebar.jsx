@@ -36,8 +36,8 @@ function Sidebar({ isOpen, onClose }) {
             <div
               className="flex h-9 w-9 items-center justify-center rounded-lg"
               style={{
-                background: "linear-gradient(135deg, #3b5fab, #23356e)",
-                boxShadow: "0 0 18px rgba(59, 95, 171, 0.45)",
+                background: "linear-gradient(135deg, #00e5ff, #124854)",
+                boxShadow: "0 0 18px rgba(0, 229, 255, 0.45)",
               }}
             >
               <Shield size={18} color="white" strokeWidth={2.5} />
@@ -52,7 +52,7 @@ function Sidebar({ isOpen, onClose }) {
             </div>
           </div>
         </div>
-
+ 
         {/* Navigation */}
         <nav className="flex flex-col gap-1.5">
           {navItems.map((item) => (
@@ -67,12 +67,12 @@ function Sidebar({ isOpen, onClose }) {
                 <div
                   className="relative flex items-center gap-3 rounded-xl px-4 py-3 text-[13.5px] font-medium transition-all duration-200"
                   style={{
-                    color: isActive ? "#3b5fab" : "#8b9dc3",
+                    color: isActive ? "#00e5ff" : "#88aeb7",
                     backgroundColor: isActive
-                      ? "rgba(59, 95, 171, 0.1)"
+                      ? "rgba(0, 229, 255, 0.1)"
                       : "transparent",
                     border: isActive
-                      ? "1px solid rgba(59, 95, 171, 0.2)"
+                      ? "1px solid rgba(0, 229, 255, 0.2)"
                       : "1px solid transparent",
                   }}
                 >
@@ -81,8 +81,8 @@ function Sidebar({ isOpen, onClose }) {
                       layoutId="sidebar-indicator"
                       className="absolute left-0 top-[15%] h-[70%] w-[3px] rounded-r-sm"
                       style={{
-                        backgroundColor: "#3b5fab",
-                        boxShadow: "0 0 10px #3b5fab",
+                        backgroundColor: "#00e5ff",
+                        boxShadow: "0 0 10px #00e5ff",
                       }}
                       transition={{
                         type: "spring",

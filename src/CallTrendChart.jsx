@@ -31,26 +31,26 @@ function CallTrendChart() {
       <AreaChart data={data}>
         <defs>
           <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#3b5fab" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="#3b5fab" stopOpacity={0.02} />
+            <stop offset="5%" stopColor="#00e5ff" stopOpacity={0.3} />
+            <stop offset="95%" stopColor="#00e5ff" stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        <CartesianGrid stroke="#1e2e52" strokeDasharray="3 3" />
+        <CartesianGrid stroke="#153c45" strokeDasharray="3 3" />
         <XAxis
           dataKey="date"
-          stroke="#5a6f94"
-          tick={{ fontSize: 11, fill: "#8b9dc3" }}
+          stroke="#547b84"
+          tick={{ fontSize: 11, fill: "#88aeb7" }}
         />
         <YAxis
-          stroke="#5a6f94"
-          tick={{ fontSize: 11, fill: "#8b9dc3" }}
+          stroke="#547b84"
+          tick={{ fontSize: 11, fill: "#88aeb7" }}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: "#111d38",
-            border: "1px solid #1e2e52",
+            backgroundColor: "#0b2d35",
+            border: "1px solid #153c45",
             borderRadius: 10,
-            color: "#e9f1f8",
+            color: "#f0f9ff",
             fontSize: 12,
             fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           }}
@@ -58,14 +58,14 @@ function CallTrendChart() {
         <Area
           type="monotone"
           dataKey="activity"
-          stroke="#3b5fab"
+          stroke="#00e5ff"
           strokeWidth={2.5}
           fill="url(#areaGradient)"
           dot={false}
           activeDot={{
             r: 5,
-            fill: "#3b5fab",
-            stroke: "#e9f1f8",
+            fill: "#00e5ff",
+            stroke: "#f0f9ff",
             strokeWidth: 2,
           }}
         />

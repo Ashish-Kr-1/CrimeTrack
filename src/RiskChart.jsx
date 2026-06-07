@@ -57,25 +57,25 @@ function RiskChart() {
         <PolarGrid stroke="#1e2e52" />
         <PolarAngleAxis
           dataKey="metric"
-          tick={{ fontSize: 11, fill: "#8b9dc3" }}
+          tick={{ fontSize: 11, fill: "#88aeb7" }}
         />
         <PolarRadiusAxis
           angle={30}
           domain={[0, 100]}
-          tick={{ fontSize: 9, fill: "#5a6f94" }}
-          stroke="#1e2e52"
+          tick={{ fontSize: 9, fill: "#547b84" }}
+          stroke="#153c45"
         />
         <Radar
           name="Threat Profile"
           dataKey="value"
-          stroke="#c18833"
-          fill="#c18833"
+          stroke="#ff6b4a"
+          fill="#ff6b4a"
           fillOpacity={0.2}
           strokeWidth={2}
           dot={{
             r: 3,
-            fill: "#c18833",
-            stroke: "#e9f1f8",
+            fill: "#ff6b4a",
+            stroke: "#f0f9ff",
             strokeWidth: 1,
           }}
         />

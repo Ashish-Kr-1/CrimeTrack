@@ -12,28 +12,28 @@
    ============================================================ */
 
 @theme {
-  /* ── Exact User Color Palette ── */
-  --color-navy: #23356e;
-  --color-navy-light: #2d4488;
-  --color-navy-dark: #1a2854;
-  --color-dark: #0c162d;
-  --color-dark-surface: #111d38;
-  --color-dark-elevated: #162545;
-  --color-accent: #3b5fab;
-  --color-accent-light: #4d72c4;
-  --color-accent-glow: rgba(59, 95, 171, 0.25);
-  --color-text: #e9f1f8;
-  --color-text-muted: #8b9dc3;
-  --color-text-subtle: #5a6f94;
-  --color-gold: #c18833;
-  --color-gold-light: #d4a04d;
-  --color-gold-glow: rgba(193, 136, 51, 0.2);
+  /* ── Cyber-Teal & Neon Orange Color Palette ── */
+  --color-navy: #124854;
+  --color-navy-light: #1b6170;
+  --color-navy-dark: #0a333c;
+  --color-dark: #082229;
+  --color-dark-surface: #0b2d35;
+  --color-dark-elevated: #0f3a44;
+  --color-accent: #00e5ff;
+  --color-accent-light: #33ebff;
+  --color-accent-glow: rgba(0, 229, 255, 0.25);
+  --color-text: #f0f9ff;
+  --color-text-muted: #88aeb7;
+  --color-text-subtle: #547b84;
+  --color-gold: #ff6b4a;
+  --color-gold-light: #ff8d75;
+  --color-gold-glow: rgba(255, 107, 74, 0.2);
   --color-danger: #c93c3c;
   --color-danger-glow: rgba(201, 60, 60, 0.15);
-  --color-success: #2d8a5e;
-  --color-success-glow: rgba(45, 138, 94, 0.15);
-  --color-border: #1e2e52;
-  --color-border-hover: #2a3f6e;
+  --color-success: #00e5ff; /* Use Neon Cyan for success in this theme */
+  --color-success-glow: rgba(0, 229, 255, 0.15);
+  --color-border: #1e4f5b;
+  --color-border-hover: #2e6e7d;
 
   /* ── Font ── */
   --font-sf-pro: "SF Pro", "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -72,6 +72,16 @@
 }
 
 /* ── Global Resets ── */
+:root {
+  --content-padding: 16px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --content-padding: 24px;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -115,18 +125,18 @@ html, body, #root {
 
 /* ── Glassmorphism Card ── */
 .glass-card {
-  background: linear-gradient(135deg, rgba(17, 29, 56, 0.7), rgba(12, 22, 45, 0.5));
+  background: linear-gradient(135deg, rgba(15, 60, 71, 0.75), rgba(9, 38, 46, 0.55));
   border: 1px solid var(--color-border);
   border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
   border-color: var(--color-border-hover);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 95, 171, 0.08);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.06);
 }
 
 /* ── Glow Borders ── */
@@ -196,7 +206,7 @@ html, body, #root {
 }
 
 .ct-table tbody tr:hover td {
-  background-color: rgba(17, 29, 56, 0.5);
+  background-color: rgba(15, 58, 68, 0.3);
 }
 
 /* ── Nav Link Active Glow ── */

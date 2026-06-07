@@ -45,18 +45,18 @@ function Cases() {
     (a, b) => b[1] - a[1]
   )[0] || ["Unknown", 0];
 
-  let riskLevel = "Low";
-  let riskColor = "#2d8a5e";
-  let riskBg = "rgba(45, 138, 94, 0.1)";
+  let riskLevel = "Nominal";
+  let riskColor = "#88aeb7";
+  let riskBg = "rgba(136, 174, 183, 0.1)";
 
   if (totalRecords > 500) {
     riskLevel = "Critical";
-    riskColor = "#c93c3c";
-    riskBg = "rgba(201, 60, 60, 0.1)";
+    riskColor = "#ff6b4a";
+    riskBg = "rgba(255, 107, 74, 0.1)";
   } else if (totalRecords > 200) {
     riskLevel = "Suspicious";
-    riskColor = "#c18833";
-    riskBg = "rgba(193, 136, 51, 0.1)";
+    riskColor = "#00e5ff";
+    riskBg = "rgba(0, 229, 255, 0.1)";
   }
 
   const dossierFields = [
@@ -64,7 +64,7 @@ function Cases() {
       label: "Target Suspect Number",
       value: targetNumber,
       mono: true,
-      color: "#3b5fab",
+      color: "#00e5ff",
     },
     { label: "Total Event Footprints", value: `${totalRecords} events` },
     { label: "Associated Contacts", value: `${uniqueContacts} unique nodes` },
@@ -117,13 +117,13 @@ function Cases() {
               className="flex items-center justify-between px-7 py-4"
               style={{
                 background:
-                  "linear-gradient(90deg, rgba(193, 136, 51, 0.12), rgba(193, 136, 51, 0.03))",
-                borderBottom: "1px solid rgba(193, 136, 51, 0.15)",
+                  "linear-gradient(90deg, rgba(255, 107, 74, 0.12), rgba(255, 107, 74, 0.03))",
+                borderBottom: "1px solid rgba(255, 107, 74, 0.15)",
               }}
             >
               <div>
                 <h2 className="flex items-center gap-2 text-lg font-bold text-text">
-                  <FileSearch size={18} color="#c18833" />
+                  <FileSearch size={18} color="#ff6b4a" />
                   CASE-001 / Target Dossier
                 </h2>
                 <span className="text-[11px] font-medium text-text-subtle">
@@ -177,7 +177,7 @@ function Cases() {
           {/* Annotations Panel */}
           <motion.div variants={fadeUp} className="glass-card p-6">
             <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-text">
-              <Crosshair size={16} color="#3b5fab" />
+              <Crosshair size={16} color="#00e5ff" />
               Investigator Annotations
             </h3>
             <div className="flex flex-col gap-4">
@@ -190,10 +190,11 @@ function Cases() {
               />
               <button
                 id="save-dossier"
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[13px] font-bold text-white transition-all hover:brightness-110"
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[13px] font-bold transition-all hover:brightness-110"
                 style={{
-                  backgroundColor: "#3b5fab",
-                  boxShadow: "0 4px 15px rgba(59, 95, 171, 0.3)",
+                  backgroundColor: "#00e5ff",
+                  boxShadow: "0 4px 15px rgba(0, 229, 255, 0.3)",
+                  color: "#082229",
                 }}
               >
                 <Save size={14} />

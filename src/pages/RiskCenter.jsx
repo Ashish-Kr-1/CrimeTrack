@@ -49,25 +49,25 @@ function RiskCenter() {
       icon: Octagon,
       label: "Critical Nodes",
       value: highRisk,
-      color: "#c93c3c",
-      bg: "rgba(201, 60, 60, 0.1)",
-      border: "#c93c3c",
+      color: "#ff6b4a",
+      bg: "rgba(255, 107, 74, 0.1)",
+      border: "#ff6b4a",
     },
     {
       icon: AlertTriangle,
       label: "Suspicious Nodes",
       value: mediumRisk,
-      color: "#c18833",
-      bg: "rgba(193, 136, 51, 0.1)",
-      border: "#c18833",
+      color: "#00e5ff",
+      bg: "rgba(0, 229, 255, 0.1)",
+      border: "#00e5ff",
     },
     {
       icon: CheckCircle2,
       label: "Stable Contacts",
       value: lowRisk,
-      color: "#2d8a5e",
-      bg: "rgba(45, 138, 94, 0.1)",
-      border: "#2d8a5e",
+      color: "#88aeb7",
+      bg: "rgba(136, 174, 183, 0.1)",
+      border: "#88aeb7",
     },
   ];
 
@@ -137,7 +137,7 @@ function RiskCenter() {
           {/* Risk Distribution Bar Chart */}
           <motion.div variants={fadeUp} className="glass-card mb-8 p-6">
             <h2 className="mb-5 flex items-center gap-2 text-lg font-bold text-text">
-              <BarChart3 size={18} color="#3b5fab" />
+              <BarChart3 size={18} color="#00e5ff" />
               Contact Interaction Density
             </h2>
             <ResponsiveContainer width="100%" height={260}>
@@ -150,10 +150,10 @@ function RiskCenter() {
                 <YAxis stroke="#5a6f94" tick={{ fontSize: 11 }} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#111d38",
-                    border: "1px solid #1e2e52",
+                    backgroundColor: "#0b2d35",
+                    border: "1px solid #153c45",
                     borderRadius: 10,
-                    color: "#e9f1f8",
+                    color: "#f0f9ff",
                     fontSize: 12,
                   }}
                   formatter={(val, name, props) => [
@@ -167,10 +167,10 @@ function RiskCenter() {
                       key={idx}
                       fill={
                         entry.level === "critical"
-                          ? "#c93c3c"
+                          ? "#ff6b4a"
                           : entry.level === "suspicious"
-                            ? "#c18833"
-                            : "#2d8a5e"
+                            ? "#00e5ff"
+                            : "#88aeb7"
                       }
                     />
                   ))}
@@ -197,16 +197,16 @@ function RiskCenter() {
                   {topContacts.map(([number, count], idx) => {
                     const cellColor =
                       count > 30
-                        ? "#c93c3c"
+                        ? "#ff6b4a"
                         : count > 10
-                          ? "#c18833"
-                          : "#2d8a5e";
+                          ? "#00e5ff"
+                          : "#88aeb7";
                     const cellBg =
                       count > 30
-                        ? "rgba(201, 60, 60, 0.08)"
+                        ? "rgba(255, 107, 74, 0.08)"
                         : count > 10
-                          ? "rgba(193, 136, 51, 0.08)"
-                          : "rgba(45, 138, 94, 0.08)";
+                          ? "rgba(0, 229, 255, 0.08)"
+                          : "rgba(136, 174, 183, 0.08)";
                     return (
                       <tr key={idx}>
                         <td className="font-mono text-sm font-semibold text-text">

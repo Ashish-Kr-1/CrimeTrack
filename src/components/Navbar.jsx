@@ -12,7 +12,7 @@ function Navbar({ onToggleSidebar }) {
       style={{ borderRadius: "14px" }}
     >
       {/* Left section: Hamburger Menu and Search */}
-      <div className="flex items-center gap-3 flex-1 lg:flex-none">
+      <div className="flex items-center gap-3 flex-1">
         <button
           onClick={onToggleSidebar}
           className="rounded-lg border border-border p-2 text-text-muted hover:text-accent hover:border-border-hover lg:hidden"
@@ -29,7 +29,7 @@ function Navbar({ onToggleSidebar }) {
           <input
             id="nav-search"
             type="text"
-            placeholder="Search phone numbers, cells, IMEIs..."
+            placeholder="               Search phone numbers, cells, IMEIs..."
             className="w-full rounded-xl border border-border bg-dark/60 px-4 py-2.5 pl-10 text-[13px] font-medium text-text outline-none transition-colors duration-200 placeholder:text-text-subtle focus:border-accent"
           />
           <span className="hidden md:inline absolute right-3 rounded border border-border bg-dark-elevated px-1.5 py-0.5 text-[10px] font-semibold text-text-subtle">
@@ -48,8 +48,8 @@ function Navbar({ onToggleSidebar }) {
           <Bell size={16} strokeWidth={2} />
           {diagnosticReport && (
             <span
-              className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold text-white"
-              style={{ backgroundColor: "#c18833" }}
+              className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold text-dark"
+              style={{ backgroundColor: "#ff6b4a" }}
             >
               {diagnosticReport.risk_summary.red_flags_count}
             </span>
@@ -63,9 +63,9 @@ function Navbar({ onToggleSidebar }) {
             animate={{ opacity: 1, scale: 1 }}
             className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-bold"
             style={{
-              backgroundColor: "rgba(193, 136, 51, 0.1)",
-              borderColor: "rgba(193, 136, 51, 0.25)",
-              color: "#c18833",
+              backgroundColor: "rgba(255, 107, 74, 0.1)",
+              borderColor: "rgba(255, 107, 74, 0.25)",
+              color: "#ff6b4a",
             }}
           >
             <Crosshair size={13} strokeWidth={2.5} className="hidden sm:inline" />
@@ -73,13 +73,13 @@ function Navbar({ onToggleSidebar }) {
               <span
                 className="absolute inline-flex h-full w-full rounded-full opacity-75"
                 style={{
-                  backgroundColor: "#c18833",
+                  backgroundColor: "#ff6b4a",
                   animation: "pulse-glow 2s ease-in-out infinite",
                 }}
               />
               <span
                 className="relative inline-flex h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: "#c18833" }}
+                style={{ backgroundColor: "#ff6b4a" }}
               />
             </span>
             <span className="font-mono">
