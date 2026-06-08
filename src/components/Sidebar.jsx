@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -26,23 +27,30 @@ const navItems = [
 ];
 
 function Sidebar({ isOpen, onClose }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const isExpanded = isOpen || isHovered;
+  const sidebarWidth = isExpanded ? 260 : 64;
+  const paddingX = isExpanded ? 20 : 12;
+
   return (
     <div
-      className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col lg:static lg:translate-x-0 ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      }`}
+      className="fixed inset-y-0 left-0 z-50 flex flex-col"
       style={{
-        width: "var(--sidebar-width, 260px)",
+        width: sidebarWidth,
         background: "#f7f9f9",
         borderRight: "1px solid var(--color-border)",
-        transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        overflow: "hidden",
+        whiteSpace: "nowrap"
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* ── Top section ── */}
-      <div style={{ padding: "24px 20px 12px" }}>
+      <div style={{ padding: `24px ${paddingX}px 12px`, transition: "padding 0.3s ease" }}>
 
         {/* Brand */}
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px", overflow: "hidden" }}>
           <div
             style={{
               width: 38,
@@ -58,7 +66,7 @@ function Sidebar({ isOpen, onClose }) {
           >
             <Shield size={18} color="white" strokeWidth={2.5} />
           </div>
-          <div>
+          <div style={{ opacity: isExpanded ? 1 : 0, transition: "opacity 0.2s", width: isExpanded ? "auto" : 0 }}>
             <div
               style={{
                 fontSize: 15,
@@ -80,7 +88,7 @@ function Sidebar({ isOpen, onClose }) {
                 marginTop: 1,
               }}
             >
-              Intelligence Platform
+              Intelligence
             </div>
           </div>
         </div>
@@ -95,6 +103,8 @@ function Sidebar({ isOpen, onClose }) {
             color: "var(--color-text-subtle)",
             marginBottom: 8,
             paddingLeft: 4,
+            opacity: isExpanded ? 1 : 0,
+            transition: "opacity 0.2s",
           }}
         >
           Navigation
@@ -116,7 +126,7 @@ function Sidebar({ isOpen, onClose }) {
                     position: "relative",
                     display: "flex",
                     alignItems: "center",
-                    gap: 10,
+                    gap: 12,
                     padding: "9px 12px",
                     borderRadius: 10,
                     fontSize: 13,
@@ -129,6 +139,8 @@ function Sidebar({ isOpen, onClose }) {
                     border: `1px solid ${isActive ? "rgba(108, 92, 231, 0.20)" : "transparent"}`,
                     transition: "all 0.18s cubic-bezier(0.4, 0, 0.2, 1)",
                     cursor: "pointer",
+                    overflow: "hidden", // Prevents the active rect from stretching
+                    width: isExpanded ? "100%" : "40px",
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
@@ -166,9 +178,9 @@ function Sidebar({ isOpen, onClose }) {
                     strokeWidth={isActive ? 2.5 : 2}
                     style={{ flexShrink: 0 }}
                   />
-                  <span style={{ flex: 1 }}>{item.label}</span>
+                  <span style={{ flex: 1, opacity: isExpanded ? 1 : 0, transition: "opacity 0.2s" }}>{item.label}</span>
 
-                  {item.badge && (
+                  {item.badge && isExpanded && (
                     <span
                       style={{
                         fontSize: 8,
@@ -186,7 +198,7 @@ function Sidebar({ isOpen, onClose }) {
                     </span>
                   )}
 
-                  {isActive && !item.badge && (
+                  {isActive && !item.badge && isExpanded && (
                     <ChevronRight size={12} style={{ opacity: 0.5 }} />
                   )}
                 </div>
@@ -197,11 +209,11 @@ function Sidebar({ isOpen, onClose }) {
       </div>
 
       {/* ── Bottom status ── */}
-      <div style={{ marginTop: "auto", padding: "16px 20px 20px" }}>
+      <div style={{ marginTop: "auto", padding: `16px ${paddingX}px 20px`, transition: "padding 0.3s ease", overflow: "hidden" }}>
         {/* Thin divider */}
         <div style={{ height: 1, background: "var(--color-border)", marginBottom: 16 }} />
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: isExpanded ? "flex-start" : "center" }}>
           {/* Pulse dot */}
           <div style={{ position: "relative", width: 8, height: 8, flexShrink: 0 }}>
             <span
@@ -223,7 +235,7 @@ function Sidebar({ isOpen, onClose }) {
               }}
             />
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 1, opacity: isExpanded ? 1 : 0, width: isExpanded ? "auto" : 0, transition: "opacity 0.2s" }}>
             <span
               style={{
                 fontSize: 11,

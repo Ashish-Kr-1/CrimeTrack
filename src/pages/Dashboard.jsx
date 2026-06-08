@@ -25,20 +25,25 @@ import {
 
 const highlightNarrativeText = (text) => {
   if (!text) return "";
-  const regex = /(Target SIM \d+|\d{10}|\d+\.\d+%|\b\d+ distinct\b|Bihar\/Jharkhand|\b\d+ unique\b|\b\d+ active\b|IMEI \d+|\b\d+ separate\b|\b\d+ bank accounts\b)/g;
+  const regex = /(Target SIM \d+|\d{10}|\d+\.\d+%|\b\d+ distinct\b|Bihar\/Jharkhand|\b\d+ unique\b|\b\d+ active\b|IMEI \d+|\b\d+ separate\b|\b\d+ bank accounts\b|device swap rate|Coordinated hardware transitions|critical telemetry alert|high-security investigations|Social footprint analysis|Geospatial logs)/gi;
   const parts = text.split(regex);
   return parts.map((part, i) => {
-    if (part.match(/^Target SIM \d+$/) || part.match(/^\d{10}$/) || part.match(/^IMEI \d+$/)) {
+    if (!part) return null;
+    const lower = part.toLowerCase();
+    if (part.match(/^Target SIM \d+$/i) || part.match(/^\d{10}$/) || part.match(/^IMEI \d+$/i)) {
       return <span key={i} className="text-gold font-mono font-bold">{part}</span>;
     }
     if (part.match(/^\d+\.\d+%$/)) {
-      return <span key={i} className="text-accent-light font-bold font-mono">{part}</span>;
+      return <span key={i} className="text-accent font-bold font-mono">{part}</span>;
     }
-    if (part.match(/Bihar\/Jharkhand/)) {
+    if (part.match(/Bihar\/Jharkhand/i)) {
       return <span key={i} className="text-danger font-semibold">{part}</span>;
     }
-    if (part.match(/(\b\d+ distinct\b|\b\d+ separate\b|\b\d+ bank accounts\b|\b\d+ unique\b|\b\d+ active\b)/)) {
-      return <span key={i} className="text-accent-light font-bold">{part}</span>;
+    if (part.match(/(\b\d+ distinct\b|\b\d+ separate\b|\b\d+ bank accounts\b|\b\d+ unique\b|\b\d+ active\b)/i)) {
+      return <span key={i} className="text-accent font-bold">{part}</span>;
+    }
+    if (lower.match(/device swap rate|coordinated hardware transitions|critical telemetry alert|high-security investigations|social footprint analysis|geospatial logs/)) {
+      return <strong key={i} style={{ color: "var(--color-text)" }}>{part}</strong>;
     }
     return part;
   });
@@ -158,27 +163,28 @@ function Dashboard() {
             display: "flex",
             alignItems: "center",
             gap: 18,
-            padding: "12px 20px",
-            borderRadius: 14,
-            border: "1px solid var(--color-border)",
-            background: "rgba(255, 255, 255, 0.65)",
-            backdropFilter: "blur(12px)",
+            padding: "16px 24px",
+            borderRadius: 12,
+            border: `1px solid rgba(108, 92, 231, 0.15)`,
+            background: `linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.8))`,
+            boxShadow: `0 4px 20px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,1)`,
+            backdropFilter: "blur(20px)",
           }}
         >
           <div style={{ textAlign: "right" }}>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 3 }}>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 4 }}>
               AI Classification
             </span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text)", lineHeight: 1 }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--color-text)", lineHeight: 1 }}>
               {diagnosticReport.classification.replace(/_/g, " ")}
             </span>
           </div>
-          <div style={{ width: 1, height: 32, background: "var(--color-border)" }} />
+          <div style={{ width: 1, height: 36, background: "var(--color-border-subtle)" }} />
           <div style={{ textAlign: "center" }}>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 3 }}>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 4 }}>
               Risk Score
             </span>
-            <span style={{ fontSize: 20, fontWeight: 800, fontFamily: "var(--font-mono)", color: statusColor, letterSpacing: "-0.04em", lineHeight: 1 }}>
+            <span style={{ fontSize: 24, fontWeight: 900, fontFamily: "var(--font-mono)", color: statusColor, letterSpacing: "-0.04em", lineHeight: 1 }}>
               {(diagnosticReport.suspicion_score * 100).toFixed(0)}%
             </span>
           </div>
@@ -191,7 +197,15 @@ function Dashboard() {
       <motion.div
         variants={fadeUp}
         className="glass-card"
-        style={{ padding: 0, marginBottom: 20, overflow: "hidden" }}
+        style={{ 
+          padding: 0, 
+          marginBottom: 24, 
+          overflow: "hidden",
+          background: "rgba(255, 255, 255, 0.75)", 
+          border: "1px solid rgba(255,255,255,0.8)",
+          borderTop: "3px solid #6c5ce7",
+          boxShadow: "0 8px 30px rgba(0,0,0,0.03)"
+        }}
       >
         {/* Card Header */}
         <div
@@ -200,12 +214,12 @@ function Dashboard() {
             alignItems: "center",
             justifyContent: "space-between",
             padding: "16px 24px",
-            borderBottom: "1px solid var(--color-border-subtle)",
-            background: "rgba(255,255,255,0.3)",
+            borderBottom: "1px solid rgba(0,0,0,0.04)",
+            background: "rgba(255,255,255,0.4)",
           }}
         >
           <h2 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 8, margin: 0 }}>
-            <Sparkles size={13} color="var(--color-accent)" />
+            <Sparkles size={13} color="#6c5ce7" />
             Intelligent Diagnostic Profile
           </h2>
           <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--color-text-subtle)" }}>
@@ -214,35 +228,34 @@ function Dashboard() {
         </div>
 
         {/* Card Body */}
-        <div style={{ padding: "24px" }}>
+        <div style={{ padding: "28px" }}>
           {/* Ring meter + description row */}
-          <div style={{ display: "flex", alignItems: "center", gap: 24, marginBottom: 24 }}>
-            <div style={{ position: "relative", width: 72, height: 72, flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 28, marginBottom: 32 }}>
+            <div style={{ position: "relative", width: 84, height: 84, flexShrink: 0 }}>
               <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }}>
-                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="8" />
+                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,0,0,0.04)" strokeWidth="8" />
                 <circle
                   cx="50" cy="50" r="42" fill="none"
                   stroke={statusColor}
                   strokeWidth="8" strokeLinecap="round"
                   strokeDasharray={`${diagnosticReport.suspicion_score * 264} 264`}
-                  style={{ filter: `drop-shadow(0 0 4px ${statusColor})` }}
                 />
               </svg>
               <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-mono)", color: statusColor }}>
+                <span style={{ fontSize: 18, fontWeight: 800, fontFamily: "var(--font-mono)", color: statusColor }}>
                   {(diagnosticReport.suspicion_score * 100).toFixed(0)}%
                 </span>
               </div>
             </div>
 
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", marginBottom: 2 }}>
+              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", marginBottom: 4 }}>
                 Anomaly Level Detected
               </div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: "var(--color-text)", marginBottom: 6 }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "var(--color-text)", marginBottom: 8 }}>
                 {diagnosticReport.raw_heuristic_score} pts scored
               </div>
-              <p style={{ fontSize: 12.5, lineHeight: 1.65, color: "var(--color-text-muted)", margin: 0 }}>
+              <p style={{ fontSize: 13, lineHeight: 1.65, color: "var(--color-text-muted)", margin: 0, maxWidth: "90%" }}>
                 Target triggers {diagnosticReport.triggered_indicators.length} behavioral heuristics warnings.
                 Risk classification suggests an active telemetry signature.
               </p>
@@ -250,20 +263,35 @@ function Dashboard() {
           </div>
 
           {/* Quick stats — 4 in a row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
             {[
-              { label: "Operational Span",   value: diagnosticReport.feature_vector.active_days || "N/A",           unit: "days",     color: "var(--color-accent)" },
-              { label: "Hardware Fleet",     value: diagnosticReport.feature_vector.unique_imei_count || "N/A",    unit: "IMEIs",    color: "#c084fc" },
-              { label: "Financial Accounts", value: diagnosticReport.feature_vector.bank_sender_count || "N/A",    unit: "banks",    color: "var(--color-gold)" },
-              { label: "UPI Aggregations",   value: diagnosticReport.feature_vector.upi_burst_sms_count || "0",   unit: "bindings", color: "var(--color-gold)" },
-            ].map((s) => (
-              <div key={s.label} className="stat-mini">
-                <span className="stat-mini-label">{s.label}</span>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 5, marginTop: 4 }}>
-                  <span className="stat-mini-value" style={{ color: s.color }}>{s.value}</span>
-                  <span className="stat-mini-sub">{s.unit}</span>
+              { label: "Operational Span",   value: diagnosticReport.feature_vector.active_days || "N/A",           unit: "days",     color: "var(--color-accent)", icon: Activity },
+              { label: "Hardware Fleet",     value: diagnosticReport.feature_vector.unique_imei_count || "N/A",    unit: "IMEIs",    color: "#a29bfe", icon: Smartphone },
+              { label: "Financial Accounts", value: diagnosticReport.feature_vector.bank_sender_count || "N/A",    unit: "banks",    color: "var(--color-gold)", icon: Lock },
+              { label: "UPI Aggregations",   value: diagnosticReport.feature_vector.upi_burst_sms_count || "0",   unit: "bindings", color: "var(--color-gold)", icon: Zap },
+            ].map((s, idx) => (
+              <motion.div
+                key={s.label}
+                className="stat-mini"
+                whileHover={{ scale: 1.02, translateY: -2 }}
+                style={{
+                  background: "rgba(255,255,255,0.6)",
+                  border: "1px solid rgba(255,255,255,0.9)",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
+                  backdropFilter: "blur(8px)",
+                  borderRadius: 10,
+                  padding: "16px"
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                  <span className="stat-mini-label" style={{ color: "var(--color-text-subtle)" }}>{s.label}</span>
+                  <s.icon size={14} color={s.color} style={{ opacity: 0.9 }} />
                 </div>
-              </div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                  <span className="stat-mini-value" style={{ color: "var(--color-text)", fontSize: 26, fontWeight: 900 }}>{s.value}</span>
+                  <span className="stat-mini-sub" style={{ fontSize: 12, color: "var(--color-text-subtle)" }}>{s.unit}</span>
+                </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -315,26 +343,31 @@ function Dashboard() {
                       letterSpacing: "0.12em",
                       textTransform: "uppercase",
                       color: "var(--color-accent)",
-                      marginBottom: 16,
                       margin: 0,
-                      marginBottom: 16,
+                      marginBottom: 24,
                     }}
                   >
                     Behavioral Narrative Overview
                   </h3>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                     {narrativeBlocks.map((block, idx) => (
-                      <p
-                        key={idx}
-                        style={{
-                          fontSize: 13,
-                          lineHeight: 1.8,
-                          color: "var(--color-text-muted)",
-                          margin: 0,
-                        }}
-                      >
-                        {highlightNarrativeText(block)}
-                      </p>
+                      <div key={idx} style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
+                        <div style={{ 
+                          width: 6, height: 6, borderRadius: "50%", 
+                          background: "var(--color-accent)", opacity: 0.6, 
+                          flexShrink: 0, transform: "translateY(-2px)" 
+                        }} />
+                        <p
+                          style={{
+                            fontSize: 13,
+                            lineHeight: 1.7,
+                            color: "var(--color-text)", // Increased contrast
+                            margin: 0,
+                          }}
+                        >
+                          {highlightNarrativeText(block)}
+                        </p>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -354,53 +387,64 @@ function Dashboard() {
                   >
                     Operational Lifecycle Phases
                   </h3>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 0, position: "relative", marginLeft: 8 }}>
+                    <div style={{ position: "absolute", top: 16, bottom: 16, left: -1, width: 2, background: "rgba(0,0,0,0.06)", zIndex: 0 }} />
                     {diagnosticReport.operational_phases.map((phase, idx) => (
                       <div
                         key={idx}
                         style={{
-                          background: "rgba(255,255,255,0.45)",
-                          border: "1px solid var(--color-border)",
-                          borderRadius: 12,
-                          padding: "16px 20px",
+                          position: "relative",
+                          padding: "16px 20px 16px 28px",
+                          zIndex: 1,
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)" }}>{phase.phase}</span>
-                          <span
+                        <div style={{ position: "absolute", top: 22, left: -5, width: 10, height: 10, borderRadius: "50%", background: "#6c5ce7", boxShadow: "0 0 0 3px rgba(108, 92, 231, 0.2)" }} />
+                        <div style={{
+                          background: "rgba(255,255,255,0.7)",
+                          border: "1px solid rgba(255,255,255,0.9)",
+                          boxShadow: "0 4px 16px rgba(0,0,0,0.03)",
+                          borderRadius: 16,
+                          padding: "20px",
+                          backdropFilter: "blur(10px)"
+                        }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                            <span style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text)" }}>{phase.phase}</span>
+                            <span
+                              style={{
+                                padding: "4px 10px",
+                                borderRadius: 8,
+                                fontSize: 10,
+                                fontWeight: 800,
+                                fontFamily: "var(--font-mono)",
+                                background: "linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(162, 155, 254, 0.1))",
+                                border: "1px solid rgba(108, 92, 231, 0.2)",
+                                color: "#6c5ce7",
+                              }}
+                            >
+                              {phase.event_count} logs
+                            </span>
+                          </div>
+                          <div
                             style={{
-                              padding: "2px 8px",
-                              borderRadius: 6,
-                              fontSize: 10,
-                              fontWeight: 700,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              fontSize: 12,
+                              color: "var(--color-text-muted)",
+                              borderTop: "1px dashed var(--color-border-subtle)",
+                              paddingTop: 12,
                               fontFamily: "var(--font-mono)",
-                              background: "rgba(108, 92, 231, 0.08)",
-                              border: "1px solid rgba(108, 92, 231, 0.15)",
-                              color: "#6c5ce7",
                             }}
                           >
-                            {phase.event_count} logs
-                          </span>
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            fontSize: 11,
-                            color: "var(--color-text-muted)",
-                            borderTop: "1px solid var(--color-border-subtle)",
-                            paddingTop: 10,
-                            fontFamily: "var(--font-mono)",
-                          }}
-                        >
-                          <div>
-                            IMEI: <span style={{ color: "#6c5ce7", fontWeight: 600 }}>{phase.imei || "Unknown"}</span>
-                          </div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--color-text-subtle)" }}>
-                            <span>From: {phase.start}</span>
-                            <span style={{ opacity: 0.4 }}>•</span>
-                            <span>To: {phase.end}</span>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <Smartphone size={14} color="var(--color-text-subtle)" />
+                              IMEI: <span style={{ color: "#6c5ce7", fontWeight: 700 }}>{phase.imei || "Unknown"}</span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--color-text-subtle)" }}>
+                              <span style={{ background: "rgba(0,0,0,0.04)", padding: "2px 6px", borderRadius: 4 }}>{phase.start}</span>
+                              <span style={{ opacity: 0.4 }}>→</span>
+                              <span style={{ background: "rgba(0,0,0,0.04)", padding: "2px 6px", borderRadius: 4 }}>{phase.end}</span>
+                            </div>
                           </div>
                         </div>
                       </div>

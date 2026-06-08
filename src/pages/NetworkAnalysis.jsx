@@ -228,9 +228,14 @@ function NetworkAnalysis() {
   }, [selectedNode]);
 
   return (
-    <motion.div className="page-container theme-network" initial="initial" animate="animate">
-  {/* Header */}
-  <motion.div variants={fadeUp} className="page-header mb-6">
+    <motion.div 
+      className="page-container theme-network" 
+      initial="initial" 
+      animate="animate"
+      style={{ display: "flex", flexDirection: "column", gap: "32px" }}
+    >
+      {/* Header */}
+      <motion.div variants={fadeUp} className="page-header" style={{ marginBottom: 0 }}>
         <h1 className="mb-1 text-[30px] font-bold text-text">
           Link Analysis & Social Network Mapping
         </h1>
@@ -248,16 +253,18 @@ function NetworkAnalysis() {
           {/* KPIs */}
           <motion.div
             variants={fadeUp}
-            className="mb-6 grid gap-5"
             style={{
+              display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "24px"
             }}
           >
             {kpis.map((kpi, i) => (
               <motion.div
                 key={i}
                 whileHover={{ y: -3, scale: 1.015 }}
-                className="glass-card flex items-center gap-4 p-5"
+                className="glass-card flex items-center gap-5 p-6"
+                style={{ padding: "24px", display: "flex", alignItems: "center", gap: "20px" }}
               >
                 <div
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border"
@@ -289,22 +296,25 @@ function NetworkAnalysis() {
           </motion.div>
 
           {/* Interactive Split Workspace */}
-          <div className="grid gap-6 lg:grid-cols-12">
+          <div style={{ display: "flex", gap: "32px", alignItems: "stretch", flexWrap: "wrap" }}>
             {/* LEFT PANEL: VIZ STUDIO (60%) */}
             <motion.div
               variants={fadeUp}
-              className="lg:col-span-7 flex flex-col gap-5"
+              style={{ flex: "1 1 55%", minWidth: "500px", display: "flex", flexDirection: "column" }}
             >
               {/* Force Graph Card */}
-              <div className="glass-card overflow-hidden flex flex-col" style={{ borderRadius: 16 }}>
-                <div className="px-6 pt-5 pb-3 border-b border-border bg-white/40 flex items-center justify-between flex-wrap gap-3">
-                  <h2 className="flex items-center gap-2 text-md font-bold text-text">
+              <div className="glass-card overflow-hidden flex flex-col h-full" style={{ borderRadius: 16 }}>
+                <div 
+                  className="px-6 py-4 border-b border-border bg-white/40 flex items-center justify-between flex-wrap gap-4"
+                  style={{ padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}
+                >
+                  <h2 className="flex items-center gap-2 text-md font-bold text-text" style={{ display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
                     <Network size={16} color="#e17055" />
                     Contact Network Canvas
                   </h2>
 
                   {/* Label Mode Toggle */}
-                  <div className="flex border border-border rounded-lg overflow-hidden bg-white/50">
+                  <div className="flex border border-border rounded-lg overflow-hidden bg-white/50" style={{ display: "flex" }}>
                     <button
                       onClick={() => setLabelMode("full")}
                       className={`px-3 py-1 text-[11px] font-bold transition-all ${
@@ -312,6 +322,7 @@ function NetworkAnalysis() {
                           ? "bg-accent/25 text-accent"
                           : "text-text-muted hover:text-text"
                       }`}
+                      style={{ padding: "6px 12px" }}
                     >
                       Full Number
                     </button>
@@ -322,6 +333,7 @@ function NetworkAnalysis() {
                           ? "bg-accent/25 text-accent"
                           : "text-text-muted hover:text-text"
                       }`}
+                      style={{ padding: "6px 12px" }}
                     >
                       Abbreviated
                     </button>
@@ -329,19 +341,22 @@ function NetworkAnalysis() {
                 </div>
 
                 {/* Legend */}
-                <div className="px-6 py-3 bg-white/30 border-b border-border flex flex-wrap gap-4 text-[11px] text-text-muted justify-between">
-                  <div className="flex gap-4">
-                    <span className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#e17055" }} /> Target Suspect
+                <div 
+                  className="px-6 py-3 bg-white/30 border-b border-border flex flex-wrap gap-4 text-[11px] text-text-muted justify-between"
+                  style={{ padding: "12px 24px", display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "space-between", alignItems: "center" }}
+                >
+                  <div className="flex gap-4" style={{ display: "flex", gap: "16px" }}>
+                    <span className="flex items-center gap-1.5" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#e17055", width: "8px", height: "8px" }} /> Target Suspect
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#e17055" }} /> Critical ({`>=30`} calls)
+                    <span className="flex items-center gap-1.5" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#e17055", width: "8px", height: "8px" }} /> Critical ({`>=30`} calls)
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#6c5ce7" }} /> Suspicious ({`15-29`} calls)
+                    <span className="flex items-center gap-1.5" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#6c5ce7", width: "8px", height: "8px" }} /> Suspicious ({`15-29`} calls)
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#95a5a6" }} /> Nominal ({`<15`} calls)
+                    <span className="flex items-center gap-1.5" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#95a5a6", width: "8px", height: "8px" }} /> Nominal ({`<15`} calls)
                     </span>
                   </div>
                   <span className="text-[10px] text-text-subtle italic">Click nodes to inspect intelligence dossier.</span>
@@ -382,13 +397,19 @@ function NetworkAnalysis() {
                 </div>
 
                 {/* Simulation Parameters Sliders */}
-                <div className="p-5 border-t border-border bg-white/30 flex flex-col gap-4">
-                  <h3 className="text-xs font-bold text-text flex items-center gap-1.5 uppercase tracking-wider">
+                <div 
+                  className="p-5 border-t border-border bg-white/30 flex flex-col gap-4"
+                  style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "16px" }}
+                >
+                  <h3 className="text-xs font-bold text-text flex items-center gap-1.5 uppercase tracking-wider" style={{ display: "flex", alignItems: "center", gap: "6px", margin: 0 }}>
                     <Sliders size={13} className="text-accent" />
                     Interactive D3 Force Parameters
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <div className="flex flex-col gap-1.5">
+                  <div 
+                    className="grid grid-cols-1 md:grid-cols-3 gap-5"
+                    style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "20px" }}
+                  >
+                    <div className="flex flex-col gap-1.5" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                       <div className="flex justify-between items-center text-[10.5px]">
                         <span className="text-text-muted">Charge Repulsion</span>
                         <span className="font-mono text-accent font-bold">{chargeStrength}</span>
@@ -440,7 +461,7 @@ function NetworkAnalysis() {
             {/* RIGHT PANEL: NODE INTELLIGENCE INSPECTOR (40%) */}
             <motion.div
               variants={fadeUp}
-              className="lg:col-span-5 flex flex-col"
+              style={{ flex: "1 1 40%", minWidth: "350px", display: "flex", flexDirection: "column" }}
             >
               <AnimatePresence mode="wait">
                 {!selectedNode ? (
@@ -450,8 +471,9 @@ function NetworkAnalysis() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="glass-card p-6 flex flex-col justify-center items-center text-center flex-1 min-h-[400px]"
+                    style={{ padding: "24px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", minHeight: "400px" }}
                   >
-                    <div className="h-16 w-16 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center mb-4 text-accent animate-pulse">
+                    <div className="h-16 w-16 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center mb-4 text-accent animate-pulse" style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "16px" }}>
                       <Network size={26} />
                     </div>
                     <h3 className="text-md font-bold text-text mb-1">Dossier Analysis Panel</h3>
@@ -459,10 +481,10 @@ function NetworkAnalysis() {
                       Select an associate node in the Link Matrix graph to retrieve behavioral intelligence telemetry, automated threat scoring, and next steps recommendations.
                     </p>
 
-                    <div className="w-full border-t border-border mt-6 pt-5 text-left flex flex-col gap-3">
+                    <div className="w-full border-t border-border mt-6 pt-5 text-left flex flex-col gap-3" style={{ width: "100%", marginTop: "24px", paddingTop: "20px", display: "flex", flexDirection: "column", gap: "12px", textAlign: "left" }}>
                       <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider block">Network Aggregates</span>
-                      <div className="grid grid-cols-2 gap-3.5 text-xs">
-                        <div className="bg-white/40 border border-border p-2.5 rounded-lg">
+                      <div className="grid grid-cols-2 gap-3.5 text-xs" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                        <div className="bg-white/40 border border-border p-2.5 rounded-lg" style={{ padding: "10px" }}>
                           <div className="text-[9px] text-text-muted font-bold">AVG LINK WEIGHT</div>
                           <div className="text-md font-bold text-text mt-0.5">
                             {topContacts.length > 0
@@ -470,7 +492,7 @@ function NetworkAnalysis() {
                               : 0}
                           </div>
                         </div>
-                        <div className="bg-white/40 border border-border p-2.5 rounded-lg">
+                        <div className="bg-white/40 border border-border p-2.5 rounded-lg" style={{ padding: "10px" }}>
                           <div className="text-[9px] text-text-muted font-bold">TOTAL LINKS</div>
                           <div className="text-md font-bold text-text mt-0.5">{totalContacts} nodes</div>
                         </div>
@@ -484,9 +506,10 @@ function NetworkAnalysis() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     className="glass-card p-6 flex flex-col flex-1 min-h-[400px]"
+                    style={{ padding: "24px", display: "flex", flexDirection: "column", minHeight: "400px" }}
                   >
                     {/* Inspector Header */}
-                    <div className="flex justify-between items-start pb-4 border-b border-border">
+                    <div className="flex justify-between items-start pb-4 border-b border-border" style={{ display: "flex", justifyContent: "space-between", paddingBottom: "16px" }}>
                       <div>
                         <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider block">INTELLIGENCE DOSSIER</span>
                         <h3 className="text-lg font-mono font-bold text-text mt-0.5 flex items-center gap-1.5">
@@ -503,7 +526,7 @@ function NetworkAnalysis() {
                     </div>
 
                     {/* Badge details */}
-                    <div className="my-5 flex flex-wrap gap-2.5 items-center">
+                    <div className="my-5 flex flex-wrap gap-2.5 items-center" style={{ margin: "20px 0", display: "flex", flexWrap: "wrap", gap: "10px", alignItems: "center" }}>
                       {selectedNode.isTarget ? (
                         <span className="rounded px-2.5 py-0.5 text-[9px] font-bold tracking-wider bg-gold-glow text-gold border border-gold/30 uppercase">
                           Target Suspect SIM
@@ -545,9 +568,9 @@ function NetworkAnalysis() {
                     </div>
 
                     {/* AI Explanation narrative */}
-                    <div className="bg-white/30 border border-border rounded-xl p-4 flex flex-col gap-3">
+                    <div className="bg-white/30 border border-border rounded-xl p-4 flex flex-col gap-3" style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
                       <div>
-                        <h4 className="text-[10px] font-bold text-accent uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                        <h4 className="text-[10px] font-bold text-accent uppercase tracking-wider mb-1.5 flex items-center gap-1" style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "6px", margin: 0 }}>
                           <ShieldAlert size={12} />
                           {nodeNarrative.role}
                         </h4>
@@ -556,8 +579,8 @@ function NetworkAnalysis() {
                         </p>
                       </div>
 
-                      <div className="border-t border-border pt-3 mt-1 flex flex-col gap-1.5">
-                        <h5 className="text-[10.5px] font-bold text-text uppercase flex items-center gap-1">
+                      <div className="border-t border-border pt-3 mt-1 flex flex-col gap-1.5" style={{ paddingTop: "12px", marginTop: "4px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <h5 className="text-[10.5px] font-bold text-text uppercase flex items-center gap-1" style={{ display: "flex", alignItems: "center", gap: "4px", margin: 0 }}>
                           <CheckCircle size={11} className="text-success" />
                           Recommended Investigative Protocol
                         </h5>
@@ -569,17 +592,17 @@ function NetworkAnalysis() {
 
                     {/* Contact Stats detail */}
                     {!selectedNode.isTarget && (
-                      <div className="mt-5 flex-1 flex flex-col justify-end">
-                        <div className="border-t border-border pt-4 text-xs flex flex-col gap-3">
+                      <div className="mt-5 flex-1 flex flex-col justify-end" style={{ marginTop: "20px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+                        <div className="border-t border-border pt-4 text-xs flex flex-col gap-3" style={{ paddingTop: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
                           <span className="text-[10px] font-bold text-text-subtle uppercase tracking-wider block">Connectivity Profile</span>
-                          <div className="grid grid-cols-2 gap-3.5">
-                            <div className="bg-white/30 border border-border p-2.5 rounded-lg">
+                          <div className="grid grid-cols-2 gap-3.5" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                            <div className="bg-white/30 border border-border p-2.5 rounded-lg" style={{ padding: "10px" }}>
                               <span className="text-[9px] text-text-subtle font-bold uppercase block">Calling Rank</span>
                               <span className="text-sm font-bold text-text mt-0.5">
                                 #{topContacts.findIndex(([num]) => num === selectedNode.id) + 1} of {totalContacts}
                               </span>
                             </div>
-                            <div className="bg-white/30 border border-border p-2.5 rounded-lg">
+                            <div className="bg-white/30 border border-border p-2.5 rounded-lg" style={{ padding: "10px" }}>
                               <span className="text-[9px] text-text-subtle font-bold uppercase block">Activity Share</span>
                               <span className="text-sm font-mono font-bold text-accent mt-0.5">
                                 {((selectedNode.count / records.length) * 100).toFixed(1)}%
@@ -590,6 +613,7 @@ function NetworkAnalysis() {
                           <button
                             onClick={() => alert(`Redirecting tracking overlays to trace associate ${selectedNode.id}`)}
                             className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl bg-accent px-4 py-2.5 text-xs font-bold text-white transition-all hover:brightness-115"
+                            style={{ padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", width: "100%", marginTop: "8px" }}
                           >
                             Isolate Movement footprint
                             <ChevronRight size={13} />
@@ -604,8 +628,8 @@ function NetworkAnalysis() {
           </div>
 
           {/* Connection List Table at Bottom */}
-          <motion.div variants={fadeUp} className="glass-card p-6 mt-6">
-            <h2 className="mb-5 text-lg font-bold text-text">
+          <motion.div variants={fadeUp} className="glass-card p-6" style={{ padding: "24px" }}>
+            <h2 className="mb-5 text-lg font-bold text-text" style={{ marginBottom: "20px" }}>
               Relationship Density & Co-Occurrence Matrix
             </h2>
             <div className="overflow-x-auto">

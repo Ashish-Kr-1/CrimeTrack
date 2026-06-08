@@ -60,7 +60,7 @@ function App() {
       {/* ── Main Content ── */}
       <div
         className="relative z-10 flex flex-1 flex-col overflow-y-auto"
-        style={{ padding: "var(--content-padding)", gap: 0 }}
+        style={{ padding: "var(--content-padding)", paddingLeft: "calc(var(--content-padding) + 64px)", gap: 0 }}
       >
         <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
