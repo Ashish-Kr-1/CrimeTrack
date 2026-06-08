@@ -18,8 +18,10 @@ from datetime import datetime
 # ─────────────────────────────────────────────────────────
 #  PATHS & CONFIG
 # ─────────────────────────────────────────────────────────
-STATS_PATH   = '/Users/ayushk/SummerIntern/cdr_stats.json'
-OUTPUT_PATH  = '/Users/ayushk/SummerIntern/diagnostic_output.json'
+# Default paths relative to script directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+STATS_PATH   = os.path.join(script_dir, 'cdr_stats.json')
+OUTPUT_PATH  = os.path.join(script_dir, 'diagnostic_output.json')
 
 # Known UPI gateway / verification short-codes used by PhonePe, GPay, Paytm etc.
 UPI_GATEWAY_NUMBERS = {
@@ -383,7 +385,7 @@ if __name__ == '__main__':
     print("[3/4] Running heuristic scoring rules ...")
     score, triggered_rules = run_heuristic_scorer(features)
     classification, confidence = classify(score)
-    print(f"      Score: {score} / {sum(r['points'] for r in RULES)}  →  [{classification}]  Confidence: {confidence}")
+    print(f"      Score: {score} / {sum(r['points'] for r in RULES)}  ->  [{classification}]  Confidence: {confidence}")
     print(f"      Triggered rules: {len(triggered_rules)}")
     for rule in triggered_rules:
         print(f"        [{rule['severity']:8s}] +{rule['points']:2d} pts  {rule['code']}")
@@ -394,7 +396,7 @@ if __name__ == '__main__':
     with open(output_path, 'w') as f:
         json.dump(diagnostic, f, indent=2)
 
-    print(f"\n✅  Diagnostic output saved → {output_path}")
+    print(f"\n[OK]  Diagnostic output saved -> {output_path}")
     print("\n" + "=" * 60)
     print("   QUICK VERDICT")
     print("=" * 60)
