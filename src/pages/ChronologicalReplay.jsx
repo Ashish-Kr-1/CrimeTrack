@@ -17,6 +17,7 @@ import {
   Zap,
   Radio,
   Clock,
+  Map,
 } from "lucide-react";
 import {
   MapContainer,
@@ -28,13 +29,20 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-function MapController({ center }) {
+function MapController({ center, fitBoundsCoords, viewMode }) {
   const map = useMap();
   useEffect(() => {
-    if (center) {
+    if (viewMode === "fit" && fitBoundsCoords && fitBoundsCoords.length > 0) {
+      map.fitBounds(fitBoundsCoords, {
+        padding: [50, 50],
+        maxZoom: 16,
+        animate: true,
+        duration: 0.8,
+      });
+    } else if (viewMode === "center" && center) {
       map.setView(center, map.getZoom(), { animate: true });
     }
-  }, [center, map]);
+  }, [center, fitBoundsCoords, viewMode, map]);
   return null;
 }
 
@@ -46,6 +54,7 @@ function ChronologicalReplay() {
   const [activeEventIndex, setActiveEventIndex] = useState(0);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showLog, setShowLog] = useState(true);
+  const [viewMode, setViewMode] = useState("center");
 
   const logListRef = useRef();
   const logItemRefs = useRef({});
@@ -55,12 +64,17 @@ function ChronologicalReplay() {
     [diagnosticReport]
   );
 
+  const allCoordinates = useMemo(() => {
+    return replayEvents.map((e) => e.coordinates).filter(Boolean);
+  }, [replayEvents]);
+
   // Playback timer
   useEffect(() => {
     let timer = null;
     if (isPlaying && replayEvents.length > 0) {
-      const intervalMs = Math.max(200, 1000 / playbackSpeed);
+      const intervalMs = Math.max(10, 1000 / playbackSpeed);
       timer = setInterval(() => {
+        setViewMode("center");
         setActiveEventIndex((prev) => {
           if (prev < replayEvents.length - 1) return prev + 1;
           setIsPlaying(false);
@@ -289,6 +303,7 @@ function ChronologicalReplay() {
             onClick={() => {
               setActiveEventIndex(0);
               setIsPlaying(false);
+              setViewMode("center");
             }}
           >
             <RotateCcw size={13} />
@@ -297,16 +312,20 @@ function ChronologicalReplay() {
             className="icon-btn"
             style={{ padding: 7 }}
             title="Prev"
-            onClick={() =>
-              setActiveEventIndex((p) => Math.max(0, p - 1))
-            }
+            onClick={() => {
+              setActiveEventIndex((p) => Math.max(0, p - 1));
+              setViewMode("center");
+            }}
           >
             <SkipBack size={13} />
           </button>
 
           {/* Play/Pause */}
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => {
+              setViewMode("center");
+              setIsPlaying(!isPlaying);
+            }}
             title={isPlaying ? "Pause" : "Play"}
             style={{
               width: 36,
@@ -343,11 +362,12 @@ function ChronologicalReplay() {
             className="icon-btn"
             style={{ padding: 7 }}
             title="Next"
-            onClick={() =>
+            onClick={() => {
               setActiveEventIndex((p) =>
                 Math.min(replayEvents.length - 1, p + 1)
-              )
-            }
+              );
+              setViewMode("center");
+            }}
           >
             <SkipForward size={13} />
           </button>
@@ -367,7 +387,7 @@ function ChronologicalReplay() {
           >
             Speed
           </span>
-          {[1, 2, 5, 10, 20].map((speed) => (
+          {[1, 5, 10, 20, 50, 100].map((speed) => (
             <button
               key={speed}
               onClick={() => setPlaybackSpeed(speed)}
@@ -402,7 +422,7 @@ function ChronologicalReplay() {
         <div
           style={{
             flex: 1,
-            minWidth: 180,
+            minWidth: 160,
             display: "flex",
             alignItems: "center",
             gap: 12,
@@ -416,6 +436,7 @@ function ChronologicalReplay() {
             onChange={(e) => {
               setIsPlaying(false);
               setActiveEventIndex(parseInt(e.target.value));
+              setViewMode("center");
             }}
             style={{
               flex: 1,
@@ -437,6 +458,35 @@ function ChronologicalReplay() {
             {activeEventIndex + 1} / {replayEvents.length}
           </span>
         </div>
+
+        {/* Finalize Path Button */}
+        <button
+          onClick={() => {
+            setIsPlaying(false);
+            setActiveEventIndex(replayEvents.length - 1);
+            setViewMode("fit");
+          }}
+          style={{
+            padding: "5px 12px",
+            borderRadius: 8,
+            border: viewMode === "fit" ? "1px solid rgba(108,92,231,0.4)" : "1px solid var(--color-border)",
+            background: viewMode === "fit"
+              ? "rgba(108,92,231,0.12)"
+              : "rgba(255,255,255,0.5)",
+            color: viewMode === "fit" ? "#6c5ce7" : "var(--color-text-muted)",
+            fontSize: 11,
+            fontWeight: 600,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            flexShrink: 0,
+            transition: "all 0.15s ease",
+          }}
+        >
+          <Map size={11} />
+          Finalize Path
+        </button>
 
         {/* Toggle event log */}
         <button
@@ -564,7 +614,7 @@ function ChronologicalReplay() {
                 </Popup>
               </CircleMarker>
 
-              <MapController center={activeCoordinates} />
+              <MapController center={activeCoordinates} fitBoundsCoords={allCoordinates} viewMode={viewMode} />
             </MapContainer>
           ) : (
             <div
@@ -836,6 +886,7 @@ function ChronologicalReplay() {
                         onClick={() => {
                           setActiveEventIndex(idx);
                           setIsPlaying(false);
+                          setViewMode("center");
                         }}
                         style={{
                           padding: "12px 20px",
