@@ -11,16 +11,18 @@ import {
   FolderOpen,
   Wifi,
   ChevronRight,
+  Clapperboard,
 } from "lucide-react";
 
 const navItems = [
-  { to: "/upload",  icon: UploadCloud,     label: "Upload Center",    badge: null },
-  { to: "/",        icon: LayoutDashboard, label: "Dashboard",        end: true, badge: null },
-  { to: "/risk",    icon: AlertTriangle,   label: "Risk Center",      badge: null },
-  { to: "/mobility",icon: Clock,           label: "Mobility Tracker", badge: null },
-  { to: "/geo",     icon: MapPin,          label: "Geo Intelligence", badge: null },
-  { to: "/network", icon: Network,         label: "Network Analysis", badge: null },
-  { to: "/cases",   icon: FolderOpen,      label: "Active Cases",     badge: null },
+  { to: "/upload",  icon: UploadCloud,     label: "Upload Center",       badge: null },
+  { to: "/",        icon: LayoutDashboard, label: "Dashboard",           end: true, badge: null },
+  { to: "/replay",  icon: Clapperboard,    label: "Chrono Replay",       badge: "NEW" },
+  { to: "/risk",    icon: AlertTriangle,   label: "Risk Center",         badge: null },
+  { to: "/mobility",icon: Clock,           label: "Mobility Tracker",    badge: null },
+  { to: "/geo",     icon: MapPin,          label: "Geo Intelligence",    badge: null },
+  { to: "/network", icon: Network,         label: "Network Analysis",    badge: null },
+  { to: "/cases",   icon: FolderOpen,      label: "Active Cases",        badge: null },
 ];
 
 function Sidebar({ isOpen, onClose }) {
@@ -166,7 +168,25 @@ function Sidebar({ isOpen, onClose }) {
                   />
                   <span style={{ flex: 1 }}>{item.label}</span>
 
-                  {isActive && (
+                  {item.badge && (
+                    <span
+                      style={{
+                        fontSize: 8,
+                        fontWeight: 800,
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                        padding: "2px 6px",
+                        borderRadius: 99,
+                        background: "linear-gradient(135deg, #6c5ce7, #a29bfe)",
+                        color: "white",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+
+                  {isActive && !item.badge && (
                     <ChevronRight size={12} style={{ opacity: 0.5 }} />
                   )}
                 </div>

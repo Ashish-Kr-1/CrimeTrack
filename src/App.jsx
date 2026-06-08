@@ -8,6 +8,7 @@ import UploadCenter from "./pages/UploadCenter";
 import RiskCenter from "./pages/RiskCenter";
 import Mobility from "./pages/Mobility";
 import NetworkAnalysis from "./pages/NetworkAnalysis";
+import ChronologicalReplay from "./pages/ChronologicalReplay";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
@@ -80,6 +81,7 @@ function App() {
               <Route path="/cases"  element={<Cases />} />
               <Route path="/geo"    element={<GeoIntelligence />} />
               <Route path="/network" element={<NetworkAnalysis />} />
+              <Route path="/replay" element={<ChronologicalReplay />} />
             </Routes>
           </motion.div>
         </AnimatePresence>
