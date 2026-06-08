@@ -522,7 +522,7 @@ p  { line-height: 1.65; }
   background: rgba(0, 0, 0, 0.05);
   border-radius: var(--radius-md);
   padding: 4px;
-  margin: 16px 16px 8px;
+  margin: 0;
 }
 
 .tab-item {
