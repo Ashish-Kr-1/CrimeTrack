@@ -5,14 +5,20 @@ import sys
 from collections import Counter, defaultdict
 from datetime import datetime
 
-# Set default CSV path
-default_csv = '/Users/ayushk/SummerIntern/9520995378_1.csv'
+# Set default CSV path relative to script directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+default_csv = os.path.join(script_dir, '9520995378_1.csv')
 csv_path = sys.argv[1] if len(sys.argv) > 1 else default_csv
-output_json_path = '/Users/ayushk/SummerIntern/cdr_stats.json'
+
+# Output path defaults to script directory, but can be overridden by second argument
+if len(sys.argv) > 2:
+    output_json_path = sys.argv[2]
+else:
+    output_json_path = os.path.join(script_dir, 'cdr_stats.json')
 
 if not os.path.exists(csv_path):
     print(f"Error: CSV file not found at {csv_path}")
-    print("Usage: python3 analyze.py <path_to_cdr_csv>")
+    print("Usage: python3 analyze.py <path_to_cdr_csv> [path_to_output_json]")
     sys.exit(1)
 
 # Extract target number from filename (e.g. "9520995378_1.csv" -> "9520995378")
