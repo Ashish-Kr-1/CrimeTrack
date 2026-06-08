@@ -43,23 +43,32 @@ function UploadCenter() {
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const text = event.target.result;
-      const rows = text.split("\n").map((row) => row.split(",")).filter((row) => row.length > 1);
+      try {
+        const text = event.target.result;
+        const rows = text.split("\n").map((row) => row.split(",")).filter((row) => row.length > 1);
 
-      let dataStartIdx = 0;
-      for (let i = 0; i < Math.min(10, rows.length); i++) {
-        if (rows[i].some((cell) => cell.includes("Target No") || cell.includes("B Party No") || cell.includes("Call Type"))) {
-          dataStartIdx = i;
-          break;
+        let dataStartIdx = 0;
+        for (let i = 0; i < Math.min(10, rows.length); i++) {
+          if (rows[i].some((cell) => cell.includes("Target No") || cell.includes("B Party No") || cell.includes("Call Type"))) {
+            dataStartIdx = i;
+            break;
+          }
         }
+        
+        setCdrData(rows.slice(dataStartIdx));
+        navigate("/");
+      } catch (err) {
+        console.error("Upload processing error:", err);
+        alert("Failed to process file: " + err.message);
       }
-      setCdrData(rows.slice(dataStartIdx));
-      navigate("/");
     };
     reader.readAsText(file);
   };
 
-  const handleFileUpload = (e) => processFile(e.target.files[0]);
+  const handleFileUpload = (e) => {
+    processFile(e.target.files[0]);
+    e.target.value = null; // Reset input so same file can be selected again
+  };
   const handleDrop       = (e) => {
     e.preventDefault();
     setIsDragging(false);
