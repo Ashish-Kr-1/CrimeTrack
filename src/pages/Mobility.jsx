@@ -161,9 +161,14 @@ function Mobility() {
   ];
 
   return (
-    <motion.div className="page-container theme-mobility" initial="initial" animate="animate">
-  {/* Header */}
-  <motion.div variants={fadeUp} className="page-header mb-6">
+    <motion.div 
+      className="page-container theme-mobility" 
+      initial="initial" 
+      animate="animate"
+      style={{ display: "flex", flexDirection: "column", gap: "32px" }}
+    >
+      {/* Header */}
+      <motion.div variants={fadeUp} className="page-header" style={{ marginBottom: 0 }}>
         <h1 className="mb-1 text-[30px] font-bold text-text">
           Mobility Tracker & Georeferencing
         </h1>
@@ -181,9 +186,10 @@ function Mobility() {
           {/* KPIs */}
           <motion.div
             variants={fadeUp}
-            className="mb-6 grid gap-5"
             style={{
+              display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "24px",
             }}
           >
             {kpis.map((kpi, i) => (
@@ -191,6 +197,7 @@ function Mobility() {
                 key={i}
                 whileHover={{ y: -3, scale: 1.015 }}
                 className="glass-card flex items-center gap-4 p-5"
+                style={{ padding: "24px", display: "flex", alignItems: "center", gap: "20px" }}
               >
                 <div
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border"
@@ -216,10 +223,14 @@ function Mobility() {
             ))}
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-start gap-6">
+          <div style={{ display: "flex", gap: "32px", alignItems: "stretch", flexWrap: "wrap" }}>
             {/* LEFT PANEL: TIMELINE (5 cols) */}
-            <motion.div variants={fadeUp} className="glass-card p-6 lg:col-span-5 h-[720px] flex flex-col">
-              <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-text">
+            <motion.div 
+              variants={fadeUp} 
+              className="glass-card p-6 h-[720px] flex flex-col"
+              style={{ padding: "24px", flex: "1 1 40%", minWidth: "350px", display: "flex", flexDirection: "column", height: "720px" }}
+            >
+              <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-text" style={{ marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
                 <Activity size={18} color="#00e5ff" />
                 Cell Transition Hops
               </h2>
@@ -227,20 +238,20 @@ function Mobility() {
                 Click a chronological cell hop below to pan the georeferenced tracker map on the right.
               </p>
 
-              <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin">
-                <div className="flex flex-col pl-2 mt-2">
+              <div style={{ flex: 1, overflowY: "auto", paddingRight: "16px", paddingLeft: "8px", paddingTop: "8px", display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
                   {timelineHops.map((hop, idx) => {
                     const isSelected = activeHop && activeHop.seqNumber === hop.seqNumber;
                     return (
                       <div
                         key={idx}
                         onClick={() => setActiveHop(hop)}
-                        className={`relative flex gap-4 cursor-pointer p-3.5 rounded-xl transition-all border ${
+                        className={`relative flex cursor-pointer rounded-xl transition-all border ${
                           isSelected
                             ? "bg-accent/10 border-accent/40 shadow-sm"
                             : "border-transparent hover:bg-dark-surface/30 text-text-muted hover:text-text"
                         }`}
-                        style={{ marginBottom: 16 }}
+                        style={{ marginBottom: 16, padding: "16px", display: "flex", gap: "16px", position: "relative" }}
                       >
                         {/* Connecting timeline line */}
                         {idx !== timelineHops.length - 1 && (
@@ -264,8 +275,8 @@ function Mobility() {
                         </div>
 
                         {/* Hop details */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                             <span className="text-[11px] font-semibold text-text-subtle">
                               {hop.date} @ {hop.time}
                             </span>
@@ -278,9 +289,9 @@ function Mobility() {
                           <h4 className="font-mono text-sm font-semibold text-text mt-1.5 truncate">
                             CGI: {hop.cgi}
                           </h4>
-                          <p className="mt-1 text-[11px] text-text-subtle flex justify-between">
+                          <p className="mt-1 text-[11px] text-text-subtle" style={{ display: "flex", justifyContent: "space-between", marginTop: "8px" }}>
                             <span>Type: {hop.type} | Service: {hop.service}</span>
-                            <span className="flex items-center gap-0.5 text-accent hover:underline">
+                            <span className="text-accent hover:underline" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                               Locate <ChevronRight size={10} />
                             </span>
                           </p>
@@ -293,11 +304,14 @@ function Mobility() {
             </motion.div>
 
             {/* RIGHT PANEL: MAP & ANCHORS (7 cols) */}
-            <div className="lg:col-span-7 flex flex-col gap-6">
+            <div style={{ flex: "1 1 55%", minWidth: "500px", display: "flex", flexDirection: "column", gap: "24px" }}>
               {/* Georeferencing Tracker Map */}
               <motion.div variants={fadeUp} className="glass-card overflow-hidden" style={{ borderRadius: 16 }}>
-                <div className="px-6 pt-5 pb-3 border-b border-border bg-white/40 flex items-center justify-between">
-                  <h2 className="flex items-center gap-2 text-md font-bold text-text">
+                <div 
+                  className="px-6 pt-5 pb-3 border-b border-border bg-white/40 flex items-center justify-between"
+                  style={{ padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}
+                >
+                  <h2 className="flex items-center gap-2 text-md font-bold text-text" style={{ display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
                     <MapPin size={16} color="#e17055" />
                     Georeferencing Path Overlay
                   </h2>
@@ -364,8 +378,8 @@ function Mobility() {
               </motion.div>
 
               {/* Top Cellular Anchors Table */}
-              <motion.div variants={fadeUp} className="glass-card p-6">
-                <h2 className="mb-5 flex items-center gap-2 text-md font-bold text-text">
+              <motion.div variants={fadeUp} className="glass-card p-6" style={{ padding: "24px" }}>
+                <h2 className="mb-5 flex items-center gap-2 text-md font-bold text-text" style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
                   <Radio size={16} color="#e17055" />
                   Top Transceiver Anchors
                 </h2>
