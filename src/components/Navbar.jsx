@@ -16,9 +16,13 @@ function Navbar({ onToggleSidebar }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "0 18px",
+        padding: "0 20px",
         gap: 16,
         flexShrink: 0,
+        background: "rgba(255, 255, 255, 0.82)",
+        backdropFilter: "blur(28px) saturate(200%)",
+        WebkitBackdropFilter: "blur(28px) saturate(200%)",
+        boxShadow: "0 2px 16px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.95), 0 0 0 1px rgba(0,0,0,0.04)",
       }}
     >
       {/* ── Left: Hamburger + Search ── */}
@@ -43,10 +47,10 @@ function Navbar({ onToggleSidebar }) {
               left: 13,
               top: "50%",
               transform: "translateY(-50%)",
-              color: "var(--color-text-subtle)",
+              color: "#94a3b8",
               flexShrink: 0,
             }}
-            strokeWidth={2.5}
+            strokeWidth={2.2}
           />
           <input
             id="nav-search"
@@ -54,10 +58,10 @@ function Navbar({ onToggleSidebar }) {
             placeholder="Search numbers, IMEIs, cells…"
             style={{
               width: "100%",
-              background: "rgba(255, 255, 255, 0.6)",
-              border: "1px solid var(--color-border)",
+              background: "rgba(248, 250, 252, 0.8)",
+              border: "1px solid rgba(0,0,0,0.08)",
               borderRadius: "var(--radius-md)",
-              color: "var(--color-text)",
+              color: "#0f172a",
               fontFamily: "var(--font-sans)",
               fontSize: 13,
               fontWeight: 500,
@@ -65,14 +69,17 @@ function Navbar({ onToggleSidebar }) {
               padding: "9px 46px 9px 38px",
               outline: "none",
               transition: "var(--transition-base)",
+              boxShadow: "inset 0 1px 3px rgba(0,0,0,0.04)",
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = "var(--color-accent)";
-              e.target.style.boxShadow = "0 0 0 3px var(--color-accent-dim)";
+              e.target.style.borderColor = "#6c5ce7";
+              e.target.style.boxShadow = "0 0 0 3px rgba(108,92,231,0.13), inset 0 1px 3px rgba(0,0,0,0.02)";
+              e.target.style.background = "#ffffff";
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = "var(--color-border)";
-              e.target.style.boxShadow = "none";
+              e.target.style.borderColor = "rgba(0,0,0,0.08)";
+              e.target.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.04)";
+              e.target.style.background = "rgba(248,250,252,0.8)";
             }}
           />
         </div>
@@ -172,32 +179,36 @@ function Navbar({ onToggleSidebar }) {
             display: "flex",
             alignItems: "center",
             gap: 9,
-            padding: "6px 12px 6px 6px",
+            padding: "5px 12px 5px 5px",
             borderRadius: "var(--radius-md)",
-            border: "1px solid var(--color-border)",
-            background: "transparent",
+            border: "1px solid rgba(0,0,0,0.08)",
+            background: "rgba(255,255,255,0.7)",
             cursor: "pointer",
             transition: "var(--transition-base)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "var(--color-border-hover)";
-            e.currentTarget.style.background = "rgba(0,0,0,0.04)";
+            e.currentTarget.style.borderColor = "rgba(108,92,231,0.22)";
+            e.currentTarget.style.background = "rgba(255,255,255,0.92)";
+            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "var(--color-border)";
-            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.borderColor = "rgba(0,0,0,0.08)";
+            e.currentTarget.style.background = "rgba(255,255,255,0.7)";
+            e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)";
           }}
         >
           <div
             style={{
-              width: 26,
-              height: 26,
+              width: 28,
+              height: 28,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #6c5ce7, #a29bfe)",
+              background: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
+              boxShadow: "0 2px 8px rgba(108,92,231,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
             }}
           >
             <User size={13} color="white" />
@@ -206,9 +217,9 @@ function Navbar({ onToggleSidebar }) {
             className="hide-mobile"
             style={{
               fontSize: 13,
-              fontWeight: 600,
-              color: "var(--color-text)",
-              letterSpacing: "-0.01em",
+              fontWeight: 700,
+              color: "#0f172a",
+              letterSpacing: "-0.02em",
             }}
           >
             Analyst

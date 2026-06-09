@@ -13,9 +13,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
 const pageVariants = {
-  initial: { opacity: 0, y: 14 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } },
-  exit:    { opacity: 0, y: -8, transition: { duration: 0.18 } },
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.28, ease: [0.4, 0, 0.2, 1] } },
+  exit:    { opacity: 0, y: -6, transition: { duration: 0.16 } },
 };
 
 function App() {
@@ -25,15 +25,16 @@ function App() {
   return (
     <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#decbb7" }}>
 
-      {/* ── Ambient Background — warm subtle radials ── */}
+      {/* ── Ambient Background — rich layered radials ── */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background: [
-            "radial-gradient(ellipse 70% 60% at 12% 20%, rgba(108,92,231,0.04) 0%, transparent 70%)",
-            "radial-gradient(ellipse 55% 50% at 88% 75%, rgba(225,112,85,0.03) 0%, transparent 70%)",
-            "radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,184,148,0.03) 0%, transparent 70%)",
+            "radial-gradient(ellipse 75% 65% at 10% 15%, rgba(108,92,231,0.07) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 55% at 90% 80%, rgba(225,112,85,0.05) 0%, transparent 70%)",
+            "radial-gradient(ellipse 50% 50% at 55% 45%, rgba(0,184,148,0.04) 0%, transparent 70%)",
+            "radial-gradient(ellipse 40% 40% at 80% 15%, rgba(9,132,227,0.03) 0%, transparent 70%)",
           ].join(", "),
         }}
       />
