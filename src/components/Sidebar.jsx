@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -16,14 +17,14 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { to: "/upload",  icon: UploadCloud,     label: "Upload Center",       badge: null },
-  { to: "/",        icon: LayoutDashboard, label: "Dashboard",           end: true, badge: null },
-  { to: "/replay",  icon: Clapperboard,    label: "Chrono Replay",       badge: "NEW" },
-  { to: "/risk",    icon: AlertTriangle,   label: "Risk Center",         badge: null },
-  { to: "/mobility",icon: Clock,           label: "Mobility Tracker",    badge: null },
-  { to: "/geo",     icon: MapPin,          label: "Geo Intelligence",    badge: null },
-  { to: "/network", icon: Network,         label: "Network Analysis",    badge: null },
-  { to: "/cases",   icon: FolderOpen,      label: "Active Cases",        badge: null },
+  { to: "/upload", icon: UploadCloud, label: "Upload Center", badge: null },
+  { to: "/", icon: LayoutDashboard, label: "Dashboard", end: true, badge: null },
+  { to: "/replay", icon: Clapperboard, label: "Chrono Replay", badge: "NEW" },
+  { to: "/risk", icon: AlertTriangle, label: "Risk Center", badge: null },
+  { to: "/mobility", icon: Clock, label: "Mobility Tracker", badge: null },
+  { to: "/geo", icon: MapPin, label: "Geo Intelligence", badge: null },
+  { to: "/network", icon: Network, label: "Network Analysis", badge: null },
+  { to: "/cases", icon: FolderOpen, label: "Active Cases", badge: null },
 ];
 
 function Sidebar({ isOpen, onClose }) {
@@ -31,9 +32,7 @@ function Sidebar({ isOpen, onClose }) {
 
   return (
     <div
-      className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col lg:static lg:translate-x-0 ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      }`}
+      className="fixed inset-y-0 left-0 z-50 flex flex-col"
       style={{
         width: "var(--sidebar-width, 260px)",
         background: "linear-gradient(180deg, #faf8f5 0%, #f4f1eb 100%)",
@@ -41,9 +40,11 @@ function Sidebar({ isOpen, onClose }) {
         boxShadow: "2px 0 24px rgba(0,0,0,0.06)",
         transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* ── Top section ── */}
-      <div style={{ padding: "24px 20px 12px" }}>
+      <div style={{ padding: `24px ${paddingX}px 12px`, transition: "padding 0.3s ease" }}>
 
         {/* Brand */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
@@ -63,7 +64,7 @@ function Sidebar({ isOpen, onClose }) {
           >
             <Shield size={18} color="white" strokeWidth={2.5} />
           </div>
-          <div>
+          <div style={{ opacity: isExpanded ? 1 : 0, transition: "opacity 0.2s", width: isExpanded ? "auto" : 0 }}>
             <div
               style={{
                 fontSize: 15,
@@ -122,7 +123,7 @@ function Sidebar({ isOpen, onClose }) {
                     position: "relative",
                     display: "flex",
                     alignItems: "center",
-                    gap: 10,
+                    gap: 12,
                     padding: "9px 12px",
                     borderRadius: 10,
                     fontSize: 13,
@@ -136,6 +137,8 @@ function Sidebar({ isOpen, onClose }) {
                     boxShadow: isActive ? "0 1px 4px rgba(108,92,231,0.10), inset 0 1px 0 rgba(255,255,255,0.6)" : "none",
                     transition: "all 0.18s cubic-bezier(0.4, 0, 0.2, 1)",
                     cursor: "pointer",
+                    overflow: "hidden", // Prevents the active rect from stretching
+                    width: isExpanded ? "100%" : "40px",
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
@@ -173,9 +176,9 @@ function Sidebar({ isOpen, onClose }) {
                     strokeWidth={isActive ? 2.5 : 2}
                     style={{ flexShrink: 0 }}
                   />
-                  <span style={{ flex: 1 }}>{item.label}</span>
+                  <span style={{ flex: 1, opacity: isExpanded ? 1 : 0, transition: "opacity 0.2s" }}>{item.label}</span>
 
-                  {item.badge && (
+                  {item.badge && isExpanded && (
                     <span
                       style={{
                         fontSize: 8,
@@ -193,7 +196,7 @@ function Sidebar({ isOpen, onClose }) {
                     </span>
                   )}
 
-                  {isActive && !item.badge && (
+                  {isActive && !item.badge && isExpanded && (
                     <ChevronRight size={12} style={{ opacity: 0.5 }} />
                   )}
                 </div>
@@ -204,7 +207,7 @@ function Sidebar({ isOpen, onClose }) {
       </div>
 
       {/* ── Bottom status ── */}
-      <div style={{ marginTop: "auto", padding: "16px 20px 20px" }}>
+      <div style={{ marginTop: "auto", padding: `16px ${paddingX}px 20px`, transition: "padding 0.3s ease", overflow: "hidden" }}>
         {/* Thin divider */}
         <div style={{ height: 1, background: "rgba(0,0,0,0.06)", marginBottom: 14 }} />
 
@@ -238,7 +241,7 @@ function Sidebar({ isOpen, onClose }) {
               }}
             />
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 1, opacity: isExpanded ? 1 : 0, width: isExpanded ? "auto" : 0, transition: "opacity 0.2s" }}>
             <span
               style={{
                 fontSize: 11,

@@ -463,7 +463,16 @@ function ChronologicalReplay() {
         <button
           onClick={() => {
             setIsPlaying(false);
-            setActiveEventIndex(replayEvents.length - 1);
+            
+            // Find the last event that has coordinates to show the final path
+            let lastValidIndex = replayEvents.length - 1;
+            while (lastValidIndex >= 0 && !replayEvents[lastValidIndex].coordinates) {
+              lastValidIndex--;
+            }
+            
+            // If there's at least one georeferenced event, jump to it. 
+            // Otherwise, fallback to the very last event.
+            setActiveEventIndex(lastValidIndex >= 0 ? lastValidIndex : replayEvents.length - 1);
             setViewMode("fit");
           }}
           style={{
