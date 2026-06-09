@@ -55,6 +55,7 @@ function ChronologicalReplay() {
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showLog, setShowLog] = useState(true);
   const [viewMode, setViewMode] = useState("center");
+  const [mapStyle, setMapStyle] = useState("light");
 
   const logListRef = useRef();
   const logItemRefs = useRef({});
@@ -542,6 +543,48 @@ function ChronologicalReplay() {
             minHeight: 0,
           }}
         >
+          {/* Map Style Selector Overlay */}
+          <div
+            style={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              zIndex: 1000,
+              background: "rgba(255, 255, 255, 0.82)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(0, 0, 0, 0.08)",
+              borderRadius: 10,
+              padding: 3,
+              display: "flex",
+              gap: 3,
+              boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+            }}
+          >
+            {[
+              { id: "light", label: "Light" },
+              { id: "dark", label: "Dark" },
+              { id: "satellite", label: "Satellite" },
+            ].map((style) => (
+              <button
+                key={style.id}
+                onClick={() => setMapStyle(style.id)}
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: 7,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  background: mapStyle === style.id ? "#6c5ce7" : "transparent",
+                  color: mapStyle === style.id ? "#ffffff" : "var(--color-text-muted)",
+                }}
+              >
+                {style.label}
+              </button>
+            ))}
+          </div>
+
           {activeCoordinates ? (
             <MapContainer
               center={activeCoordinates}
@@ -551,7 +594,13 @@ function ChronologicalReplay() {
               zoomControl={true}
             >
               <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                url={
+                  mapStyle === "dark"
+                    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    : mapStyle === "satellite"
+                    ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                    : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                }
                 attribution=""
               />
 

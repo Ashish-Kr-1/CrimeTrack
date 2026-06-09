@@ -230,7 +230,7 @@ function Dashboard() {
         {/* Card Body */}
         <div style={{ padding: "28px" }}>
           {/* Ring meter + description row */}
-          <div style={{ display: "flex", alignItems: "center", gap: 28, marginBottom: 32 }}>
+          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-7 mb-8">
             <div style={{ position: "relative", width: 84, height: 84, flexShrink: 0 }}>
               <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }}>
                 <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,0,0,0.04)" strokeWidth="8" />
@@ -262,8 +262,8 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* Quick stats — 4 in a row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+          {/* Quick stats — responsive grid layout */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { label: "Operational Span",   value: diagnosticReport.feature_vector.active_days || "N/A",           unit: "days",     color: "var(--color-accent)", icon: Activity },
               { label: "Hardware Fleet",     value: diagnosticReport.feature_vector.unique_imei_count || "N/A",    unit: "IMEIs",    color: "#a29bfe", icon: Smartphone },

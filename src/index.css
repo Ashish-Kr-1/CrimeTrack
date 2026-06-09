@@ -219,10 +219,19 @@
   --sidebar-width: 260px;
   --navbar-height: 64px;
   --content-padding: 20px;
+  --sidebar-translate: -100%;
+  --sidebar-collapsed-width: 0px;
 }
 
 @media (min-width: 768px) {
   :root { --content-padding: 28px; }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --sidebar-translate: 0%;
+    --sidebar-collapsed-width: 64px;
+  }
 }
 
 @media (min-width: 1280px) {
