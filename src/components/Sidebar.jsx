@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -28,17 +27,24 @@ const navItems = [
 ];
 
 function Sidebar({ isOpen, onClose }) {
-  const [expanded, setExpanded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const isExpanded = isOpen || isHovered;
+  const sidebarWidth = isExpanded ? 260 : 64;
+  const paddingX = isExpanded ? 20 : 12;
 
   return (
     <div
-      className="fixed inset-y-0 left-0 z-50 flex flex-col"
+      className={`fixed inset-y-0 left-0 z-50 flex flex-col lg:translate-x-0 ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
       style={{
-        width: "var(--sidebar-width, 260px)",
+        width: sidebarWidth,
         background: "linear-gradient(180deg, #faf8f5 0%, #f4f1eb 100%)",
         borderRight: "1px solid rgba(0,0,0,0.07)",
         boxShadow: "2px 0 24px rgba(0,0,0,0.06)",
-        transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
