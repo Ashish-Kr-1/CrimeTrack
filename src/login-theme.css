@@ -421,3 +421,78 @@
 a[href*="spline.design"] {
   display: none !important;
 }
+
+/* ============================================================
+   SECURE ACCESS CARD STYLE (Matching screenshot exactly)
+   ============================================================ */
+
+.secure-access-card {
+  background: #0d1222 !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+              0 0 40px rgba(0, 0, 0, 0.5) !important;
+  padding: 40px !important;
+  width: 100%;
+  max-width: 440px;
+  box-sizing: border-box !important;
+  position: relative;
+  z-index: 10;
+}
+
+.secure-access-input {
+  width: 100% !important;
+  height: 52px !important;
+  background: #070b16 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  font-family: inherit;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  padding: 0 16px !important;
+  outline: none !important;
+  transition: all 0.2s ease-in-out !important;
+  box-sizing: border-box !important;
+}
+
+.secure-access-input:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 1px #6366f1, 0 0 14px rgba(99, 102, 241, 0.25) !important;
+}
+
+.secure-access-btn-primary {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  height: 52px !important;
+  background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease-in-out !important;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35) !important;
+  outline: none !important;
+}
+
+.secure-access-btn-primary:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45) !important;
+  filter: brightness(1.05) !important;
+}
+
+.secure-access-btn-primary:active {
+  transform: translateY(1px) !important;
+}
+
+.secure-access-btn-primary:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
