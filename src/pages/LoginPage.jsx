@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Spline from "@splinetool/react-spline";
 import { AuthContext } from "../context/AuthContext";
 import "../login-theme.css";
@@ -43,7 +43,15 @@ function LoginPage() {
     setPassword(creds[role].p);
   };
 
+  const [pageLoading, setPageLoading] = useState(true);
 
+  // 0.5s loading animation on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -133,6 +141,72 @@ function LoginPage() {
 
   return (
     <div className="cyber-dark-root relative flex flex-col justify-between overflow-hidden h-screen w-screen">
+
+      {/* 0.5s Full screen loading animation on mount */}
+      <AnimatePresence>
+        {pageLoading && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#030712] text-white"
+          >
+            <div className="flex flex-col items-center gap-6 max-w-sm px-6 text-center">
+              {/* Glowing Shield Icon with Pulsing Effect */}
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  opacity: [0.7, 1, 0.7],
+                  boxShadow: [
+                    "0 0 20px rgba(0, 229, 255, 0.2)",
+                    "0 0 35px rgba(0, 229, 255, 0.5)",
+                    "0 0 20px rgba(0, 229, 255, 0.2)"
+                  ]
+                }}
+                transition={{ 
+                  duration: 1.5, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                style={{
+                  borderRadius: "16px",
+                  border: "1px solid rgba(0, 229, 255, 0.4)",
+                  backgroundColor: "rgba(8, 47, 73, 0.8)",
+                  boxShadow: "0 0 20px rgba(0, 229, 255, 0.2)",
+                }}
+                className="w-16 h-16 flex items-center justify-center"
+              >
+                <Shield className="w-8 h-8 text-cyan-400" />
+              </motion.div>
+
+              {/* Secure Identity Text */}
+              <div className="space-y-1">
+                <h2 className="text-sm font-black tracking-widest text-white uppercase font-mono">
+                  CYBERDEFEND GATEWAY
+                </h2>
+                <p className="text-[10px] font-bold text-cyan-400 tracking-wider font-mono">
+                  INITIALIZING SECURE HANDSHAKE...
+                </p>
+              </div>
+
+              {/* Progress Bar Container */}
+              <div className="w-48 h-1 bg-slate-900 border border-slate-800 rounded-full overflow-hidden relative">
+                <motion.div
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="h-full bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full"
+                />
+              </div>
+
+              {/* Status Code */}
+              <span className="text-[9px] text-slate-500 font-mono tracking-widest uppercase">
+                STATUS // SYS_BOOT_OK
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Visual background overlays */}
       <div className="cyber-starfield" />
