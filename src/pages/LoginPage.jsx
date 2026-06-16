@@ -136,7 +136,6 @@ function LoginPage() {
 
       {/* Visual background overlays */}
       <div className="cyber-starfield" />
-      <div className="cyber-grid-overlay" />
       <div className="cyber-scanline" />
 
       {/* ── Spline 3D Scene - Full Screen Background ── */}
@@ -162,14 +161,7 @@ function LoginPage() {
         }}
       />
 
-      {/* Digital Hologram Scanline & Grid overlays on top of the 3D scene */}
-      <div
-        className="absolute inset-0 z-1 pointer-events-none opacity-20"
-        style={{
-          backgroundImage: "linear-gradient(to right, rgba(0, 229, 255, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 229, 255, 0.1) 1px, transparent 1px)",
-          backgroundSize: "35px 35px"
-        }}
-      />
+      {/* Digital Hologram Scanline overlay on top of the 3D scene */}
       <div
         className="absolute inset-0 z-1 pointer-events-none opacity-15"
         style={{
