@@ -1,3 +1,10 @@
+import Login from "./pages/Login";
+import Unauthorized from "./pages/Unauthorized";
+import ProtectedRoute from "./auth/ProtectedRoute";
+import FieldLookup from "./pages/FieldLookup";
+import AdminUsers from "./pages/AdminUsers";
+import AdminAudit from "./pages/AdminAudit";
+import AIPrediction from "./pages/AIPrediction";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Cases from "./pages/Cases";
@@ -23,6 +30,11 @@ const pageVariants = {
 
 function App() {
   const location = useLocation();
+  const { user } = useAuth();
+  const isAuthPage =
+    location.pathname === "/login" ||
+    location.pathname === "/unauthorized";
+  const showLayout = user && !isAuthPage;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, addAuditLog } = useContext(AuthContext);
 
@@ -58,24 +70,29 @@ function App() {
 
   // Case 3: Authenticated as Analyst -> Render standard workspace
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#decbb7" }}>
+    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#020617" }}>
 
-      {/* ── Ambient Background — rich layered radials ── */}
+      {/* ── Ambient Background — rich layered dark radials ── */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background: [
-            "radial-gradient(ellipse 75% 65% at 10% 15%, rgba(108,92,231,0.07) 0%, transparent 70%)",
-            "radial-gradient(ellipse 60% 55% at 90% 80%, rgba(225,112,85,0.05) 0%, transparent 70%)",
-            "radial-gradient(ellipse 50% 50% at 55% 45%, rgba(0,184,148,0.04) 0%, transparent 70%)",
-            "radial-gradient(ellipse 40% 40% at 80% 15%, rgba(9,132,227,0.03) 0%, transparent 70%)",
+            "radial-gradient(ellipse 75% 65% at 10% 15%, rgba(34,197,94,0.07) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 55% at 90% 80%, rgba(225,112,85,0.04) 0%, transparent 70%)",
+            "radial-gradient(ellipse 50% 50% at 55% 45%, rgba(9,132,227,0.05) 0%, transparent 70%)",
+            "radial-gradient(ellipse 40% 40% at 80% 15%, rgba(34,197,94,0.03) 0%, transparent 70%)",
           ].join(", "),
         }}
       />
 
       {/* ── Sidebar ── */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {showLayout && (
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* ── Mobile backdrop ── */}
       <AnimatePresence>
@@ -95,9 +112,24 @@ function App() {
 
       <div
         className="relative z-10 flex flex-1 flex-col overflow-y-auto"
-        style={{ padding: "var(--content-padding)", paddingLeft: "calc(var(--content-padding) + var(--sidebar-collapsed-width, 0px))", gap: 0 }}
+        style={
+          showLayout
+            ? {
+                padding: "var(--content-padding)",
+                paddingLeft:
+                  "calc(var(--content-padding) + var(--sidebar-collapsed-width, 0px))",
+                gap: 0,
+              }
+            : {}
+        }
       >
-        <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        {showLayout && (
+          <Navbar
+            onToggleSidebar={() =>
+              setSidebarOpen(!sidebarOpen)
+            }
+          />
+        )}
 
         <AnimatePresence mode="wait">
           <motion.div

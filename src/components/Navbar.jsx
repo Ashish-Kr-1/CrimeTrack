@@ -2,11 +2,44 @@ import { useContext } from "react";
 import { CDRContext } from "../context/CDRContext";
 import { AuthContext } from "../context/AuthContext";
 import { motion } from "framer-motion";
-import { Search, Bell, Crosshair, User, Menu } from "lucide-react";
+import { Search, Bell, Crosshair, User, Menu, Shield, Key } from "lucide-react";
 
 function Navbar({ onToggleSidebar }) {
+  const { user } = useAuth();
   const { diagnosticReport } = useContext(CDRContext);
   const { user, addAuditLog } = useContext(AuthContext);
+
+  const getBadgeDetails = () => {
+    const role = user?.role || "analyst";
+    if (role === "admin") {
+      return {
+        text: "Administrator",
+        gradient: "linear-gradient(135deg, #e17055 0%, #fab1a0 100%)",
+        icon: <Key size={13} color="white" />,
+        shadow: "0 2px 8px rgba(225, 112, 85, 0.3)",
+        hoverBorder: "rgba(225, 112, 85, 0.22)",
+      };
+    }
+    if (role === "officer") {
+      return {
+        text: "Officer",
+        gradient: "linear-gradient(135deg, #00b894 0%, #55efc4 100%)",
+        icon: <Shield size={13} color="white" />,
+        shadow: "0 2px 8px rgba(0, 184, 148, 0.3)",
+        hoverBorder: "rgba(0, 184, 148, 0.22)",
+      };
+    }
+    return {
+      text: "Analyst",
+      gradient: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
+      icon: <User size={13} color="white" />,
+      shadow: "0 2px 8px rgba(108, 92, 231, 0.3)",
+      hoverBorder: "rgba(108, 92, 231, 0.22)",
+    };
+  };
+
+  const badge = getBadgeDetails();
+  const role = user?.role || "analyst";
 
   return (
     <div
@@ -21,10 +54,10 @@ function Navbar({ onToggleSidebar }) {
         padding: "0 20px",
         gap: 16,
         flexShrink: 0,
-        background: "rgba(255, 255, 255, 0.82)",
+        background: "rgba(15, 23, 42, 0.65)",
         backdropFilter: "blur(28px) saturate(200%)",
         WebkitBackdropFilter: "blur(28px) saturate(200%)",
-        boxShadow: "0 2px 16px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.95), 0 0 0 1px rgba(0,0,0,0.04)",
+        boxShadow: "0 2px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 0 1px rgba(255,255,255,0.04)",
       }}
     >
       {/* ── Left: Hamburger + Search ── */}
@@ -65,10 +98,10 @@ function Navbar({ onToggleSidebar }) {
             }}
             style={{
               width: "100%",
-              background: "rgba(248, 250, 252, 0.8)",
-              border: "1px solid rgba(0,0,0,0.08)",
+              background: "rgba(15, 23, 42, 0.7)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
               borderRadius: "var(--radius-md)",
-              color: "#0f172a",
+              color: "#f8fafc",
               fontFamily: "var(--font-sans)",
               fontSize: 13,
               fontWeight: 500,
@@ -76,17 +109,17 @@ function Navbar({ onToggleSidebar }) {
               padding: "9px 46px 9px 38px",
               outline: "none",
               transition: "var(--transition-base)",
-              boxShadow: "inset 0 1px 3px rgba(0,0,0,0.04)",
+              boxShadow: "inset 0 1px 3px rgba(0,0,0,0.5)",
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = "#6c5ce7";
-              e.target.style.boxShadow = "0 0 0 3px rgba(108,92,231,0.13), inset 0 1px 3px rgba(0,0,0,0.02)";
-              e.target.style.background = "#ffffff";
+              e.target.style.borderColor = role === "admin" ? "#e17055" : role === "officer" ? "#00b894" : "#6c5ce7";
+              e.target.style.boxShadow = `0 0 0 3px ${role === "admin" ? "rgba(225,112,85,0.18)" : role === "officer" ? "rgba(0,184,148,0.18)" : "rgba(108,92,231,0.18)"}, inset 0 1px 3px rgba(0,0,0,0.3)`;
+              e.target.style.background = "rgba(15, 23, 42, 0.95)";
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = "rgba(0,0,0,0.08)";
-              e.target.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.04)";
-              e.target.style.background = "rgba(248,250,252,0.8)";
+              e.target.style.borderColor = "rgba(255, 255, 255, 0.08)";
+              e.target.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.5)";
+              e.target.style.background = "rgba(15, 23, 42, 0.7)";
             }}
           />
         </div>
@@ -188,21 +221,21 @@ function Navbar({ onToggleSidebar }) {
             gap: 9,
             padding: "5px 12px 5px 5px",
             borderRadius: "var(--radius-md)",
-            border: "1px solid rgba(0,0,0,0.08)",
-            background: "rgba(255,255,255,0.7)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            background: "rgba(15, 23, 42, 0.6)",
             cursor: "pointer",
             transition: "var(--transition-base)",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.02)",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "rgba(108,92,231,0.22)";
-            e.currentTarget.style.background = "rgba(255,255,255,0.92)";
-            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9)";
+            e.currentTarget.style.borderColor = badge.hoverBorder;
+            e.currentTarget.style.background = "rgba(15, 23, 42, 0.85)";
+            e.currentTarget.style.boxShadow = `0 2px 8px ${role === 'admin' ? 'rgba(225, 112, 85, 0.18)' : role === 'officer' ? 'rgba(0, 184, 148, 0.18)' : 'rgba(108, 92, 231, 0.18)'}, inset 0 1px 0 rgba(255,255,255,0.05)`;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "rgba(0,0,0,0.08)";
-            e.currentTarget.style.background = "rgba(255,255,255,0.7)";
-            e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)";
+            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
+            e.currentTarget.style.background = "rgba(15, 23, 42, 0.6)";
+            e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.02)";
           }}
         >
           <div
@@ -210,22 +243,22 @@ function Navbar({ onToggleSidebar }) {
               width: 28,
               height: 28,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
+              background: badge.gradient,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
-              boxShadow: "0 2px 8px rgba(108,92,231,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+              boxShadow: `${badge.shadow}, inset 0 1px 0 rgba(255,255,255,0.2)`,
             }}
           >
-            <User size={13} color="white" />
+            {badge.icon}
           </div>
           <span
             className="hide-mobile"
             style={{
               fontSize: 13,
               fontWeight: 700,
-              color: "#0f172a",
+              color: "#f8fafc",
               letterSpacing: "-0.02em",
               textTransform: "capitalize"
             }}
