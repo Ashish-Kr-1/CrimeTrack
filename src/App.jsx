@@ -18,6 +18,7 @@ import NetworkAnalysis from "./pages/NetworkAnalysis";
 import ChronologicalReplay from "./pages/ChronologicalReplay";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import { useAuth } from "./auth/AuthContext";
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -27,9 +28,11 @@ const pageVariants = {
 
 function App() {
   const location = useLocation();
+  const { user } = useAuth();
   const isAuthPage =
-  location.pathname === "/login" ||
-  location.pathname === "/unauthorized";
+    location.pathname === "/login" ||
+    location.pathname === "/unauthorized";
+  const showLayout = user && !isAuthPage;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -50,12 +53,12 @@ function App() {
       />
 
       {/* ── Sidebar ── */}
-      {!isAuthPage && (
-  <Sidebar
-    isOpen={sidebarOpen}
-    onClose={() => setSidebarOpen(false)}
-  />
-)}
+      {showLayout && (
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* ── Mobile backdrop ── */}
       <AnimatePresence>
@@ -74,25 +77,25 @@ function App() {
       </AnimatePresence>
 
       <div
-  className="relative z-10 flex flex-1 flex-col overflow-y-auto"
-  style={
-    isAuthPage
-      ? {}
-      : {
-          padding: "var(--content-padding)",
-          paddingLeft:
-            "calc(var(--content-padding) + var(--sidebar-collapsed-width, 0px))",
-          gap: 0,
+        className="relative z-10 flex flex-1 flex-col overflow-y-auto"
+        style={
+          showLayout
+            ? {
+                padding: "var(--content-padding)",
+                paddingLeft:
+                  "calc(var(--content-padding) + var(--sidebar-collapsed-width, 0px))",
+                gap: 0,
+              }
+            : {}
         }
-  }
->
-        {!isAuthPage && (
-  <Navbar
-    onToggleSidebar={() =>
-      setSidebarOpen(!sidebarOpen)
-    }
-  />
-)}
+      >
+        {showLayout && (
+          <Navbar
+            onToggleSidebar={() =>
+              setSidebarOpen(!sidebarOpen)
+            }
+          />
+        )}
 
         <AnimatePresence mode="wait">
           <motion.div

@@ -174,9 +174,7 @@ export default function Login() {
                 margin: "0 0 24px 0",
               }}
             >
-              CRIME
-              <br />
-              TRACK X
+              CyberTrack
             </h1>
 
             <p

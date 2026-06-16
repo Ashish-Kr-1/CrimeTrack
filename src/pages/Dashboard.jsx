@@ -69,6 +69,12 @@ function Dashboard() {
 
   // Admin Dashboard Render
   if (role === "admin") {
+    const totalLogsCount = records.length;
+    const systemStatus = totalLogsCount > 0 ? "ACTIVE DOSSIER" : "STANDBY / IDLE";
+    const systemStatusColor = totalLogsCount > 0 ? "#00b894" : "var(--color-text-subtle)";
+    const storageUsedPercent = totalLogsCount > 0 ? Math.min(15 + Math.ceil(totalLogsCount / 100), 98) : 8;
+    const storageGb = (storageUsedPercent * 0.1).toFixed(2);
+
     return (
       <motion.div
         className="page-container theme-dashboard"
@@ -93,15 +99,19 @@ function Dashboard() {
               <span style={{ color: "var(--color-text-subtle)", fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em" }}>Ingested Telemetry Records</span>
               <FileText size={14} color="#6c5ce7" />
             </div>
-            <div style={{ fontSize: "28px", fontWeight: "900", color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>14,805 logs</div>
+            <div style={{ fontSize: "28px", fontWeight: "900", color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>
+              {totalLogsCount > 0 ? `${totalLogsCount.toLocaleString()} logs` : "0 logs"}
+            </div>
           </div>
 
-          <div className="glass-card stat-mini" style={{ padding: "20px", background: "rgba(255, 255, 255, 0.75)", borderTop: "3px solid #00b894" }}>
+          <div className="glass-card stat-mini" style={{ padding: "20px", background: "rgba(255, 255, 255, 0.75)", borderTop: `3px solid ${systemStatusColor}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
               <span style={{ color: "var(--color-text-subtle)", fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em" }}>System Operations Status</span>
-              <Activity size={14} color="#00b894" />
+              <Activity size={14} color={systemStatusColor} />
             </div>
-            <div style={{ fontSize: "28px", fontWeight: "900", color: "#00b894", fontFamily: "var(--font-mono)" }}>OPTIMAL</div>
+            <div style={{ fontSize: "28px", fontWeight: "900", color: systemStatusColor, fontFamily: "var(--font-mono)" }}>
+              {systemStatus}
+            </div>
           </div>
 
           <div className="glass-card stat-mini" style={{ padding: "20px", background: "rgba(255, 255, 255, 0.75)", borderTop: "3px solid #e17055" }}>
@@ -122,17 +132,17 @@ function Dashboard() {
             <div>
               <h3 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "12px" }}>System Storage Capacity</h3>
               <div style={{ background: "rgba(0,0,0,0.06)", height: "12px", borderRadius: "6px", overflow: "hidden", marginBottom: "8px" }}>
-                <div style={{ background: "#6c5ce7", width: "42%", height: "100%" }} />
+                <div style={{ background: "#6c5ce7", width: `${storageUsedPercent}%`, height: "100%", transition: "width 0.5s ease" }} />
               </div>
               <p style={{ fontSize: "12px", color: "var(--color-text-muted)", margin: 0 }}>
-                Using 42% of total allocated workspace storage (4.2 GB of 10 GB).
+                Using {storageUsedPercent}% of total allocated workspace storage ({storageGb} GB of 10 GB).
               </p>
             </div>
             <div>
               <h3 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "12px" }}>Active Ingestion Queues</h3>
               <p style={{ fontSize: "13px", lineHeight: "1.6", color: "var(--color-text-muted)", margin: 0 }}>
-                Patna carrier server interface: <strong style={{ color: "#00b894" }}>ONLINE</strong><br />
-                Gaya CDR spreadsheet ingestion channel: <strong style={{ color: "#00b894" }}>ONLINE</strong><br />
+                Patna carrier server interface: <strong style={{ color: totalLogsCount > 0 ? "#00b894" : "var(--color-text-subtle)" }}>{totalLogsCount > 0 ? "ONLINE" : "STANDBY"}</strong><br />
+                Gaya CDR spreadsheet ingestion channel: <strong style={{ color: totalLogsCount > 0 ? "#00b894" : "var(--color-text-subtle)" }}>{totalLogsCount > 0 ? "INGESTED" : "STANDBY"}</strong><br />
                 Security encryption node: <strong style={{ color: "#6c5ce7" }}>AES-256 ACTIVE</strong>
               </p>
             </div>
