@@ -1,6 +1,7 @@
 import { useContext, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CDRContext } from "../context/CDRContext";
+import { useAuth } from "../auth/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShieldAlert,
@@ -58,11 +59,186 @@ const fadeUp = {
 };
 
 function Dashboard() {
+  const { user } = useAuth();
+  const role = user?.role || "analyst";
   const { cdrData, diagnosticReport } = useContext(CDRContext);
   const navigate = useNavigate();
   const records = cdrData.slice(1);
 
   const [leftTab, setLeftTab] = useState("narrative");
+
+  // Admin Dashboard Render
+  if (role === "admin") {
+    return (
+      <motion.div
+        className="page-container theme-dashboard"
+        variants={stagger}
+        initial="initial"
+        animate="animate"
+      >
+        {/* Header */}
+        <motion.div variants={fadeUp} style={{ marginBottom: "28px" }}>
+          <h1 style={{ fontSize: "26px", fontWeight: 800, letterSpacing: "-0.035em", color: "var(--color-text)", margin: 0 }}>
+            System Administration Dashboard
+          </h1>
+          <p style={{ fontSize: "13px", color: "var(--color-text-muted)", margin: "6px 0 0 0" }}>
+            Operational health diagnostics, active accounts overview, and Ingestion metrics.
+          </p>
+        </motion.div>
+
+        {/* Audit Stats Grid */}
+        <motion.div variants={fadeUp} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px", marginBottom: "24px" }}>
+          <div className="glass-card stat-mini" style={{ padding: "20px", background: "rgba(255, 255, 255, 0.75)", borderTop: "3px solid #6c5ce7" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+              <span style={{ color: "var(--color-text-subtle)", fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em" }}>Ingested Telemetry Records</span>
+              <FileText size={14} color="#6c5ce7" />
+            </div>
+            <div style={{ fontSize: "28px", fontWeight: "900", color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>14,805 logs</div>
+          </div>
+
+          <div className="glass-card stat-mini" style={{ padding: "20px", background: "rgba(255, 255, 255, 0.75)", borderTop: "3px solid #00b894" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+              <span style={{ color: "var(--color-text-subtle)", fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em" }}>System Operations Status</span>
+              <Activity size={14} color="#00b894" />
+            </div>
+            <div style={{ fontSize: "28px", fontWeight: "900", color: "#00b894", fontFamily: "var(--font-mono)" }}>OPTIMAL</div>
+          </div>
+
+          <div className="glass-card stat-mini" style={{ padding: "20px", background: "rgba(255, 255, 255, 0.75)", borderTop: "3px solid #e17055" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+              <span style={{ color: "var(--color-text-subtle)", fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em" }}>Security Gateway</span>
+              <Lock size={14} color="#e17055" />
+            </div>
+            <div style={{ fontSize: "28px", fontWeight: "900", color: "var(--color-text)", fontFamily: "var(--font-mono)" }}>3 / 3 Active</div>
+          </div>
+        </motion.div>
+
+        {/* Detail Panel */}
+        <motion.div variants={fadeUp} className="glass-card" style={{ padding: "28px", background: "rgba(255, 255, 255, 0.78)" }}>
+          <h2 style={{ fontSize: "14px", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-muted)", margin: "0 0 20px 0" }}>
+            Admin Diagnostics & Storage Overview
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "24px" }} className="md:grid-cols-2">
+            <div>
+              <h3 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "12px" }}>System Storage Capacity</h3>
+              <div style={{ background: "rgba(0,0,0,0.06)", height: "12px", borderRadius: "6px", overflow: "hidden", marginBottom: "8px" }}>
+                <div style={{ background: "#6c5ce7", width: "42%", height: "100%" }} />
+              </div>
+              <p style={{ fontSize: "12px", color: "var(--color-text-muted)", margin: 0 }}>
+                Using 42% of total allocated workspace storage (4.2 GB of 10 GB).
+              </p>
+            </div>
+            <div>
+              <h3 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "12px" }}>Active Ingestion Queues</h3>
+              <p style={{ fontSize: "13px", lineHeight: "1.6", color: "var(--color-text-muted)", margin: 0 }}>
+                Patna carrier server interface: <strong style={{ color: "#00b894" }}>ONLINE</strong><br />
+                Gaya CDR spreadsheet ingestion channel: <strong style={{ color: "#00b894" }}>ONLINE</strong><br />
+                Security encryption node: <strong style={{ color: "#6c5ce7" }}>AES-256 ACTIVE</strong>
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
+  // Officer Dashboard Render
+  if (role === "officer") {
+    return (
+      <motion.div
+        className="page-container theme-mobility"
+        variants={stagger}
+        initial="initial"
+        animate="animate"
+      >
+        {/* Header */}
+        <motion.div variants={fadeUp} style={{ marginBottom: "28px" }}>
+          <h1 style={{ fontSize: "26px", fontWeight: 800, letterSpacing: "-0.035em", color: "var(--color-text)", margin: 0 }}>
+            Field Operations Hub
+          </h1>
+          <p style={{ fontSize: "13px", color: "var(--color-text-muted)", margin: "6px 0 0 0" }}>
+            Active suspect dispatch, live coordinate triangulation, and operational alerts.
+          </p>
+        </motion.div>
+
+        {/* Targets Summary Widget */}
+        <motion.div variants={fadeUp} className="glass-card" style={{ padding: "28px", background: "rgba(255, 255, 255, 0.78)", marginBottom: "24px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "16px" }}>
+            <div>
+              <h2 style={{ fontSize: "14px", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-muted)", margin: 0 }}>
+                Active Target Triangulation Alert
+              </h2>
+              <p style={{ fontSize: "12px", color: "var(--color-text-muted)", margin: "4px 0 0 0" }}>
+                Latest telemetry data processed for suspect device.
+              </p>
+            </div>
+            {diagnosticReport && (
+              <span style={{ padding: "6px 14px", borderRadius: "9999px", background: "rgba(214, 48, 49, 0.08)", border: "1px solid rgba(214, 48, 49, 0.2)", color: "#d63031", fontWeight: "800", fontSize: "11px" }}>
+                {(diagnosticReport.suspicion_score * 100).toFixed(0)}% THREAT VERDICT
+              </span>
+            )}
+          </div>
+
+          {diagnosticReport ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px" }} className="md:grid-cols-3">
+                <div style={{ padding: "16px", background: "rgba(0,0,0,0.02)", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.04)" }}>
+                  <span style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", color: "#94a3b8" }}>Target Phone</span>
+                  <div style={{ fontSize: "16px", fontWeight: "800", marginTop: "6px", fontFamily: "var(--font-mono)" }}>{diagnosticReport.target_phone}</div>
+                </div>
+                <div style={{ padding: "16px", background: "rgba(0,0,0,0.02)", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.04)" }}>
+                  <span style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", color: "#94a3b8" }}>Suspect Classification</span>
+                  <div style={{ fontSize: "14px", fontWeight: "800", marginTop: "6px" }}>{diagnosticReport.classification.replace(/_/g, " ")}</div>
+                </div>
+                <div style={{ padding: "16px", background: "rgba(0,0,0,0.02)", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.04)" }}>
+                  <span style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", color: "#94a3b8" }}>Operational Location</span>
+                  <div style={{ fontSize: "14px", fontWeight: "800", marginTop: "6px" }}>Bihar / Jharkhand region</div>
+                </div>
+              </div>
+
+              <div style={{ borderTop: "1px dashed rgba(0,0,0,0.06)", paddingTop: "16px", display: "flex", gap: "12px" }}>
+                <button
+                  onClick={() => navigate("/lookup")}
+                  style={{
+                    background: "#00b894",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "10px",
+                    padding: "10px 20px",
+                    fontWeight: "700",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 12px rgba(0, 184, 148, 0.2)",
+                  }}
+                >
+                  Triangulate Live Coordinates
+                </button>
+                <button
+                  onClick={() => navigate("/mobility")}
+                  style={{
+                    background: "rgba(0,0,0,0.05)",
+                    color: "var(--color-text)",
+                    border: "none",
+                    borderRadius: "10px",
+                    padding: "10px 20px",
+                    fontWeight: "700",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  View Mobility History
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "20px", color: "var(--color-text-muted)" }}>
+              No active forensic suspect datasets have been ingested yet.
+            </div>
+          )}
+        </motion.div>
+      </motion.div>
+    );
+  }
 
   const narrativeBlocks = useMemo(() => {
     if (!diagnosticReport?.behavioral_narrative) return [];

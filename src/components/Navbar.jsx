@@ -1,10 +1,44 @@
 import { useContext } from "react";
 import { CDRContext } from "../context/CDRContext";
+import { useAuth } from "../auth/AuthContext";
 import { motion } from "framer-motion";
-import { Search, Bell, Crosshair, User, Menu } from "lucide-react";
+import { Search, Bell, Crosshair, User, Menu, Shield, Key } from "lucide-react";
 
 function Navbar({ onToggleSidebar }) {
+  const { user } = useAuth();
   const { diagnosticReport } = useContext(CDRContext);
+
+  const getBadgeDetails = () => {
+    const role = user?.role || "analyst";
+    if (role === "admin") {
+      return {
+        text: "Administrator",
+        gradient: "linear-gradient(135deg, #e17055 0%, #fab1a0 100%)",
+        icon: <Key size={13} color="white" />,
+        shadow: "0 2px 8px rgba(225, 112, 85, 0.3)",
+        hoverBorder: "rgba(225, 112, 85, 0.22)",
+      };
+    }
+    if (role === "officer") {
+      return {
+        text: "Officer",
+        gradient: "linear-gradient(135deg, #00b894 0%, #55efc4 100%)",
+        icon: <Shield size={13} color="white" />,
+        shadow: "0 2px 8px rgba(0, 184, 148, 0.3)",
+        hoverBorder: "rgba(0, 184, 148, 0.22)",
+      };
+    }
+    return {
+      text: "Analyst",
+      gradient: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
+      icon: <User size={13} color="white" />,
+      shadow: "0 2px 8px rgba(108, 92, 231, 0.3)",
+      hoverBorder: "rgba(108, 92, 231, 0.22)",
+    };
+  };
+
+  const badge = getBadgeDetails();
+  const role = user?.role || "analyst";
 
   return (
     <div
@@ -72,8 +106,8 @@ function Navbar({ onToggleSidebar }) {
               boxShadow: "inset 0 1px 3px rgba(0,0,0,0.04)",
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = "#6c5ce7";
-              e.target.style.boxShadow = "0 0 0 3px rgba(108,92,231,0.13), inset 0 1px 3px rgba(0,0,0,0.02)";
+              e.target.style.borderColor = role === "admin" ? "#e17055" : role === "officer" ? "#00b894" : "#6c5ce7";
+              e.target.style.boxShadow = `0 0 0 3px ${role === "admin" ? "rgba(225,112,85,0.13)" : role === "officer" ? "rgba(0,184,148,0.13)" : "rgba(108,92,231,0.13)"}, inset 0 1px 3px rgba(0,0,0,0.02)`;
               e.target.style.background = "#ffffff";
             }}
             onBlur={(e) => {
@@ -188,9 +222,9 @@ function Navbar({ onToggleSidebar }) {
             boxShadow: "0 1px 3px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "rgba(108,92,231,0.22)";
+            e.currentTarget.style.borderColor = badge.hoverBorder;
             e.currentTarget.style.background = "rgba(255,255,255,0.92)";
-            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9)";
+            e.currentTarget.style.boxShadow = `0 2px 8px ${role === 'admin' ? 'rgba(225, 112, 85, 0.12)' : role === 'officer' ? 'rgba(0, 184, 148, 0.12)' : 'rgba(108, 92, 231, 0.12)'}, inset 0 1px 0 rgba(255,255,255,0.9)`;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = "rgba(0,0,0,0.08)";
@@ -203,15 +237,15 @@ function Navbar({ onToggleSidebar }) {
               width: 28,
               height: 28,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
+              background: badge.gradient,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
-              boxShadow: "0 2px 8px rgba(108,92,231,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+              boxShadow: `${badge.shadow}, inset 0 1px 0 rgba(255,255,255,0.2)`,
             }}
           >
-            <User size={13} color="white" />
+            {badge.icon}
           </div>
           <span
             className="hide-mobile"
@@ -222,7 +256,7 @@ function Navbar({ onToggleSidebar }) {
               letterSpacing: "-0.02em",
             }}
           >
-            Analyst
+            {badge.text}
           </span>
         </button>
       </div>

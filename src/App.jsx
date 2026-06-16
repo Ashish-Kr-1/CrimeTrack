@@ -1,3 +1,10 @@
+import Login from "./pages/Login";
+import Unauthorized from "./pages/Unauthorized";
+import ProtectedRoute from "./auth/ProtectedRoute";
+import FieldLookup from "./pages/FieldLookup";
+import AdminUsers from "./pages/AdminUsers";
+import AdminAudit from "./pages/AdminAudit";
+import AIPrediction from "./pages/AIPrediction";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Cases from "./pages/Cases";
@@ -20,6 +27,9 @@ const pageVariants = {
 
 function App() {
   const location = useLocation();
+  const isAuthPage =
+  location.pathname === "/login" ||
+  location.pathname === "/unauthorized";
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -40,7 +50,12 @@ function App() {
       />
 
       {/* ── Sidebar ── */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {!isAuthPage && (
+  <Sidebar
+    isOpen={sidebarOpen}
+    onClose={() => setSidebarOpen(false)}
+  />
+)}
 
       {/* ── Mobile backdrop ── */}
       <AnimatePresence>
@@ -59,10 +74,25 @@ function App() {
       </AnimatePresence>
 
       <div
-        className="relative z-10 flex flex-1 flex-col overflow-y-auto"
-        style={{ padding: "var(--content-padding)", paddingLeft: "calc(var(--content-padding) + var(--sidebar-collapsed-width, 0px))", gap: 0 }}
-      >
-        <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+  className="relative z-10 flex flex-1 flex-col overflow-y-auto"
+  style={
+    isAuthPage
+      ? {}
+      : {
+          padding: "var(--content-padding)",
+          paddingLeft:
+            "calc(var(--content-padding) + var(--sidebar-collapsed-width, 0px))",
+          gap: 0,
+        }
+  }
+>
+        {!isAuthPage && (
+  <Navbar
+    onToggleSidebar={() =>
+      setSidebarOpen(!sidebarOpen)
+    }
+  />
+)}
 
         <AnimatePresence mode="wait">
           <motion.div
@@ -74,15 +104,123 @@ function App() {
             className="flex-1"
           >
             <Routes location={location}>
-              <Route index element={<Dashboard />} />
-              <Route path="/upload"  element={<UploadCenter />} />
-              <Route path="/risk"    element={<RiskCenter />} />
-              <Route path="/mobility" element={<Mobility />} />
-              <Route path="/cases"  element={<Cases />} />
-              <Route path="/geo"    element={<GeoIntelligence />} />
-              <Route path="/network" element={<NetworkAnalysis />} />
-              <Route path="/replay" element={<ChronologicalReplay />} />
-            </Routes>
+
+  {/* Public Routes */}
+
+  <Route path="/login" element={<Login />} />
+  <Route path="/unauthorized" element={<Unauthorized />} />
+
+  {/* Protected Routes */}
+
+  <Route
+    index
+    element={
+      <ProtectedRoute allowedRoles={["analyst", "officer", "admin"]}>
+        <Dashboard />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/upload"
+    element={
+      <ProtectedRoute allowedRoles={["analyst", "admin"]}>
+        <UploadCenter />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/risk"
+    element={
+      <ProtectedRoute allowedRoles={["analyst"]}>
+        <RiskCenter />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/mobility"
+    element={
+      <ProtectedRoute allowedRoles={["analyst", "officer"]}>
+        <Mobility />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/cases"
+    element={
+      <ProtectedRoute allowedRoles={["analyst", "officer", "admin"]}>
+        <Cases />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/geo"
+    element={
+      <ProtectedRoute allowedRoles={["analyst", "officer"]}>
+        <GeoIntelligence />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/network"
+    element={
+      <ProtectedRoute allowedRoles={["analyst"]}>
+        <NetworkAnalysis />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/replay"
+    element={
+      <ProtectedRoute allowedRoles={["analyst", "officer"]}>
+        <ChronologicalReplay />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/lookup"
+    element={
+      <ProtectedRoute allowedRoles={["officer"]}>
+        <FieldLookup />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/users"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <AdminUsers />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/audit"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <AdminAudit />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/prediction"
+    element={
+      <ProtectedRoute allowedRoles={["analyst", "officer"]}>
+        <AIPrediction />
+      </ProtectedRoute>
+    }
+  />
+
+</Routes>
           </motion.div>
         </AnimatePresence>
       </div>

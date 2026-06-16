@@ -13,24 +13,89 @@ import {
   Wifi,
   ChevronRight,
   Clapperboard,
+  Users,
+  Terminal,
+  Search,
+  Key,
+  Brain,
 } from "lucide-react";
+import { useAuth } from "../auth/AuthContext";
 
-const navItems = [
-  { to: "/upload", icon: UploadCloud, label: "Upload Center", badge: null },
-  { to: "/", icon: LayoutDashboard, label: "Dashboard", end: true, badge: null },
-  { to: "/replay", icon: Clapperboard, label: "Chrono Replay", badge: "NEW" },
-  { to: "/risk", icon: AlertTriangle, label: "Risk Center", badge: null },
-  { to: "/mobility", icon: Clock, label: "Mobility Tracker", badge: null },
-  { to: "/geo", icon: MapPin, label: "Geo Intelligence", badge: null },
-  { to: "/network", icon: Network, label: "Network Analysis", badge: null },
-  { to: "/cases", icon: FolderOpen, label: "Active Cases", badge: null },
-];
 
 function Sidebar({ isOpen, onClose }) {
+  const { user } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
   const isExpanded = isOpen || isHovered;
   const sidebarWidth = isExpanded ? 260 : 64;
   const paddingX = isExpanded ? 20 : 12;
+
+  const getNavItems = () => {
+    const role = user?.role || "analyst";
+
+    if (role === "admin") {
+      return [
+        { to: "/", icon: LayoutDashboard, label: "Dashboard", end: true, badge: null },
+        { to: "/upload", icon: UploadCloud, label: "Upload Center", badge: null },
+        { to: "/cases", icon: FolderOpen, label: "Active Cases", badge: null },
+        { to: "/users", icon: Users, label: "User Management", badge: null },
+        { to: "/audit", icon: Terminal, label: "Audit Logs", badge: null },
+      ];
+    }
+
+    if (role === "officer") {
+      return [
+        { to: "/", icon: LayoutDashboard, label: "Dashboard", end: true, badge: null },
+        { to: "/lookup", icon: Search, label: "Field Lookup", badge: "NEW" },
+        { to: "/replay", icon: Clapperboard, label: "Chrono Replay", badge: null },
+        { to: "/mobility", icon: Clock, label: "Mobility Tracker", badge: null },
+        { to: "/geo", icon: MapPin, label: "Geo Intelligence", badge: null },
+        { to: "/prediction", icon: Brain, label: "AI Prediction", badge: "LIVE" },
+        { to: "/cases", icon: FolderOpen, label: "Active Cases", badge: null },
+      ];
+    }
+
+    // Default Analyst: full access
+    return [
+      { to: "/upload", icon: UploadCloud, label: "Upload Center", badge: null },
+      { to: "/", icon: LayoutDashboard, label: "Dashboard", end: true, badge: null },
+      { to: "/replay", icon: Clapperboard, label: "Chrono Replay", badge: "NEW" },
+      { to: "/risk", icon: AlertTriangle, label: "Risk Center", badge: null },
+      { to: "/mobility", icon: Clock, label: "Mobility Tracker", badge: null },
+      { to: "/geo", icon: MapPin, label: "Geo Intelligence", badge: null },
+      { to: "/network", icon: Network, label: "Network Analysis", badge: null },
+      { to: "/prediction", icon: Brain, label: "AI Prediction", badge: "LIVE" },
+      { to: "/cases", icon: FolderOpen, label: "Active Cases", badge: null },
+    ];
+  };
+
+  const getBrandDetails = () => {
+    const role = user?.role || "analyst";
+    if (role === "admin") {
+      return {
+        gradient: "linear-gradient(135deg, #e17055 0%, #fab1a0 100%)",
+        icon: <Key size={18} color="white" strokeWidth={2.5} />,
+        shadow: "0 4px 16px rgba(225, 112, 85, 0.35)",
+        textColor: "#e17055",
+      };
+    }
+    if (role === "officer") {
+      return {
+        gradient: "linear-gradient(135deg, #00b894 0%, #55efc4 100%)",
+        icon: <Shield size={18} color="white" strokeWidth={2.5} />,
+        shadow: "0 4px 16px rgba(0, 184, 148, 0.35)",
+        textColor: "#00b894",
+      };
+    }
+    return {
+      gradient: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
+      icon: <Users size={18} color="white" strokeWidth={2.5} />,
+      shadow: "0 4px 16px rgba(108, 92, 231, 0.35)",
+      textColor: "#6c5ce7",
+    };
+  };
+
+  const navItems = getNavItems();
+  const brand = getBrandDetails();
 
   return (
     <div
@@ -58,8 +123,8 @@ function Sidebar({ isOpen, onClose }) {
               width: 40,
               height: 40,
               borderRadius: 12,
-              background: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
-              boxShadow: "0 4px 16px rgba(108, 92, 231, 0.35), inset 0 1px 0 rgba(255,255,255,0.25)",
+              background: brand.gradient,
+              boxShadow: `${brand.shadow}, inset 0 1px 0 rgba(255,255,255,0.25)`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -67,7 +132,7 @@ function Sidebar({ isOpen, onClose }) {
               border: "1px solid rgba(255,255,255,0.2)",
             }}
           >
-            <Shield size={18} color="white" strokeWidth={2.5} />
+            {brand.icon}
           </div>
           <div style={{ opacity: isExpanded ? 1 : 0, transition: "opacity 0.2s", width: isExpanded ? "auto" : 0, overflow: "hidden" }}>
             <div
@@ -87,7 +152,7 @@ function Sidebar({ isOpen, onClose }) {
                 fontWeight: 700,
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: "#6c5ce7",
+                color: brand.textColor,
                 marginTop: 1,
                 opacity: 0.8,
               }}
