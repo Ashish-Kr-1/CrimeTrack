@@ -1,7 +1,6 @@
 import { useContext, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CDRContext } from "../context/CDRContext";
-import { useAuth } from "../auth/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShieldAlert, FileText, Smartphone, MessageSquare, ChevronRight,
@@ -206,8 +205,6 @@ const fadeUp  = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0, t
    DASHBOARD
 ═══════════════════════════════════════════════════════════════════════════ */
 function Dashboard() {
-  const { user } = useAuth();
-  const role = user?.role || "analyst";
   const { cdrData, diagnosticReport } = useContext(CDRContext);
   const navigate = useNavigate();
   const records = cdrData.slice(1);
