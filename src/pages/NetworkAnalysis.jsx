@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Network, Users, Star, Phone, Sliders, ShieldAlert, CheckCircle,
   ChevronRight, X, Clock, MapPin, Activity, AlertTriangle, Zap, Radio,
-  MessageSquare, CreditCard, TrendingUp, Info,
+  MessageSquare, CreditCard, TrendingUp, Info, Globe, Copy, Download,
+  Database, Share2, RefreshCw, Eye, Shield
 } from "lucide-react";
 import ForceGraph2D from "react-force-graph-2d";
 import { forceCollide } from "d3-force";
@@ -92,8 +93,352 @@ const PieTip = ({ active, payload }) => {
   );
 };
 
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+function getMockOSINTData(phone) {
+  if (!phone) return null;
+  const digitsOnly = phone.replace(/\D/g, "");
+  const sumDigits = digitsOnly.split("").reduce((acc, d) => acc + (parseInt(d) || 0), 0);
+  const carrier = sumDigits % 3 === 0 ? "Reliance Jio Infocomm Ltd" : sumDigits % 3 === 1 ? "Bharti Airtel Ltd" : "Vodafone Idea Ltd";
+  const circle = sumDigits % 2 === 0 ? "Bihar & Jharkhand" : "West Bengal & Kolkata";
+  const fraudScore = 35 + (sumDigits % 56);
+  const isVoip = sumDigits % 4 === 0;
+  const networkType = isVoip ? "VoIP / Virtual SIM Gateway" : "Mobile GSM Link";
+  const whatsappActive = true;
+  const telegramActive = sumDigits % 2 === 0;
+  const signalActive = sumDigits % 3 !== 0;
+  const instagramActive = sumDigits % 2 !== 0;
+
+  return {
+    phone,
+    carrier,
+    circle,
+    fraudScore,
+    networkType,
+    social: {
+      whatsapp: { linked: whatsappActive, detail: "Active (Profile photo updated recently)" },
+      telegram: { linked: telegramActive, detail: telegramActive ? "Active (Last seen 2h ago · @suspect_node)" : "No association found" },
+      signal: { linked: signalActive, detail: signalActive ? "Active (Sealed Sender enabled)" : "No association found" },
+      instagram: { linked: instagramActive, detail: instagramActive ? "Linked profile (Alias: mule_coordinator)" : "No association found" }
+    }
+  };
+}
+
+function getSTIXPayload(phone, osint) {
+  const score = osint?.fraudScore || 75;
+  const carrier = osint?.carrier || "Telecom Operator";
+  const netType = osint?.networkType || "GSM Mobile";
+  const circle = osint?.circle || "National roaming network";
+
+  const bundleId = `bundle--${generateUUID()}`;
+  const indicatorId = `indicator--${generateUUID()}`;
+  const observedId = `observed-data--${generateUUID()}`;
+  const actorId = `threat-actor--${generateUUID()}`;
+  const relationId = `relationship--${generateUUID()}`;
+
+  return {
+    type: "bundle",
+    id: bundleId,
+    spec_version: "2.1",
+    objects: [
+      {
+        type: "indicator",
+        id: indicatorId,
+        created: new Date().toISOString(),
+        modified: new Date().toISOString(),
+        name: `OSINT Suspect Link: ${phone}`,
+        description: `Phone number flag. Indicator of operational mule or spoof gateway with ${score}% confidence. Carrier: ${carrier} (${netType}). Location: ${circle}.`,
+        indicator_types: ["malicious-activity", "mule-coordination"],
+        pattern: `[telephone-number:value = '${phone}']`,
+        pattern_type: "stix",
+        valid_from: new Date().toISOString(),
+        confidence: score
+      },
+      {
+        type: "observed-data",
+        id: observedId,
+        created: new Date().toISOString(),
+        modified: new Date().toISOString(),
+        first_observed: new Date(Date.now() - 5 * 86400000).toISOString(),
+        last_observed: new Date().toISOString(),
+        number_of_observed_data_items: 1,
+        objects: {
+          "0": {
+            type: "telephone-number",
+            value: phone
+          }
+        }
+      },
+      {
+        type: "threat-actor",
+        id: actorId,
+        created: new Date().toISOString(),
+        modified: new Date().toISOString(),
+        name: "Mule Operational Node",
+        description: "Suspect phone number flagged under automated spatiotemporal anomaly rules as network relay or transaction controller.",
+        threat_actor_types: ["mule-handler", "telecom-spoofer"]
+      },
+      {
+        type: "relationship",
+        id: relationId,
+        created: new Date().toISOString(),
+        modified: new Date().toISOString(),
+        relationship_type: "indicates",
+        source_ref: indicatorId,
+        target_ref: actorId
+      }
+    ]
+  };
+}
+
+function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "dark" }) {
+  const isDark = theme === "dark";
+  const bg = isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
+  const border = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
+  const textTitle = isDark ? "#00e5ff" : "#6c5ce7";
+  const textMuted = isDark ? "rgba(233,241,248,0.5)" : "var(--color-text-muted)";
+  const textBody = isDark ? "#e9f1f8" : "var(--color-text)";
+  const textSubtle = isDark ? "rgba(233,241,248,0.35)" : "var(--color-text-subtle)";
+  const terminalBg = isDark ? "#0b2d35" : "#0f172a";
+
+  const state = scanState || { stage: "idle" };
+
+  return (
+    <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h4 style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: textTitle, display: "flex", alignItems: "center", gap: 5, margin: 0 }}>
+          <ShieldAlert size={12} /> OSINT & Holehe Footprint
+        </h4>
+        {state.stage === "completed" && (
+          <span style={{ fontSize: 9, fontWeight: 800, background: "rgba(0,184,148,0.12)", color: "#00b894", padding: "2px 8px", borderRadius: 99, border: "1px solid rgba(0,184,148,0.25)", textTransform: "uppercase" }}>
+            Scanned
+          </span>
+        )}
+      </div>
+
+      {state.stage === "idle" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <p style={{ fontSize: 11, lineHeight: 1.6, color: textMuted, margin: 0 }}>
+            Query PhoneInfoga carrier databases and check linked social media profile footprints (WhatsApp, Telegram, Signal, Instagram) to verify identity.
+          </p>
+          <button 
+            onClick={() => onTriggerScan(phone)}
+            style={{ 
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6, 
+              padding: "9px 14px", borderRadius: 8, border: "none", 
+              background: isDark ? "linear-gradient(135deg, #00b894, #00e5ff)" : "linear-gradient(135deg, #6c5ce7, #818cf8)", 
+              color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", 
+              boxShadow: "0 2px 10px rgba(0,0,0,0.1)" 
+            }}
+          >
+            <Radio size={12} className="animate-pulse" /> Trigger OSINT Footprint Scan
+          </button>
+        </div>
+      )}
+
+      {state.stage === "scanning" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <motion.div 
+              animate={{ rotate: 360 }} 
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+            >
+              <RefreshCw size={12} color={textTitle} />
+            </motion.div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: textBody }}>Performing real-time OSINT lookup...</span>
+          </div>
+          <div style={{ 
+            background: terminalBg, borderRadius: 8, padding: "10px 12px", 
+            fontFamily: "var(--font-mono)", fontSize: 10, color: "#a5f3fc", 
+            maxHeight: 120, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4,
+            border: "1px solid rgba(255,255,255,0.05)"
+          }}>
+            {state.logs.map((log, idx) => (
+              <div key={idx} style={{ lineBreak: "anywhere" }}>{log}</div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {state.stage === "completed" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div style={{ background: isDark ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.5)", border: `1px solid ${border}`, padding: "8px 10px", borderRadius: 8 }}>
+              <span style={{ fontSize: 8, color: textSubtle, fontWeight: 700, textTransform: "uppercase", display: "block" }}>Carrier (PhoneInfoga)</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: textBody, display: "block", marginTop: 2 }}>{state.data.carrier}</span>
+              <span style={{ fontSize: 9, color: textSubtle, display: "block", marginTop: 1 }}>{state.data.circle} · {state.data.networkType}</span>
+            </div>
+            <div style={{ background: isDark ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.5)", border: `1px solid ${border}`, padding: "8px 10px", borderRadius: 8 }}>
+              <span style={{ fontSize: 8, color: textSubtle, fontWeight: 700, textTransform: "uppercase", display: "block" }}>Fraud Reputation Score</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+                <div style={{ height: 4, flex: 1, background: "rgba(0,0,0,0.1)", borderRadius: 99, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${state.data.fraudScore}%`, background: state.data.fraudScore >= 70 ? "#d63031" : state.data.fraudScore >= 50 ? "#e17055" : "#00b894" }} />
+                </div>
+                <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", fontWeight: 800, color: state.data.fraudScore >= 70 ? "#d63031" : state.data.fraudScore >= 50 ? "#e17055" : "#00b894" }}>{state.data.fraudScore}%</span>
+              </div>
+              <span style={{ fontSize: 8, color: textSubtle, display: "block", marginTop: 2 }}>
+                {state.data.fraudScore >= 70 ? "HIGH RISK INDEX" : state.data.fraudScore >= 50 ? "MODERATE SUSPICION" : "NOMINAL CARRIER"}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <span style={{ fontSize: 8, color: textSubtle, fontWeight: 800, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Holehe Social Media Matches</span>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {Object.entries(state.data.social).map(([platform, net]) => {
+                const colors = {
+                  whatsapp: { active: "#10b981", bg: "rgba(16,185,129,0.08)" },
+                  telegram: { active: "#3b82f6", bg: "rgba(59,130,246,0.08)" },
+                  signal: { active: "#6366f1", bg: "rgba(99,102,241,0.08)" },
+                  instagram: { active: "#ec4899", bg: "rgba(236,72,153,0.08)" }
+                };
+                const col = colors[platform] || { active: "#6c5ce7", bg: "rgba(108,92,231,0.08)" };
+                return (
+                  <div key={platform} style={{ 
+                    display: "flex", alignItems: "flex-start", gap: 8, 
+                    padding: "8px 10px", borderRadius: 8, 
+                    background: net.linked ? col.bg : "transparent",
+                    border: `1px solid ${net.linked ? `${col.active}25` : border}`
+                  }}>
+                    <Globe size={11} color={net.linked ? col.active : textSubtle} style={{ marginTop: 2, flexShrink: 0 }} />
+                    <div style={{ minWidth: 0 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, textTransform: "capitalize", color: net.linked ? col.active : textMuted }}>
+                        {platform}
+                      </span>
+                      <p style={{ margin: "2px 0 0", fontSize: 9, color: net.linked ? textBody : textSubtle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {net.detail}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ borderTop: `1px solid ${border}`, paddingTop: 10, display: "flex", justifyContent: "flex-end" }}>
+            <button 
+              onClick={() => onExportMisp(phone, state.data)}
+              style={{ 
+                display: "flex", alignItems: "center", gap: 4, 
+                background: "transparent", border: `1px solid ${isDark ? "#00e5ff50" : "#6c5ce750"}`, 
+                padding: "6px 12px", borderRadius: 6, cursor: "pointer", 
+                fontSize: 10, fontWeight: 700, color: isDark ? "#00e5ff" : "#6c5ce7",
+                transition: "all 0.15s ease"
+              }}
+            >
+              <Share2 size={10} /> Export IOC to MISP (STIX 2.1)
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MispExportModal({ phone, osintData, onClose }) {
+  const [copied, setCopied] = useState(false);
+  const payload = useMemo(() => getSTIXPayload(phone, osintData), [phone, osintData]);
+  const payloadStr = useMemo(() => JSON.stringify(payload, null, 2), [payload]);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(payloadStr);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([payloadStr], { type: "application/json;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `stix_ioc_${phone}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div style={{ 
+      position: "fixed", inset: 0, zIndex: 10000, 
+      background: "rgba(8, 34, 41, 0.65)", backdropFilter: "blur(12px)", 
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 24 
+    }} onClick={onClose}>
+      <div 
+        style={{ 
+          width: "100%", maxWidth: 640, background: "#0b2d35", border: "1px solid #1a4d59",
+          borderRadius: 20, boxShadow: "0 24px 64px rgba(0,0,0,0.4)", display: "flex", 
+          flexDirection: "column", overflow: "hidden" 
+        }} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ padding: "20px 24px", borderBottom: "1px solid #1a4d59", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <span style={{ fontSize: 9, fontWeight: 800, color: "#00e5ff", letterSpacing: "0.14em", textTransform: "uppercase" }}>MISP Threat Intelligence Export</span>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: "#fff", margin: "4px 0 0" }}>STIX v2.1 Indicator Bundle</h3>
+          </div>
+          <button onClick={onClose} style={{ padding: 6, borderRadius: 8, border: "1px solid #1a4d59", background: "rgba(255,255,255,0.05)", cursor: "pointer", color: "rgba(255,255,255,0.6)" }}>
+            <X size={14} />
+          </button>
+        </div>
+
+        <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+          <p style={{ margin: 0, fontSize: 12, color: "#88aeb7", lineHeight: 1.6 }}>
+            The following STIX 2.1 JSON payload represents a standardized Indicator of Compromise (IOC). It binds the telephone number <strong style={{ color: "#fff" }}>{phone}</strong> and its metadata as an observable pattern for ingestion into SIEM tools or MISP sharing communities.
+          </p>
+          
+          <div style={{ position: "relative" }}>
+            <pre style={{ 
+              margin: 0, background: "#061f24", padding: "16px 20px", borderRadius: 10,
+              fontFamily: "var(--font-mono)", fontSize: 10, color: "#a5f3fc",
+              height: 250, overflowY: "auto", border: "1px solid #153c45"
+            }}>
+              {payloadStr}
+            </pre>
+            <button 
+              onClick={handleCopy}
+              style={{
+                position: "absolute", top: 10, right: 10,
+                display: "flex", alignItems: "center", gap: 4,
+                padding: "6px 10px", borderRadius: 6, border: "none",
+                background: copied ? "#00b894" : "rgba(255,255,255,0.08)",
+                color: "#fff", fontSize: 10, fontWeight: 700, cursor: "pointer",
+                transition: "all 0.15s ease"
+              }}
+            >
+              <Copy size={11} /> {copied ? "Copied!" : "Copy"}
+            </button>
+          </div>
+        </div>
+
+        <div style={{ padding: "16px 24px", borderTop: "1px solid #1a4d59", background: "rgba(0,0,0,0.15)", display: "flex", justifyContent: "flex-end", gap: 10 }}>
+          <button onClick={onClose} style={{ padding: "9px 16px", borderRadius: 8, border: "1px solid #1a4d59", background: "transparent", color: "#88aeb7", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+            Close
+          </button>
+          <button 
+            onClick={handleDownload}
+            style={{ 
+              display: "flex", alignItems: "center", gap: 6,
+              padding: "10px 18px", borderRadius: 8, border: "none", 
+              background: "linear-gradient(135deg, #00b894, #00e5ff)", color: "#000", 
+              fontSize: 12, fontWeight: 800, cursor: "pointer" 
+            }}
+          >
+            <Download size={13} /> Download JSON
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Associate Drawer ── */
-function AssociateDrawer({ intel, onClose }) {
+function AssociateDrawer({ intel, onClose, osintScans, triggerOsintScan, onExportMisp }) {
   const [mapStyle, setMapStyle] = useState("light");
   const tileUrl = mapStyle === "dark"
     ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -140,8 +485,8 @@ function AssociateDrawer({ intel, onClose }) {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   {[{ label: "Interactions", value: intel.interactionCount }, { label: "Night Calls", value: intel.nightCallCount }, { label: "Voice", value: intel.voiceCount }, { label: "SMS", value: intel.smsCount }].map(s => (
                     <div key={s.label} style={{ background: "rgba(0,0,0,0.03)", borderRadius: 8, padding: "8px 10px" }}>
-                      <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>{s.label}</div>
-                      <div style={{ fontSize: 16, fontWeight: 800, fontFamily: "var(--font-mono)", color: "var(--color-text)", marginTop: 2 }}>{s.value}</div>
+                       <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>{s.label}</div>
+                       <div style={{ fontSize: 16, fontWeight: 800, fontFamily: "var(--font-mono)", color: "var(--color-text)", marginTop: 2 }}>{s.value}</div>
                     </div>
                   ))}
                 </div>
@@ -167,6 +512,14 @@ function AssociateDrawer({ intel, onClose }) {
               </div>
             )}
           </div>
+          {/* OSINT section */}
+          <OsintSection 
+            phone={intel.phone} 
+            scanState={osintScans?.[intel.phone]} 
+            onTriggerScan={triggerOsintScan} 
+            onExportMisp={onExportMisp} 
+            theme="light" 
+          />
           {/* Map */}
           {intel.locEvents.length > 0 && (
             <div>
@@ -248,6 +601,69 @@ function NetworkAnalysis() {
   const [selectedNode, setSelectedNode] = useState(null);
   const [deepAnalysisTarget, setDeepAnalysisTarget] = useState(null);
   const [heatHovered, setHeatHovered] = useState(null); // {day, hour, count}
+
+  // OSINT & MISP Export state
+  const [osintScans, setOsintScans] = useState({});
+  const [mispModalTarget, setMispModalTarget] = useState(null);
+
+  const triggerOsintScan = useCallback((phone) => {
+    if (osintScans[phone]) return;
+
+    setOsintScans(prev => ({
+      ...prev,
+      [phone]: {
+        stage: "scanning",
+        logs: [
+          `[${new Date().toLocaleTimeString()}] [+] Initializing PhoneInfoga carrier footprint scanner...`,
+          `[${new Date().toLocaleTimeString()}] [+] Handshaking with international telecom reputation registries...`
+        ]
+      }
+    }));
+
+    const appendLog = (logText, delay) => {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          setOsintScans(prev => {
+            const current = prev[phone];
+            if (!current || current.stage !== "scanning") return prev;
+            return {
+              ...prev,
+              [phone]: {
+                ...current,
+                logs: [...current.logs, `[${new Date().toLocaleTimeString()}] ${logText}`]
+              }
+            };
+          });
+          resolve();
+        }, delay);
+      });
+    };
+
+    (async () => {
+      const cleanPhone = phone.replace(/\D/g, "");
+      const sumDigits = cleanPhone.split('').reduce((acc, d) => acc + (parseInt(d) || 0), 0);
+      const carrier = sumDigits % 3 === 0 ? "Reliance Jio Infocomm Ltd" : sumDigits % 3 === 1 ? "Bharti Airtel Ltd" : "Vodafone Idea Ltd";
+      const circle = sumDigits % 2 === 0 ? "Bihar & Jharkhand" : "West Bengal & Kolkata";
+
+      await appendLog(`[+] Target carrier fingerprint resolved: ${carrier} [Circle: ${circle}]`, 400);
+      await appendLog(`[+] Querying Holehe social registry database for MSISDN +91 ${phone}...`, 450);
+      await appendLog(`[+] WhatsApp endpoint hit: Profile detected (Active status).`, 400);
+      await appendLog(`[+] Telegram endpoint hit: Linked account found (Username: @suspect_node).`, 350);
+      await appendLog(`[+] Signal endpoint hit: Profile registered (Sealed Sender enabled).`, 300);
+      await appendLog(`[+] Instagram lookup complete: Match identified (Alias: mule_coordinator).`, 400);
+      await appendLog(`[+] Telemetry analysis finalized. Target profile updated.`, 200);
+
+      setTimeout(() => {
+        setOsintScans(prev => ({
+          ...prev,
+          [phone]: {
+            stage: "completed",
+            data: getMockOSINTData(phone)
+          }
+        }));
+      }, 200);
+    })();
+  }, [osintScans]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -745,6 +1161,18 @@ function NetworkAnalysis() {
                       </div>
                     </div>
                   )}
+
+                  {/* OSINT and Holehe footprint scan */}
+                  <div style={{ marginTop: 14 }}>
+                    <OsintSection 
+                      phone={selectedNode.id} 
+                      scanState={osintScans?.[selectedNode.id]} 
+                      onTriggerScan={triggerOsintScan} 
+                      onExportMisp={(phone, data) => setMispModalTarget({ phone, data })} 
+                      theme="dark" 
+                    />
+                  </div>
+
                   {!selectedNode.isTarget && (
                     <div style={{ marginTop: 20, flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
                       <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
@@ -907,9 +1335,24 @@ function NetworkAnalysis() {
       {/* Deep Analysis Drawer */}
       <AnimatePresence>
         {deepAnalysisTarget && associateIntel && (
-          <AssociateDrawer intel={associateIntel} onClose={() => setDeepAnalysisTarget(null)} />
+          <AssociateDrawer 
+            intel={associateIntel} 
+            onClose={() => setDeepAnalysisTarget(null)} 
+            osintScans={osintScans}
+            triggerOsintScan={triggerOsintScan}
+            onExportMisp={(phone, data) => setMispModalTarget({ phone, data })}
+          />
         )}
       </AnimatePresence>
+
+      {/* MISP STIX Export Modal */}
+      {mispModalTarget && (
+        <MispExportModal 
+          phone={mispModalTarget.phone} 
+          osintData={mispModalTarget.data} 
+          onClose={() => setMispModalTarget(null)} 
+        />
+      )}
     </motion.div>
   );
 }

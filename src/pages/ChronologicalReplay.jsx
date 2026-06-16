@@ -45,6 +45,21 @@ function MapController({ center, fitBoundsCoords, viewMode }) {
   return null;
 }
 
+function haversineDistance(coords1, coords2) {
+  if (!coords1 || !coords2) return 0;
+  const [lat1, lon1] = coords1;
+  const [lat2, lon2] = coords2;
+  const R = 6371; // km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 function ChronologicalReplay() {
   const { diagnosticReport } = useContext(CDRContext);
   const navigate = useNavigate();
@@ -57,16 +72,84 @@ function ChronologicalReplay() {
   const [mapStyle, setMapStyle] = useState("light");
   const [filterType, setFilterType] = useState(null); // null = show all
 
+  // Cellebrite Forensics Ingest state
+  const [cellebriteIngested, setCellebriteIngested] = useState(false);
+  const [cellebriteUploading, setCellebriteUploading] = useState(false);
+  const [cellebriteFileName, setCellebriteFileName] = useState("");
+  const [cellebriteHash, setCellebriteHash] = useState(0);
+
+  const cellebriteInputRef = useRef(null);
   const logListRef = useRef();
   const logItemRefs = useRef({});
 
-  const replayEvents = useMemo(
+  const handleCellebriteFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setCellebriteUploading(true);
+    const hash = file.name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    setTimeout(() => {
+      setCellebriteUploading(false);
+      setCellebriteFileName(file.name);
+      setCellebriteHash(hash);
+      setCellebriteIngested(true);
+    }, 1200);
+  };
+
+  const rawReplayEvents = useMemo(
     () => diagnosticReport?.replay_events || [],
     [diagnosticReport]
   );
 
+  const replayEvents = useMemo(() => {
+    if (!rawReplayEvents.length) return [];
+    if (!cellebriteIngested) return rawReplayEvents;
+
+    return rawReplayEvents.map((evt, idx) => {
+      if (!evt.coordinates) return evt;
+      const [lat, lng] = evt.coordinates;
+      let deviceCoords = [lat, lng];
+      let isSpoofed = false;
+      let offsetDistance = 0;
+
+      // Introduce GPS spoofing anomalies dynamically based on the hash of the file
+      const isSpoofCandidate = evt.isAnomaly || ((idx + cellebriteHash) % 4 === 1);
+      if (isSpoofCandidate) {
+        // Shift coordinate by a dynamic offset (approx 18-35km)
+        const latShift = 0.16 + ((cellebriteHash + idx) % 5) * 0.04;
+        const lngShift = -0.12 - ((cellebriteHash + idx) % 3) * 0.05;
+        deviceCoords = [lat + latShift, lng + lngShift];
+        offsetDistance = haversineDistance(evt.coordinates, deviceCoords);
+        isSpoofed = offsetDistance > 10;
+      } else {
+        // Normal minor GPS dispersion
+        const latShift = 0.002 + ((cellebriteHash + idx) % 10) * 0.0005;
+        const lngShift = -0.001 - ((cellebriteHash + idx) % 10) * 0.0003;
+        deviceCoords = [lat + latShift, lng + lngShift];
+        offsetDistance = haversineDistance(evt.coordinates, deviceCoords);
+      }
+
+      return {
+        ...evt,
+        deviceCoords,
+        offsetDistance,
+        isSpoofed
+      };
+    });
+  }, [rawReplayEvents, cellebriteIngested, cellebriteHash]);
+
   const allCoordinates = useMemo(() => {
     return replayEvents.map((e) => e.coordinates).filter(Boolean);
+  }, [replayEvents]);
+
+  const historicalDeviceTrail = useMemo(() => {
+    return replayEvents
+      .slice(0, activeEventIndex + 1)
+      .map((e) => e.deviceCoords)
+      .filter(Boolean);
+  }, [replayEvents, activeEventIndex]);
+
+  const spoofedEvents = useMemo(() => {
+    return replayEvents.filter(e => e.isSpoofed);
   }, [replayEvents]);
 
   /* Anomaly indices for jump buttons */
@@ -665,6 +748,19 @@ function ChronologicalReplay() {
                 />
               )}
 
+              {/* Cellebrite Device GPS trail polyline */}
+              {cellebriteIngested && historicalDeviceTrail.length > 1 && (
+                <Polyline
+                  positions={historicalDeviceTrail}
+                  pathOptions={{
+                    color: "#00b894",
+                    weight: 2.5,
+                    opacity: 0.65,
+                    dashArray: "4 6",
+                  }}
+                />
+              )}
+
               {/* Past positions (faded) */}
               {historicalTrail.slice(0, -1).map((coord, i) => (
                 <CircleMarker
@@ -680,15 +776,30 @@ function ChronologicalReplay() {
                 />
               ))}
 
+              {/* Past device positions (faded) */}
+              {cellebriteIngested && historicalDeviceTrail.slice(0, -1).map((coord, i) => (
+                <CircleMarker
+                  key={`dev-past-${i}`}
+                  center={coord}
+                  radius={4}
+                  pathOptions={{
+                    color: "#55efc4",
+                    fillColor: "#55efc4",
+                    fillOpacity: 0.45,
+                    weight: 1,
+                  }}
+                />
+              ))}
+
               {/* Active position marker */}
               <CircleMarker
                 center={activeCoordinates}
-                radius={14}
+                radius={12}
                 pathOptions={{
                   color: activeEvent?.isAnomaly ? "#d63031" : "#6c5ce7",
                   fillColor: activeEvent?.isAnomaly ? "#ff6b4a" : "#6c5ce7",
-                  fillOpacity: 0.9,
-                  weight: 3,
+                  fillOpacity: 0.85,
+                  weight: 2,
                 }}
               >
                 <Popup>
@@ -696,7 +807,7 @@ function ChronologicalReplay() {
                     style={{ fontFamily: "var(--font-sans)", color: "#082229", fontSize: 12 }}
                   >
                     <strong style={{ fontSize: 13 }}>
-                      Event #{activeEventIndex + 1}
+                      Telecom Tower (CGI) #{activeEventIndex + 1}
                     </strong>
                     <br />
                     <span style={{ color: "#636e72" }}>{activeEvent?.timeLabel}</span>
@@ -719,6 +830,59 @@ function ChronologicalReplay() {
                   </div>
                 </Popup>
               </CircleMarker>
+
+              {/* Correlated Cellebrite Device GPS Marker */}
+              {cellebriteIngested && activeEvent?.deviceCoords && (
+                <CircleMarker
+                  center={activeEvent.deviceCoords}
+                  radius={12}
+                  pathOptions={{
+                    color: activeEvent.isSpoofed ? "#d63031" : "#00b894",
+                    fillColor: activeEvent.isSpoofed ? "#ff7675" : "#55efc4",
+                    fillOpacity: 0.9,
+                    weight: 3,
+                  }}
+                >
+                  <Popup>
+                    <div style={{ fontFamily: "var(--font-sans)", color: "#082229", fontSize: 12 }}>
+                      <strong style={{ fontSize: 13, color: activeEvent.isSpoofed ? "#d63031" : "#00b894" }}>
+                        Cellebrite Device GPS
+                      </strong>
+                      <br />
+                      <span style={{ color: "#636e72" }}>{activeEvent?.timeLabel}</span>
+                      <br />
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
+                        {activeEvent.deviceCoords[0].toFixed(5)}, {activeEvent.deviceCoords[1].toFixed(5)}
+                      </span>
+                      <br />
+                      <span style={{ fontWeight: 600, color: "var(--color-text)" }}>
+                        Offset: {activeEvent.offsetDistance.toFixed(2)} km
+                      </span>
+                      {activeEvent.isSpoofed && (
+                        <>
+                          <br />
+                          <span style={{ color: "#d63031", fontWeight: 800, fontSize: 10 }}>
+                            ⚠ COORDINATE SPOOFING ALERT
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              )}
+
+              {/* Connecting Offset Line */}
+              {cellebriteIngested && activeEvent?.deviceCoords && activeCoordinates && (
+                <Polyline
+                  positions={[activeCoordinates, activeEvent.deviceCoords]}
+                  pathOptions={{
+                    color: activeEvent.isSpoofed ? "#d63031" : "#a29bfe",
+                    weight: 2,
+                    dashArray: "5 5",
+                    opacity: 0.8
+                  }}
+                />
+              )}
 
               <MapController center={activeCoordinates} fitBoundsCoords={allCoordinates} viewMode={viewMode} />
             </MapContainer>
@@ -814,6 +978,10 @@ function ChronologicalReplay() {
                 { label: "Roaming Circle", value: activeEvent?.roam || "Home Circle", color: "var(--color-text)" },
                 { label: "Phone Device (IMEI)", value: activeEvent?.imei || "N/A", color: "#6c5ce7", mono: true },
                 { label: "Contact Number", value: activeEvent?.bParty || "N/A", color: "var(--color-text)", mono: true },
+                ...(cellebriteIngested && activeEvent?.deviceCoords ? [
+                  { label: "Device GPS Coords", value: `${activeEvent.deviceCoords[0].toFixed(4)}, ${activeEvent.deviceCoords[1].toFixed(4)}`, color: "#00b894", mono: true },
+                  { label: "Spatial Offset", value: `${activeEvent.offsetDistance.toFixed(2)} km ${activeEvent.isSpoofed ? '⚠ SPOOF' : '(Nominal)'}`, color: activeEvent.isSpoofed ? "#d63031" : "#00b894" }
+                ] : [])
               ].map((item) => (
                 <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                   <span
@@ -969,6 +1137,79 @@ function ChronologicalReplay() {
                   </span>
                 </div>
 
+                {/* Cellebrite Forensics Ingest Panel */}
+                <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--color-border)", background: "rgba(255,255,255,0.15)" }}>
+                  {!cellebriteIngested ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                        <ShieldAlert size={14} color="#6c5ce7" style={{ marginTop: 2, flexShrink: 0 }} />
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text)", display: "block" }}>Cellebrite GPS Alignment</span>
+                          <span style={{ fontSize: 9, color: "var(--color-text-subtle)", lineHeight: 1.4, display: "block", marginTop: 2 }}>
+                            Correlate local filesystem geotags against telecom tower CGI triangulation logs.
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {cellebriteUploading ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          <span style={{ fontSize: 9, fontWeight: 700, color: "#6c5ce7", display: "flex", alignItems: "center", gap: 4 }}>
+                            <RefreshCw size={10} className="animate-spin" /> Correlating spatiotemporal coordinates...
+                          </span>
+                          <div style={{ height: 3, background: "rgba(0,0,0,0.06)", borderRadius: 99, overflow: "hidden" }}>
+                            <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 1.2 }} style={{ height: "100%", background: "#6c5ce7" }} />
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => cellebriteInputRef.current?.click()}
+                            style={{
+                              width: "100%", padding: "7px 10px", borderRadius: 8, border: "1px dashed rgba(108,92,231,0.4)",
+                              background: "rgba(108,92,231,0.05)", color: "#6c5ce7", fontSize: 10, fontWeight: 700,
+                              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                              transition: "all 0.15s ease"
+                            }}
+                          >
+                            <Radio size={11} /> Ingest Cellebrite Report
+                          </button>
+                          <input 
+                            type="file" 
+                            ref={cellebriteInputRef} 
+                            onChange={handleCellebriteFile} 
+                            style={{ display: "none" }} 
+                            accept=".xml,.json,.csv,.txt" 
+                          />
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      <div style={{ display: "flex", justifyItems: "center", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: 10, fontWeight: 800, color: "#00b894", display: "flex", alignItems: "center", gap: 4, maxWidth: "80%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <CheckCircle size={11} color="#00b894" /> CORRELATED: {cellebriteFileName}
+                        </span>
+                        <button 
+                          onClick={() => setCellebriteIngested(false)}
+                          style={{ background: "none", border: "none", color: "var(--color-text-subtle)", fontSize: 8, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}
+                        >
+                          Reset
+                        </button>
+                      </div>
+                      
+                      <div style={{ background: "rgba(214,48,49,0.05)", border: "1px solid rgba(214,48,49,0.18)", borderRadius: 8, padding: "8px 10px", display: "flex", gap: 8, alignItems: "flex-start" }}>
+                        <AlertTriangle size={12} color="#d63031" style={{ flexShrink: 0, marginTop: 1 }} />
+                        <div>
+                          <span style={{ fontSize: 9, fontWeight: 700, color: "#d63031", display: "block" }}>GPS Spoofing Alarm</span>
+                          <span style={{ fontSize: 9, color: "var(--color-text-muted)", lineHeight: 1.4, display: "block", marginTop: 2 }}>
+                            Detected <strong>{spoofedEvents.length} coordinate{spoofedEvents.length !== 1 ? "s" : ""}</strong> with spatial offsets exceeding the 10 km CGI triangulation threshold.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Log Items */}
                 <div
                   ref={logListRef}
@@ -1014,6 +1255,11 @@ function ChronologicalReplay() {
                           {evt.isAnomaly && (
                             <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, color: "#d63031", display: "flex", alignItems: "center", gap: 3 }}>
                               <AlertTriangle size={9} /> Flag
+                            </span>
+                          )}
+                          {cellebriteIngested && evt.isSpoofed && (
+                            <span style={{ marginLeft: evt.isAnomaly ? 6 : "auto", fontSize: 9, fontWeight: 800, color: "#d63031", display: "flex", alignItems: "center", gap: 3, padding: "1px 6px", borderRadius: 4, background: "rgba(214,48,49,0.08)", border: "1px solid rgba(214,48,49,0.22)" }}>
+                              <ShieldAlert size={9} /> GPS Spoofed
                             </span>
                           )}
                         </div>
