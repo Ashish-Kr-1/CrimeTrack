@@ -3,100 +3,269 @@ import { useNavigate } from "react-router-dom";
 import { CDRContext } from "../context/CDRContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ShieldAlert,
-  FileText,
-  Smartphone,
-  MessageSquare,
-  Octagon,
-  ChevronRight,
-  Zap,
-  MapPin,
-  TrendingUp,
-  Sparkles,
-  Lock,
-  Activity,
-  Phone,
-  Radio,
-  ExternalLink,
-  PlusCircle,
-  Terminal,
-  AlertTriangle
+  ShieldAlert, FileText, Smartphone, MessageSquare, ChevronRight,
+  Zap, Sparkles, Lock, Activity, Phone, AlertTriangle,
+  TrendingUp, Info, CheckCircle2, XCircle, Clock, Users,
+  CreditCard, MapPin, Wifi, BarChart2,
 } from "lucide-react";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
+} from "recharts";
 
-const highlightNarrativeText = (text) => {
-  if (!text) return "";
-  const regex = /(Target SIM \d+|\d{10}|\d+\.\d+%|\b\d+ distinct\b|Bihar\/Jharkhand|\b\d+ unique\b|\b\d+ active\b|IMEI \d+|\b\d+ separate\b|\b\d+ bank accounts\b|device swap rate|Coordinated hardware transitions|critical telemetry alert|high-security investigations|Social footprint analysis|Geospatial logs)/gi;
-  const parts = text.split(regex);
-  return parts.map((part, i) => {
-    if (!part) return null;
-    const lower = part.toLowerCase();
-    if (part.match(/^Target SIM \d+$/i) || part.match(/^\d{10}$/) || part.match(/^IMEI \d+$/i)) {
-      return <span key={i} className="text-gold font-mono font-bold">{part}</span>;
-    }
-    if (part.match(/^\d+\.\d+%$/)) {
-      return <span key={i} className="text-accent font-bold font-mono">{part}</span>;
-    }
-    if (part.match(/Bihar\/Jharkhand/i)) {
-      return <span key={i} className="text-danger font-semibold">{part}</span>;
-    }
-    if (part.match(/(\b\d+ distinct\b|\b\d+ separate\b|\b\d+ bank accounts\b|\b\d+ unique\b|\b\d+ active\b)/i)) {
-      return <span key={i} className="text-accent font-bold">{part}</span>;
-    }
-    if (lower.match(/device swap rate|coordinated hardware transitions|critical telemetry alert|high-security investigations|social footprint analysis|geospatial logs/)) {
-      return <strong key={i} style={{ color: "var(--color-text)" }}>{part}</strong>;
-    }
-    return part;
-  });
+/* ─── Plain-English translation maps ─────────────────────────────────────── */
+const RULE_LABELS = {
+  HIGH_SMS_RATIO:               { title: "Mostly Text Messages, Almost No Calls", icon: MessageSquare, color: "#d63031" },
+  MULTI_BANK_AGGREGATION:       { title: "Connected to Too Many Banks on One Phone", icon: CreditCard, color: "#d63031" },
+  UPI_BIND_BURST:               { title: "Bulk Payment App Setup Detected", icon: Zap, color: "#d63031" },
+  RAPID_DEVICE_SWAPPING:        { title: "Frequently Changing Phones", icon: Smartphone, color: "#6c5ce7" },
+  VOICE_CESSATION:              { title: "Stopped Making Calls Completely", icon: Phone, color: "#6c5ce7" },
+  NO_PERSONAL_SOCIAL_FOOTPRINT: { title: "Barely Any Personal Contacts", icon: Users, color: "#e17055" },
+  HIGH_RISK_GEOGRAPHIC_CIRCLE:  { title: "Active in Known Fraud Hotspot Area", icon: MapPin, color: "#e17055" },
+  HIGH_BANK_SENDER_RATIO:       { title: "Almost All Contacts Are Banks / Payment Apps", icon: CreditCard, color: "#e17055" },
 };
 
-const stagger = {
-  animate: { transition: { staggerChildren: 0.05 } },
-};
-const fadeUp = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+const CLASS_PLAIN = {
+  HIGHLY_SUSPECT_FINANCIAL_MULE: {
+    headline: "Very likely a financial fraud mule",
+    sub: "This phone is being used as a tool to launder money through multiple banks and payment apps.",
+    color: "#d63031",
+    bg: "rgba(214,48,49,0.07)",
+    border: "rgba(214,48,49,0.25)",
+    icon: XCircle,
+  },
+  SUSPECT_OPERATIONAL_SIM: {
+    headline: "Suspicious activity detected",
+    sub: "This phone shows multiple signs of being used for organised fraud operations.",
+    color: "#e17055",
+    bg: "rgba(225,112,85,0.07)",
+    border: "rgba(225,112,85,0.25)",
+    icon: AlertTriangle,
+  },
+  ANOMALOUS_USAGE_PATTERN: {
+    headline: "Unusual behaviour — needs monitoring",
+    sub: "Some red flags detected. This phone doesn't behave like a normal user's phone.",
+    color: "#fdcb6e",
+    bg: "rgba(253,203,110,0.1)",
+    border: "rgba(253,203,110,0.35)",
+    icon: Info,
+  },
+  NORMAL_USER: {
+    headline: "No major threats found",
+    sub: "This phone appears to be used normally. Keep monitoring.",
+    color: "#00b894",
+    bg: "rgba(0,184,148,0.07)",
+    border: "rgba(0,184,148,0.25)",
+    icon: CheckCircle2,
+  },
 };
 
+const EVT_LABELS = { VOICE: "Phone Calls", SMS: "Text Messages", UPI_REG: "Payment App Setup", FINANCIAL: "Bank Alerts" };
+const EVT_COLORS = { VOICE: "#6c5ce7", SMS: "#0984e3", UPI_REG: "#d63031", FINANCIAL: "#e17055" };
+
+/* ─── Custom Tooltip for bar chart ──────────────────────────────────────── */
+const DayTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{ background: "rgba(255,255,255,0.97)", border: "1px solid rgba(0,0,0,0.09)", borderRadius: 10, padding: "10px 14px", boxShadow: "0 6px 20px rgba(0,0,0,0.1)", fontFamily: "var(--font-sans)" }}>
+      <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: "var(--color-text-subtle)", marginBottom: 4 }}>{label}</p>
+      <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#6c5ce7" }}>{payload[0].value} events</p>
+    </div>
+  );
+};
+
+const PieTooltip = ({ active, payload }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{ background: "rgba(255,255,255,0.97)", border: "1px solid rgba(0,0,0,0.09)", borderRadius: 10, padding: "10px 14px", boxShadow: "0 6px 20px rgba(0,0,0,0.1)" }}>
+      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "var(--color-text)" }}>{payload[0].name}</p>
+      <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: payload[0].payload.fill }}>{payload[0].value} events ({payload[0].payload.pct}%)</p>
+    </div>
+  );
+};
+
+/* ─── Activity Heatmap Calendar ──────────────────────────────────────────── */
+function ActivityCalendar({ events }) {
+  const [hovered, setHovered] = useState(null);
+
+  const { weeks, maxCount, months } = useMemo(() => {
+    if (!events.length) return { weeks: [], maxCount: 1, months: [] };
+    const dayMap = {};
+    events.forEach(e => {
+      const d = e.timestamp;
+      if (!d) return;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      dayMap[key] = (dayMap[key] || 0) + 1;
+    });
+
+    const keys = Object.keys(dayMap).sort();
+    if (!keys.length) return { weeks: [], maxCount: 1, months: [] };
+    const start = new Date(keys[0]);
+    const end = new Date(keys[keys.length - 1]);
+    start.setDate(start.getDate() - start.getDay()); // align to Sunday
+
+    const all = [];
+    const cur = new Date(start);
+    while (cur <= end) {
+      const key = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,"0")}-${String(cur.getDate()).padStart(2,"0")}`;
+      all.push({ date: new Date(cur), key, count: dayMap[key] || 0 });
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    const ws = [];
+    for (let i = 0; i < all.length; i += 7) ws.push(all.slice(i, i + 7));
+    const mx = Math.max(...Object.values(dayMap), 1);
+
+    // Month labels
+    const seen = new Set();
+    const mths = [];
+    ws.forEach((w, wi) => {
+      const m = w[0]?.date.toLocaleString("default", { month: "short" });
+      if (m && !seen.has(m)) { seen.add(m); mths.push({ label: m, col: wi }); }
+    });
+
+    return { weeks: ws, maxCount: mx, months: mths };
+  }, [events]);
+
+  const color = (count) => {
+    if (!count) return "rgba(0,0,0,0.05)";
+    const ratio = count / maxCount;
+    if (ratio > 0.75) return "#d63031";
+    if (ratio > 0.50) return "#e17055";
+    if (ratio > 0.25) return "#fdcb6e";
+    return "#a29bfe";
+  };
+
+  if (!weeks.length) return null;
+
+  return (
+    <div style={{ overflowX: "auto" }}>
+      {/* Month row */}
+      <div style={{ display: "flex", marginBottom: 4, paddingLeft: 20 }}>
+        {months.map(m => (
+          <div key={m.label} style={{ position: "relative", minWidth: 0 }}>
+            <span style={{ position: "absolute", left: m.col * 14, fontSize: 9, fontWeight: 700, color: "var(--color-text-subtle)", textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
+              {m.label}
+            </span>
+          </div>
+        ))}
+      </div>
+      {/* Day labels + grid */}
+      <div style={{ display: "flex", gap: 4, alignItems: "flex-start" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 2, paddingTop: 2 }}>
+          {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d => (
+            <span key={d} style={{ fontSize: 8, color: "var(--color-text-subtle)", height: 12, lineHeight: "12px", width: 18, textAlign: "right" }}>{d}</span>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 2 }}>
+          {weeks.map((week, wi) => (
+            <div key={wi} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {week.map((day, di) => (
+                <div
+                  key={di}
+                  onMouseEnter={() => setHovered(day)}
+                  onMouseLeave={() => setHovered(null)}
+                  title={day.count ? `${day.date.toDateString()}: ${day.count} events` : day.date.toDateString()}
+                  style={{
+                    width: 12, height: 12, borderRadius: 2,
+                    background: color(day.count),
+                    cursor: day.count ? "pointer" : "default",
+                    transition: "transform 0.1s ease",
+                    transform: hovered?.key === day.key ? "scale(1.5)" : "scale(1)",
+                    position: "relative",
+                  }}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Legend */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, justifyContent: "flex-end" }}>
+        <span style={{ fontSize: 9, color: "var(--color-text-subtle)" }}>Less</span>
+        {["rgba(0,0,0,0.05)", "#a29bfe", "#fdcb6e", "#e17055", "#d63031"].map((c, i) => (
+          <div key={i} style={{ width: 12, height: 12, borderRadius: 2, background: c }} />
+        ))}
+        <span style={{ fontSize: 9, color: "var(--color-text-subtle)" }}>More</span>
+      </div>
+      {hovered && hovered.count > 0 && (
+        <div style={{ marginTop: 6, fontSize: 11, color: "var(--color-text-muted)", textAlign: "center" }}>
+          <strong style={{ color: "var(--color-text)" }}>{hovered.date.toDateString()}</strong> — {hovered.count} events recorded
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Stagger animation ──────────────────────────────────────────────────── */
+const stagger = { animate: { transition: { staggerChildren: 0.06 } } };
+const fadeUp  = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0, transition: { duration: 0.32 } } };
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════════════════════ */
 function Dashboard() {
   const { cdrData, diagnosticReport } = useContext(CDRContext);
   const navigate = useNavigate();
   const records = cdrData.slice(1);
 
-  const [leftTab, setLeftTab] = useState("narrative");
+  const [activeTab, setActiveTab] = useState("narrative");
 
+  /* ── Narrative prose blocks ── */
   const narrativeBlocks = useMemo(() => {
     if (!diagnosticReport?.behavioral_narrative) return [];
     return diagnosticReport.behavioral_narrative
-      .split(/\.\s+/)
-      .filter(Boolean)
-      .map((s) => s.trim() + (s.endsWith(".") ? "" : "."));
+      .split(/\.\s+/).filter(Boolean)
+      .map(s => s.trim() + (s.endsWith(".") ? "" : "."));
   }, [diagnosticReport?.behavioral_narrative]);
 
-  /* ── Empty State ── */
+  /* ── Daily activity for bar chart ── */
+  const dailyActivity = useMemo(() => {
+    if (!diagnosticReport?.replay_events?.length) return [];
+    const map = {};
+    diagnosticReport.replay_events.forEach(e => {
+      if (!e.timestamp) return;
+      const d = e.timestamp;
+      const key = `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}`;
+      map[key] = (map[key] || 0) + 1;
+    });
+    return Object.entries(map).map(([date, count]) => ({ date, count }));
+  }, [diagnosticReport]);
+
+  /* ── Event type breakdown for donut ── */
+  const eventTypeData = useMemo(() => {
+    if (!diagnosticReport?.replay_events?.length) return [];
+    const map = {};
+    diagnosticReport.replay_events.forEach(e => {
+      const t = e.type || "SMS";
+      map[t] = (map[t] || 0) + 1;
+    });
+    const total = diagnosticReport.replay_events.length;
+    return Object.entries(map).map(([type, count]) => ({
+      name: EVT_LABELS[type] || type,
+      value: count,
+      pct: ((count / total) * 100).toFixed(0),
+      fill: EVT_COLORS[type] || "#95a5a6",
+    }));
+  }, [diagnosticReport]);
+
+  /* ── Empty state ── */
   if (!diagnosticReport || records.length === 0) {
     return (
       <div style={{ maxWidth: 860, margin: "0 auto", paddingTop: 40 }}>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="glass-card empty-state"
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+          className="glass-card empty-state">
           <div className="empty-state-icon">
             <ShieldAlert size={32} color="var(--color-accent)" strokeWidth={1.8} />
           </div>
-          <div className="empty-state-title">Forensic Intelligence Engine Offline</div>
+          <div className="empty-state-title">No suspect file loaded yet</div>
           <p className="empty-state-body">
-            No active suspect datasets loaded. Upload a standard Call Detail Record (CDR)
-            file in the Ingestion Center to generate behavioral narrative profiles,
-            explainable threat matrices, and link diagrams.
+            Upload a Call Detail Record (CDR) file from your telecom operator to start analysing
+            a suspect's phone activity, risk score, and connections.
           </p>
-          <button
-            id="goto-upload"
-            onClick={() => navigate("/upload")}
-            className="btn btn-primary"
-            style={{ marginTop: 8, padding: "12px 28px", fontSize: 14 }}
-          >
-            Go to Upload Center
+          <button onClick={() => navigate("/upload")} className="btn btn-primary"
+            style={{ marginTop: 8, padding: "12px 28px", fontSize: 14 }}>
+            Upload a CDR File
             <ChevronRight size={16} />
           </button>
         </motion.div>
@@ -104,521 +273,411 @@ function Dashboard() {
     );
   }
 
-  const isMule = diagnosticReport.classification === "HIGHLY_SUSPECT_FINANCIAL_MULE";
-  const statusColor = isMule ? "#d63031" : "#6c5ce7";
-  const statusGlow = isMule ? "rgba(214, 48, 49, 0.10)" : "rgba(108, 92, 231, 0.10)";
+  const cls = diagnosticReport.classification;
+  const plain = CLASS_PLAIN[cls] || CLASS_PLAIN.NORMAL_USER;
+  const PlainIcon = plain.icon;
+  const isMule = cls === "HIGHLY_SUSPECT_FINANCIAL_MULE";
+  const scoreColor = isMule ? "#d63031" : "#6c5ce7";
 
   return (
-    <motion.div
-      className="page-container theme-dashboard"
-      variants={stagger}
-      initial="initial"
-      animate="animate"
-    >
-      {/* ════════════════════════════════════════════════════════════
-          SECTION 1: PAGE HEADER
-          ════════════════════════════════════════════════════════════ */}
-      <motion.div
-        variants={fadeUp}
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-          marginBottom: 24,
-        }}
-      >
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-            <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", color: "var(--color-text)", lineHeight: 1.2, margin: 0 }}>
-              Investigative Workspace
-            </h1>
-            <span
-              style={{
-                padding: "3px 10px",
-                borderRadius: 999,
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                background: statusGlow,
-                color: statusColor,
-                border: `1px solid ${statusColor}40`,
-                flexShrink: 0,
-              }}
-            >
-              Target Active
-            </span>
-          </div>
-          <p style={{ fontSize: 12, color: "var(--color-text-muted)", margin: 0, marginTop: 2 }}>
-            Telecom telemetry dossier on target ID:{" "}
-            <strong style={{ color: "var(--color-text)", fontFamily: "var(--font-mono)", fontSize: 13 }}>{diagnosticReport.target_phone}</strong>
-          </p>
-        </div>
+    <motion.div className="page-container theme-dashboard" variants={stagger} initial="initial" animate="animate">
 
-        {/* Verdict chip */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 18,
-            padding: "16px 24px",
-            borderRadius: 12,
-            border: `1px solid rgba(108, 92, 231, 0.15)`,
-            background: `linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.8))`,
-            boxShadow: `0 4px 20px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,1)`,
-            backdropFilter: "blur(20px)",
-          }}
-        >
-          <div style={{ textAlign: "right" }}>
-            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 4 }}>
-              AI Classification
+      {/* ══════════════════════════════════════════════════════
+          SECTION 1 — PLAIN ENGLISH VERDICT BANNER
+      ══════════════════════════════════════════════════════ */}
+      <motion.div variants={fadeUp} style={{
+        borderRadius: 16, padding: "20px 24px", marginBottom: 24,
+        background: plain.bg, border: `1.5px solid ${plain.border}`,
+        display: "flex", alignItems: "flex-start", gap: 16,
+      }}>
+        <div style={{
+          width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+          background: `${plain.color}15`, border: `1px solid ${plain.color}30`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <PlainIcon size={22} color={plain.color} strokeWidth={2} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
+            <span style={{ fontSize: 17, fontWeight: 800, color: plain.color, letterSpacing: "-0.02em" }}>
+              {plain.headline}
             </span>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--color-text)", lineHeight: 1 }}>
-              {diagnosticReport.classification.replace(/_/g, " ")}
+            <span style={{
+              padding: "3px 10px", borderRadius: 99, fontSize: 9, fontWeight: 800,
+              letterSpacing: "0.1em", textTransform: "uppercase",
+              background: `${plain.color}18`, color: plain.color, border: `1px solid ${plain.color}35`,
+            }}>
+              Risk Score: {(diagnosticReport.suspicion_score * 100).toFixed(0)}%
             </span>
           </div>
-          <div style={{ width: 1, height: 36, background: "var(--color-border-subtle)" }} />
-          <div style={{ textAlign: "center" }}>
-            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 4 }}>
-              Risk Score
+          <p style={{ margin: 0, fontSize: 13, color: "var(--color-text-muted)", lineHeight: 1.6 }}>
+            {plain.sub}
+          </p>
+          {/* Quick plain-English bullets */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
+            {diagnosticReport.feature_vector.bank_sender_count >= 2 && (
+              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-muted)", background: "rgba(0,0,0,0.05)", borderRadius: 8, padding: "4px 10px" }}>
+                Connected to {diagnosticReport.feature_vector.bank_sender_count} banks
+              </span>
+            )}
+            {diagnosticReport.feature_vector.unique_imei_count >= 2 && (
+              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-muted)", background: "rgba(0,0,0,0.05)", borderRadius: 8, padding: "4px 10px" }}>
+                Changed phones {diagnosticReport.feature_vector.unique_imei_count} times
+              </span>
+            )}
+            {diagnosticReport.feature_vector.sms_ratio_pct > 80 && (
+              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-muted)", background: "rgba(0,0,0,0.05)", borderRadius: 8, padding: "4px 10px" }}>
+                {diagnosticReport.feature_vector.sms_ratio_pct}% text-only activity
+              </span>
+            )}
+            {diagnosticReport.feature_vector.upi_burst_sms_count > 0 && (
+              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-muted)", background: "rgba(0,0,0,0.05)", borderRadius: 8, padding: "4px 10px" }}>
+                {diagnosticReport.feature_vector.upi_burst_sms_count} payment apps set up in bulk
+              </span>
+            )}
+            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-muted)", background: "rgba(0,0,0,0.05)", borderRadius: 8, padding: "4px 10px" }}>
+              {diagnosticReport.feature_vector.active_days} days of activity
             </span>
-            <span style={{ fontSize: 24, fontWeight: 900, fontFamily: "var(--font-mono)", color: statusColor, letterSpacing: "-0.04em", lineHeight: 1 }}>
+          </div>
+        </div>
+        <div style={{ flexShrink: 0, textAlign: "center" }}>
+          <svg width={80} height={80} viewBox="0 0 80 80">
+            <circle cx={40} cy={40} r={32} fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth={7} />
+            <circle cx={40} cy={40} r={32} fill="none" stroke={plain.color} strokeWidth={7}
+              strokeLinecap="round"
+              strokeDasharray={`${diagnosticReport.suspicion_score * 201} 201`}
+              strokeDashoffset={50}
+              style={{ transition: "stroke-dasharray 1s ease" }}
+            />
+            <text x={40} y={44} textAnchor="middle" fontSize={17} fontWeight={800}
+              fontFamily="var(--font-mono)" fill={plain.color}>
               {(diagnosticReport.suspicion_score * 100).toFixed(0)}%
-            </span>
-          </div>
+            </text>
+          </svg>
+          <p style={{ margin: "4px 0 0", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)" }}>Risk</p>
         </div>
       </motion.div>
 
-      {/* ════════════════════════════════════════════════════════════
-          SECTION 2: DIAGNOSTIC PROFILE + QUICK STATS (side by side)
-          ════════════════════════════════════════════════════════════ */}
-      <motion.div
-        variants={fadeUp}
-        className="glass-card"
-        style={{ 
-          padding: 0, 
-          marginBottom: 24, 
-          overflow: "hidden",
-          background: "rgba(255, 255, 255, 0.75)", 
-          border: "1px solid rgba(255,255,255,0.8)",
-          borderTop: "3px solid #6c5ce7",
-          boxShadow: "0 8px 30px rgba(0,0,0,0.03)"
-        }}
-      >
-        {/* Card Header */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "16px 24px",
-            borderBottom: "1px solid rgba(0,0,0,0.04)",
-            background: "rgba(255,255,255,0.4)",
-          }}
-        >
+      {/* ══════════════════════════════════════════════════════
+          SECTION 2 — KPI STATS CARD
+      ══════════════════════════════════════════════════════ */}
+      <motion.div variants={fadeUp} className="glass-card" style={{
+        padding: 0, marginBottom: 24, overflow: "hidden",
+        borderTop: `3px solid ${scoreColor}`,
+      }}>
+        <div style={{ padding: "14px 24px", borderBottom: "1px solid var(--color-border)", background: "rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <h2 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 8, margin: 0 }}>
-            <Sparkles size={13} color="#6c5ce7" />
-            Intelligent Diagnostic Profile
+            <Sparkles size={13} color={scoreColor} />
+            Key Statistics — What Was Found
           </h2>
           <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--color-text-subtle)" }}>
             Confidence: <strong style={{ color: "var(--color-text)" }}>{diagnosticReport.confidence_level}</strong>
           </span>
         </div>
-
-        {/* Card Body */}
-        <div style={{ padding: "28px" }}>
-          {/* Ring meter + description row */}
-          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-7 mb-8">
-            <div style={{ position: "relative", width: 84, height: 84, flexShrink: 0 }}>
-              <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }}>
-                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,0,0,0.04)" strokeWidth="8" />
-                <circle
-                  cx="50" cy="50" r="42" fill="none"
-                  stroke={statusColor}
-                  strokeWidth="8" strokeLinecap="round"
-                  strokeDasharray={`${diagnosticReport.suspicion_score * 264} 264`}
-                />
-              </svg>
-              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ fontSize: 18, fontWeight: 800, fontFamily: "var(--font-mono)", color: statusColor }}>
-                  {(diagnosticReport.suspicion_score * 100).toFixed(0)}%
-                </span>
-              </div>
-            </div>
-
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", marginBottom: 4 }}>
-                Anomaly Level Detected
-              </div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "var(--color-text)", marginBottom: 8 }}>
-                {diagnosticReport.raw_heuristic_score} pts scored
-              </div>
-              <p style={{ fontSize: 13, lineHeight: 1.65, color: "var(--color-text-muted)", margin: 0, maxWidth: "90%" }}>
-                Target triggers {diagnosticReport.triggered_indicators.length} behavioral heuristics warnings.
-                Risk classification suggests an active telemetry signature.
-              </p>
-            </div>
-          </div>
-
-          {/* Quick stats — responsive grid layout */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div style={{ padding: "24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr))", gap: 16 }}>
             {[
-              { label: "Operational Span",   value: diagnosticReport.feature_vector.active_days || "N/A",           unit: "days",     color: "var(--color-accent)", icon: Activity },
-              { label: "Hardware Fleet",     value: diagnosticReport.feature_vector.unique_imei_count || "N/A",    unit: "IMEIs",    color: "#a29bfe", icon: Smartphone },
-              { label: "Financial Accounts", value: diagnosticReport.feature_vector.bank_sender_count || "N/A",    unit: "banks",    color: "var(--color-gold)", icon: Lock },
-              { label: "UPI Aggregations",   value: diagnosticReport.feature_vector.upi_burst_sms_count || "0",   unit: "bindings", color: "var(--color-gold)", icon: Zap },
-            ].map((s, idx) => (
-              <motion.div
-                key={s.label}
-                className="stat-mini"
-                whileHover={{ scale: 1.02, translateY: -2 }}
-                style={{
-                  background: "rgba(255,255,255,0.6)",
-                  border: "1px solid rgba(255,255,255,0.9)",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
-                  backdropFilter: "blur(8px)",
-                  borderRadius: 10,
-                  padding: "16px"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                  <span className="stat-mini-label" style={{ color: "var(--color-text-subtle)" }}>{s.label}</span>
-                  <s.icon size={14} color={s.color} style={{ opacity: 0.9 }} />
-                </div>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                  <span className="stat-mini-value" style={{ color: "var(--color-text)", fontSize: 26, fontWeight: 900 }}>{s.value}</span>
-                  <span className="stat-mini-sub" style={{ fontSize: 12, color: "var(--color-text-subtle)" }}>{s.unit}</span>
-                </div>
-              </motion.div>
-            ))}
+              {
+                label: "Days Active",
+                value: diagnosticReport.feature_vector.active_days,
+                unit: "days",
+                help: "How many days this phone was in use",
+                color: "var(--color-accent)",
+                icon: Clock,
+              },
+              {
+                label: "Phones Used",
+                value: diagnosticReport.feature_vector.unique_imei_count,
+                unit: "devices",
+                help: "Number of different handsets this SIM was put into",
+                color: "#a29bfe",
+                icon: Smartphone,
+              },
+              {
+                label: "Banks Connected",
+                value: diagnosticReport.feature_vector.bank_sender_count,
+                unit: "banks",
+                help: "Number of different banks sending alerts to this SIM",
+                color: "var(--color-gold)",
+                icon: CreditCard,
+              },
+              {
+                label: "Payment Setups",
+                value: diagnosticReport.feature_vector.upi_burst_sms_count || "0",
+                unit: "UPI apps",
+                help: "Number of payment apps (GPay, PhonePe, Paytm) bulk-activated",
+                color: "var(--color-gold)",
+                icon: Zap,
+              },
+              {
+                label: "Personal Contacts",
+                value: diagnosticReport.feature_vector.personal_contact_count,
+                unit: "people",
+                help: "Number of regular personal contacts. Very low = suspicious",
+                color: "var(--color-success)",
+                icon: Users,
+              },
+              {
+                label: "Total Events",
+                value: diagnosticReport.feature_vector.total_records,
+                unit: "records",
+                help: "Total CDR records analysed",
+                color: "#74b9ff",
+                icon: BarChart2,
+              },
+            ].map((s) => {
+              const Icon = s.icon;
+              return (
+                <motion.div key={s.label} whileHover={{ scale: 1.02, y: -2 }}
+                  title={s.help}
+                  className="stat-mini"
+                  style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.9)", borderRadius: 12, padding: 16, cursor: "help" }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.09em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>{s.label}</span>
+                    <Icon size={14} color={s.color} />
+                  </div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
+                    <span style={{ fontSize: 26, fontWeight: 900, fontFamily: "var(--font-mono)", color: "var(--color-text)", letterSpacing: "-0.04em", lineHeight: 1 }}>{s.value}</span>
+                    <span style={{ fontSize: 11, color: "var(--color-text-subtle)" }}>{s.unit}</span>
+                  </div>
+                  <p style={{ margin: "6px 0 0", fontSize: 10, color: "var(--color-text-subtle)", lineHeight: 1.5 }}>{s.help}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </motion.div>
 
-      {/* ════════════════════════════════════════════════════════════
-          SECTION 3: TABBED WORKSPACE
-          ════════════════════════════════════════════════════════════ */}
-      <motion.div
-        variants={fadeUp}
-        className="glass-card"
-        style={{ overflow: "hidden" }}
-      >
-        {/* Tabs Header */}
+      {/* ══════════════════════════════════════════════════════
+          SECTION 3 — DAILY ACTIVITY + EVENT TYPE CHARTS
+      ══════════════════════════════════════════════════════ */}
+      {(dailyActivity.length > 0 || eventTypeData.length > 0) && (
+        <motion.div variants={fadeUp} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
+
+          {/* Daily Activity Bar Chart */}
+          <div className="glass-card" style={{ padding: "20px 24px" }}>
+            <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
+              <Activity size={13} color="#6c5ce7" />
+              Activity Per Day
+            </h3>
+            <p style={{ fontSize: 11, color: "var(--color-text-subtle)", marginBottom: 16, marginTop: 0 }}>
+              How many phone events happened each day — spikes show high-activity days
+            </p>
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={dailyActivity} margin={{ top: 0, right: 4, left: -20, bottom: 0 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 9, fill: "var(--color-text-subtle)", fontFamily: "var(--font-mono)" }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 9, fill: "var(--color-text-subtle)" }} axisLine={false} tickLine={false} />
+                <Tooltip content={<DayTooltip />} cursor={{ fill: "rgba(108,92,231,0.07)" }} />
+                <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                  {dailyActivity.map((entry, i) => {
+                    const max = Math.max(...dailyActivity.map(d => d.count));
+                    const ratio = entry.count / max;
+                    const fill = ratio > 0.7 ? "#d63031" : ratio > 0.4 ? "#e17055" : "#6c5ce7";
+                    return <Cell key={i} fill={fill} fillOpacity={0.85} />;
+                  })}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <p style={{ fontSize: 10, color: "var(--color-text-subtle)", margin: "8px 0 0", textAlign: "center" }}>
+              Red bars = unusually high activity days
+            </p>
+          </div>
+
+          {/* Event Type Donut */}
+          <div className="glass-card" style={{ padding: "20px 24px" }}>
+            <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
+              <MessageSquare size={13} color="#0984e3" />
+              What Type of Activity?
+            </h3>
+            <p style={{ fontSize: 11, color: "var(--color-text-subtle)", marginBottom: 8, marginTop: 0 }}>
+              Breakdown of all events by category — normal users mostly have calls
+            </p>
+            <ResponsiveContainer width="100%" height={160}>
+              <PieChart>
+                <Pie data={eventTypeData} cx="50%" cy="50%" innerRadius={42} outerRadius={68}
+                  dataKey="value" paddingAngle={3}>
+                  {eventTypeData.map((entry, i) => (
+                    <Cell key={i} fill={entry.fill} strokeWidth={0} />
+                  ))}
+                </Pie>
+                <Tooltip content={<PieTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 14px", justifyContent: "center", marginTop: 4 }}>
+              {eventTypeData.map(e => (
+                <span key={e.name} style={{ fontSize: 10, color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: 2, background: e.fill, flexShrink: 0 }} />
+                  {e.name} ({e.pct}%)
+                </span>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════
+          SECTION 4 — TABBED WORKSPACE
+      ══════════════════════════════════════════════════════ */}
+      <motion.div variants={fadeUp} className="glass-card" style={{ overflow: "hidden", marginBottom: 24 }}>
         <div className="tab-bar" style={{ margin: "12px 16px 0" }}>
           {[
-            { id: "narrative",       label: "Behavioral Narrative" },
-            { id: "heuristics",     label: "Threat Matrix" },
-            { id: "recommendations",label: "Next Actions" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setLeftTab(tab.id)}
-              className={`tab-item${leftTab === tab.id ? " active" : ""}`}
-            >
+            { id: "narrative",       label: "Full Story" },
+            { id: "heuristics",      label: "Red Flags Found" },
+            { id: "recommendations", label: "What To Do Next" },
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`tab-item${activeTab === tab.id ? " active" : ""}`}>
               {tab.label}
             </button>
           ))}
         </div>
 
-        {/* Tab Content */}
         <div style={{ padding: "28px 28px 32px" }}>
           <AnimatePresence mode="wait">
-            {/* ── Behavioral Narrative ── */}
-            {leftTab === "narrative" && (
-              <motion.div
-                key="narrative"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                style={{ display: "flex", flexDirection: "column", gap: 28 }}
-              >
-                {/* Narrative prose */}
+
+            {/* ── Full Story (Narrative) ── */}
+            {activeTab === "narrative" && (
+              <motion.div key="narrative" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                style={{ display: "flex", flexDirection: "column", gap: 28 }}>
                 <div>
-                  <h3
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 800,
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      color: "var(--color-accent)",
-                      margin: 0,
-                      marginBottom: 24,
-                    }}
-                  >
-                    Behavioral Narrative Overview
+                  <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-accent)", margin: "0 0 20px" }}>
+                    What this phone has been doing — in plain English
                   </h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                     {narrativeBlocks.map((block, idx) => (
                       <div key={idx} style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
-                        <div style={{ 
-                          width: 6, height: 6, borderRadius: "50%", 
-                          background: "var(--color-accent)", opacity: 0.6, 
-                          flexShrink: 0, transform: "translateY(-2px)" 
-                        }} />
-                        <p
-                          style={{
-                            fontSize: 13,
-                            lineHeight: 1.7,
-                            color: "var(--color-text)", // Increased contrast
-                            margin: 0,
-                          }}
-                        >
-                          {highlightNarrativeText(block)}
-                        </p>
+                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--color-accent)", opacity: 0.55, flexShrink: 0, transform: "translateY(-2px)" }} />
+                        <p style={{ fontSize: 13, lineHeight: 1.75, color: "var(--color-text)", margin: 0 }}>{block}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Operational Lifecycle Phases */}
-                <div style={{ borderTop: "1px solid var(--color-border-subtle)", paddingTop: 24 }}>
-                  <h3
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 800,
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      color: "var(--color-text-muted)",
-                      margin: 0,
-                      marginBottom: 16,
-                    }}
-                  >
-                    Operational Lifecycle Phases
-                  </h3>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 0, position: "relative", marginLeft: 8 }}>
-                    <div style={{ position: "absolute", top: 16, bottom: 16, left: -1, width: 2, background: "rgba(0,0,0,0.06)", zIndex: 0 }} />
-                    {diagnosticReport.operational_phases.map((phase, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          position: "relative",
-                          padding: "16px 20px 16px 28px",
-                          zIndex: 1,
-                        }}
-                      >
-                        <div style={{ position: "absolute", top: 22, left: -5, width: 10, height: 10, borderRadius: "50%", background: "#6c5ce7", boxShadow: "0 0 0 3px rgba(108, 92, 231, 0.2)" }} />
-                        <div style={{
-                          background: "rgba(255,255,255,0.7)",
-                          border: "1px solid rgba(255,255,255,0.9)",
-                          boxShadow: "0 4px 16px rgba(0,0,0,0.03)",
-                          borderRadius: 16,
-                          padding: "20px",
-                          backdropFilter: "blur(10px)"
-                        }}>
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                            <span style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text)" }}>{phase.phase}</span>
-                            <span
-                              style={{
-                                padding: "4px 10px",
-                                borderRadius: 8,
-                                fontSize: 10,
-                                fontWeight: 800,
-                                fontFamily: "var(--font-mono)",
-                                background: "linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(162, 155, 254, 0.1))",
-                                border: "1px solid rgba(108, 92, 231, 0.2)",
-                                color: "#6c5ce7",
-                              }}
-                            >
-                              {phase.event_count} logs
-                            </span>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              fontSize: 12,
-                              color: "var(--color-text-muted)",
-                              borderTop: "1px dashed var(--color-border-subtle)",
-                              paddingTop: 12,
-                              fontFamily: "var(--font-mono)",
-                            }}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                              <Smartphone size={14} color="var(--color-text-subtle)" />
-                              IMEI: <span style={{ color: "#6c5ce7", fontWeight: 700 }}>{phase.imei || "Unknown"}</span>
+                {/* Operational phases timeline */}
+                {diagnosticReport.operational_phases?.length > 0 && (
+                  <div style={{ borderTop: "1px solid var(--color-border-subtle)", paddingTop: 24 }}>
+                    <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", margin: "0 0 16px" }}>
+                      Timeline — How the phone was used over time
+                    </h3>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 0, position: "relative", marginLeft: 8 }}>
+                      <div style={{ position: "absolute", top: 16, bottom: 16, left: -1, width: 2, background: "rgba(0,0,0,0.06)", zIndex: 0 }} />
+                      {diagnosticReport.operational_phases.map((phase, idx) => (
+                        <div key={idx} style={{ position: "relative", padding: "16px 20px 16px 28px", zIndex: 1 }}>
+                          <div style={{ position: "absolute", top: 22, left: -5, width: 10, height: 10, borderRadius: "50%", background: "#6c5ce7", boxShadow: "0 0 0 3px rgba(108,92,231,0.2)" }} />
+                          <div style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.9)", borderRadius: 14, padding: 18, backdropFilter: "blur(10px)", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, flexWrap: "wrap", gap: 8 }}>
+                              <span style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text)" }}>{phase.phase}</span>
+                              <span style={{ padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 800, fontFamily: "var(--font-mono)", background: "rgba(108,92,231,0.08)", border: "1px solid rgba(108,92,231,0.18)", color: "#6c5ce7" }}>
+                                {phase.event_count} events
+                              </span>
                             </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--color-text-subtle)" }}>
-                              <span style={{ background: "rgba(0,0,0,0.04)", padding: "2px 6px", borderRadius: 4 }}>{phase.start}</span>
-                              <span style={{ opacity: 0.4 }}>→</span>
-                              <span style={{ background: "rgba(0,0,0,0.04)", padding: "2px 6px", borderRadius: 4 }}>{phase.end}</span>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: "var(--color-text-muted)", borderTop: "1px dashed var(--color-border-subtle)", paddingTop: 10, fontFamily: "var(--font-mono)", flexWrap: "wrap", gap: 8 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                <Smartphone size={13} color="var(--color-text-subtle)" />
+                                Phone: <span style={{ color: "#6c5ce7", fontWeight: 700 }}>{phase.imei || "Unknown"}</span>
+                              </div>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ background: "rgba(0,0,0,0.04)", padding: "2px 6px", borderRadius: 4 }}>{phase.start}</span>
+                                <span style={{ opacity: 0.4 }}>→</span>
+                                <span style={{ background: "rgba(0,0,0,0.04)", padding: "2px 6px", borderRadius: 4 }}>{phase.end}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </motion.div>
             )}
 
-            {/* ── Threat Matrix ── */}
-            {leftTab === "heuristics" && (
-              <motion.div
-                key="heuristics"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
-              >
-                <h3
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 800,
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    color: "var(--color-accent)",
-                    margin: 0,
-                    marginBottom: 4,
-                  }}
-                >
-                  Triggered Threat Heuristics
-                </h3>
+            {/* ── Red Flags Found (Threat Matrix) ── */}
+            {activeTab === "heuristics" && (
+              <motion.div key="heuristics" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ marginBottom: 8 }}>
+                  <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-accent)", margin: "0 0 4px" }}>
+                    Red Flags Detected — {diagnosticReport.triggered_indicators.length} warning{diagnosticReport.triggered_indicators.length !== 1 ? "s" : ""} triggered
+                  </h3>
+                  <p style={{ margin: 0, fontSize: 12, color: "var(--color-text-muted)" }}>
+                    Each flag below is a specific behaviour pattern that is unusual for a normal phone user.
+                  </p>
+                </div>
+
                 {diagnosticReport.triggered_indicators.map((rule, idx) => {
-                  const rColor =
-                    rule.severity === "CRITICAL"
-                      ? "#d63031"
-                      : rule.severity === "HIGH"
-                        ? "#6c5ce7"
-                        : "#95a5a6";
-                  const rBg =
-                    rule.severity === "CRITICAL"
-                      ? "rgba(214, 48, 49, 0.06)"
-                      : rule.severity === "HIGH"
-                        ? "rgba(108, 92, 231, 0.06)"
-                        : "rgba(149, 165, 166, 0.06)";
+                  const meta = RULE_LABELS[rule.code] || { title: rule.code.replace(/_/g, " "), icon: AlertTriangle, color: "#95a5a6" };
+                  const RuleIcon = meta.icon;
+                  const isCritical = rule.severity === "CRITICAL";
+                  const isHigh = rule.severity === "HIGH";
+                  const badgeColor = isCritical ? "#d63031" : isHigh ? "#6c5ce7" : "#95a5a6";
                   return (
-                    <div
-                      key={idx}
-                      style={{
-                        border: "1px solid var(--color-border)",
-                        background: "rgba(255,255,255,0.4)",
-                        borderRadius: 12,
-                        padding: "16px 20px",
-                      }}
-                    >
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 8 }}>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text)" }}>
-                          {rule.code.replace(/_/g, " ")}
-                        </span>
-                        <span
-                          style={{
-                            flexShrink: 0,
-                            padding: "3px 8px",
-                            borderRadius: 99,
-                            fontSize: 9,
-                            fontWeight: 700,
-                            fontFamily: "var(--font-mono)",
-                            background: rBg,
-                            color: rColor,
-                            border: `1px solid ${rColor}30`,
-                          }}
-                        >
-                          +{rule.points} pts | {rule.severity}
-                        </span>
+                    <motion.div key={idx} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }}
+                      style={{ border: `1px solid ${badgeColor}20`, borderLeft: `4px solid ${badgeColor}`, background: "rgba(255,255,255,0.5)", borderRadius: 12, padding: "16px 20px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 8, flexWrap: "wrap" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 8, background: `${badgeColor}10`, border: `1px solid ${badgeColor}20`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <RuleIcon size={15} color={badgeColor} strokeWidth={2.2} />
+                          </div>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)" }}>{meta.title}</span>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ padding: "3px 9px", borderRadius: 99, fontSize: 9, fontWeight: 800, fontFamily: "var(--font-mono)", background: `${badgeColor}10`, color: badgeColor, border: `1px solid ${badgeColor}30`, textTransform: "uppercase" }}>
+                            {isCritical ? "Critical" : isHigh ? "High" : "Medium"} · +{rule.points} pts
+                          </span>
+                        </div>
                       </div>
-                      <p style={{ fontSize: 11.5, lineHeight: 1.65, color: "var(--color-text-muted)", margin: 0 }}>
+                      <p style={{ fontSize: 12, lineHeight: 1.65, color: "var(--color-text-muted)", margin: 0 }}>
                         {rule.detail}
                       </p>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </motion.div>
             )}
 
-            {/* ── Recommendations ── */}
-            {leftTab === "recommendations" && (
-              <motion.div
-                key="recommendations"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
-              >
-                <h3
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 800,
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    color: "var(--color-accent)",
-                    margin: 0,
-                    marginBottom: 4,
-                  }}
-                >
-                  Actionable Next Investigation Steps
-                </h3>
-                {diagnosticReport.automated_recommendations.map((rec) => {
-                  const isCritical = rec.urgency === "CRITICAL";
-                  const isHigh = rec.urgency === "HIGH";
-                  const badgeColor = isCritical ? "#ff6b4a" : isHigh ? "#00e5ff" : "#88aeb7";
-                  const badgeBg = isCritical
-                    ? "rgba(255, 107, 74, 0.06)"
-                    : isHigh
-                      ? "rgba(0, 229, 255, 0.06)"
-                      : "rgba(136, 174, 183, 0.06)";
+            {/* ── What To Do Next (Recommendations) ── */}
+            {activeTab === "recommendations" && (
+              <motion.div key="recommendations" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ marginBottom: 4 }}>
+                  <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-accent)", margin: "0 0 4px" }}>
+                    Recommended Next Steps
+                  </h3>
+                  <p style={{ margin: 0, fontSize: 12, color: "var(--color-text-muted)" }}>
+                    Actions your investigation team should take, ordered by urgency.
+                  </p>
+                </div>
+
+                {diagnosticReport.automated_recommendations.map((rec, i) => {
+                  const isCrit = rec.urgency === "CRITICAL";
+                  const isHi   = rec.urgency === "HIGH";
+                  const c = isCrit ? "#d63031" : isHi ? "#6c5ce7" : "#95a5a6";
+                  const urgLabel = isCrit ? "Do this immediately" : isHi ? "Do this soon" : "When possible";
                   return (
-                    <div
-                      key={rec.id}
-                      style={{
-                        border: "1px solid var(--color-border)",
-                        borderLeft: `4px solid ${badgeColor}`,
-                        background: "rgba(255,255,255,0.45)",
-                        borderRadius: 12,
-                        padding: "16px 20px 16px 22px",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 12,
-                      }}
-                    >
+                    <motion.div key={rec.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                      style={{ border: `1px solid ${c}20`, borderLeft: `4px solid ${c}`, background: "rgba(255,255,255,0.5)", borderRadius: 12, padding: "16px 20px 16px 22px", display: "flex", flexDirection: "column", gap: 10 }}>
                       <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 8 }}>
-                          <h4 style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text)", margin: 0 }}>{rec.title}</h4>
-                          <span
-                            style={{
-                              flexShrink: 0,
-                              padding: "3px 8px",
-                              borderRadius: 6,
-                              fontSize: 8.5,
-                              fontWeight: 700,
-                              fontFamily: "var(--font-mono)",
-                              background: badgeBg,
-                              color: badgeColor,
-                              border: `1px solid ${badgeColor}30`,
-                            }}
-                          >
-                            {rec.urgency}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 6, flexWrap: "wrap" }}>
+                          <h4 style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)", margin: 0 }}>{rec.title}</h4>
+                          <span style={{ padding: "3px 9px", borderRadius: 8, fontSize: 9, fontWeight: 800, textTransform: "uppercase", background: `${c}10`, color: c, border: `1px solid ${c}25`, flexShrink: 0 }}>
+                            {urgLabel}
                           </span>
                         </div>
-                        <p style={{ fontSize: 11, lineHeight: 1.65, color: "var(--color-text-muted)", margin: 0 }}>
-                          {rec.description}
-                        </p>
+                        <p style={{ fontSize: 12, lineHeight: 1.65, color: "var(--color-text-muted)", margin: 0 }}>{rec.description}</p>
                       </div>
-
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid var(--color-border-subtle)", paddingTop: 10 }}>
                         <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--color-text-subtle)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                          Category: {rec.category}
+                          {rec.category}
                         </span>
                         <button
-                          onClick={() => alert(`Initiating Protocol: ${rec.action}`)}
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            borderRadius: 6,
-                            padding: "5px 12px",
-                            color: "white",
-                            backgroundColor: badgeColor,
-                            border: "none",
-                            cursor: "pointer",
-                            transition: "all 0.15s ease",
-                          }}
-                        >
+                          onClick={() => alert(`Initiating: ${rec.action}`)}
+                          style={{ fontSize: 11, fontWeight: 700, borderRadius: 8, padding: "6px 14px", color: "white", backgroundColor: c, border: "none", cursor: "pointer", transition: "all 0.15s ease", display: "flex", alignItems: "center", gap: 6 }}>
                           {rec.action}
+                          <ChevronRight size={12} />
                         </button>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </motion.div>
@@ -626,6 +685,23 @@ function Dashboard() {
           </AnimatePresence>
         </div>
       </motion.div>
+
+      {/* ══════════════════════════════════════════════════════
+          SECTION 5 — ACTIVITY CALENDAR HEATMAP
+      ══════════════════════════════════════════════════════ */}
+      {diagnosticReport?.replay_events?.length > 0 && (
+        <motion.div variants={fadeUp} className="glass-card" style={{ padding: "20px 24px" }}>
+          <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
+            <TrendingUp size={13} color="#e17055" />
+            Activity Calendar — Daily Phone Usage Intensity
+          </h3>
+          <p style={{ fontSize: 11, color: "var(--color-text-subtle)", marginBottom: 20, marginTop: 0 }}>
+            Each square is one day. Darker red = more phone activity that day. Hover a square to see exact count.
+          </p>
+          <ActivityCalendar events={diagnosticReport.replay_events} />
+        </motion.div>
+      )}
+
     </motion.div>
   );
 }

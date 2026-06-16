@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /* ============================================================
@@ -49,7 +49,7 @@
   --color-dark-card:       #f8f4f0;
 
   /* ── Typography ── */
-  --font-sans: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-sans: "Lexend", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", Menlo, Consolas, monospace;
 
   /* ── Spacing Scale ── */
@@ -238,40 +238,36 @@
   :root { --content-padding: 32px; }
 }
 
-html {
-  font-size: 16px;
-  -webkit-text-size-adjust: 100%;
+@layer base {
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html, body, #root {
+    width: 100%;
+    height: 100%;
+    background-color: #decbb7;
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.14) transparent;
+  }
+
+  /* ── Typography Scale ── */
+  h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.2; color: var(--color-text); }
+  h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.3; color: var(--color-text); }
+  h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+  h4 { font-size: 14px; font-weight: 600; letter-spacing: -0.015em; }
+  p  { line-height: 1.7; }
 }
-
-html, body, #root {
-  width: 100%;
-  height: 100%;
-  background-color: #decbb7;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  overflow: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.01em;
-}
-
-/* ── Custom Scrollbar (light) ── */
-::-webkit-scrollbar        { width: 6px; height: 6px; }
-::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: rgba(0, 0, 0, 0.14); border-radius: 6px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.26); }
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.14) transparent;
-}
-
-/* ── Typography Scale ── */
-h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.2; color: var(--color-text); }
-h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.3; color: var(--color-text); }
-h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
-h4 { font-size: 14px; font-weight: 600; letter-spacing: -0.015em; }
-p  { line-height: 1.7; }
 
 /* ── Glass Card — Premium Light ── */
 .glass-card {

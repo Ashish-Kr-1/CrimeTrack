@@ -1,7 +1,7 @@
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Cases from "./pages/Cases";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import GeoIntelligence from "./pages/GeoIntelligence";
 import Dashboard from "./pages/Dashboard";
 import UploadCenter from "./pages/UploadCenter";
@@ -9,8 +9,11 @@ import RiskCenter from "./pages/RiskCenter";
 import Mobility from "./pages/Mobility";
 import NetworkAnalysis from "./pages/NetworkAnalysis";
 import ChronologicalReplay from "./pages/ChronologicalReplay";
+import LoginPage from "./pages/LoginPage";
+import AdminDashboard from "./pages/AdminDashboard";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
+import { AuthContext } from "./context/AuthContext";
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -21,7 +24,39 @@ const pageVariants = {
 function App() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, addAuditLog } = useContext(AuthContext);
 
+  // Auto-log page navigation events for the security audit trail
+  useEffect(() => {
+    if (user) {
+      const pageName = location.pathname === "/" 
+        ? "Dashboard" 
+        : location.pathname.slice(1).toUpperCase();
+      addAuditLog("PAGE_VIEW", `Opened workspace view: ${pageName}`);
+    }
+  }, [location.pathname, user]);
+
+  // Case 1: Unauthenticated -> Force Login page
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
+
+  // Case 2: Authenticated as Admin -> Render Admin Dashboard exclusively
+  if (user.role === "admin") {
+    return (
+      <Routes>
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="*" element={<Navigate to="/admin" replace />} />
+      </Routes>
+    );
+  }
+
+  // Case 3: Authenticated as Analyst -> Render standard workspace
   return (
     <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#decbb7" }}>
 
@@ -82,6 +117,7 @@ function App() {
               <Route path="/geo"    element={<GeoIntelligence />} />
               <Route path="/network" element={<NetworkAnalysis />} />
               <Route path="/replay" element={<ChronologicalReplay />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </motion.div>
         </AnimatePresence>

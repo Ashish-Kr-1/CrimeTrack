@@ -3,22 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { CDRContext } from "../context/CDRContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Play,
-  Pause,
-  RotateCcw,
-  SkipForward,
-  SkipBack,
-  MapPin,
-  Terminal,
-  AlertTriangle,
-  ShieldAlert,
-  ChevronRight,
-  Activity,
-  Zap,
-  Radio,
-  Clock,
-  Map,
+  Play, Pause, RotateCcw, SkipForward, SkipBack,
+  MapPin, Terminal, AlertTriangle, ShieldAlert, ChevronRight,
+  Activity, Zap, Radio, Clock, Map, MessageSquare, Phone,
+  CreditCard, ArrowLeft, ArrowRight as ArrowRightIcon,
 } from "lucide-react";
+
+/* ── Plain-English event types ────────────────────────────────────────────── */
+const EVT_PLAIN = {
+  SMS:       { label: "Text Message",    icon: MessageSquare, color: "#0984e3" },
+  VOICE:     { label: "Phone Call",      icon: Phone,         color: "#6c5ce7" },
+  UPI_REG:   { label: "Payment Setup",   icon: Zap,           color: "#d63031" },
+  FINANCIAL: { label: "Bank Alert",      icon: CreditCard,    color: "#e17055" },
+};
+const evtPlain = (type) => EVT_PLAIN[type] || { label: type, icon: Activity, color: "#95a5a6" };
+const DIR_PLAIN = { "MO": "Outgoing", "MT": "Incoming", "MOC": "Outgoing Call", "MTC": "Incoming Call" };
 import {
   MapContainer,
   TileLayer,
@@ -56,6 +55,7 @@ function ChronologicalReplay() {
   const [showLog, setShowLog] = useState(true);
   const [viewMode, setViewMode] = useState("center");
   const [mapStyle, setMapStyle] = useState("light");
+  const [filterType, setFilterType] = useState(null); // null = show all
 
   const logListRef = useRef();
   const logItemRefs = useRef({});
@@ -68,6 +68,21 @@ function ChronologicalReplay() {
   const allCoordinates = useMemo(() => {
     return replayEvents.map((e) => e.coordinates).filter(Boolean);
   }, [replayEvents]);
+
+  /* Anomaly indices for jump buttons */
+  const anomalyIndices = useMemo(() =>
+    replayEvents.map((e, i) => e.isAnomaly ? i : -1).filter(i => i >= 0),
+    [replayEvents]
+  );
+  const jumpToAnomaly = (dir) => {
+    if (!anomalyIndices.length) return;
+    const next = dir === "next"
+      ? anomalyIndices.find(i => i > activeEventIndex) ?? anomalyIndices[0]
+      : [...anomalyIndices].reverse().find(i => i < activeEventIndex) ?? anomalyIndices[anomalyIndices.length - 1];
+    setActiveEventIndex(next);
+    setIsPlaying(false);
+    setViewMode("center");
+  };
 
   // Playback timer
   useEffect(() => {
@@ -235,7 +250,7 @@ function ChronologicalReplay() {
               border: `1px solid ${statusColor}35`,
             }}
           >
-            {diagnosticReport.classification.replace(/_/g, " ")}
+            {{ HIGHLY_SUSPECT_FINANCIAL_MULE: "Financial Fraud Mule", SUSPECT_OPERATIONAL_SIM: "Suspicious SIM", ANOMALOUS_USAGE_PATTERN: "Unusual Pattern", NORMAL_USER: "Normal User" }[diagnosticReport.classification] || diagnosticReport.classification.replace(/_/g, " ")}
           </span>
           <span
             style={{
@@ -521,6 +536,39 @@ function ChronologicalReplay() {
         </button>
       </div>
 
+      {/* ── Filter bar ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexShrink: 0, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)", marginRight: 4 }}>Show:</span>
+        {[null, "VOICE", "SMS", "UPI_REG", "FINANCIAL"].map(type => {
+          const meta = type ? evtPlain(type) : { label: "All Events", color: "#6c5ce7" };
+          const cnt  = type ? replayEvents.filter(e => e.type === type).length : replayEvents.length;
+          const active = filterType === type;
+          return (
+            <button key={type ?? "all"} onClick={() => setFilterType(type)}
+              style={{ padding: "5px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", transition: "all 0.15s ease", border: `1px solid ${active ? meta.color : "var(--color-border)"}`, background: active ? `${meta.color}12` : "rgba(255,255,255,0.5)", color: active ? meta.color : "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 5 }}>
+              {meta.label}
+              <span style={{ fontSize: 9, fontFamily: "var(--font-mono)", background: active ? `${meta.color}20` : "rgba(0,0,0,0.05)", padding: "1px 5px", borderRadius: 4 }}>{cnt}</span>
+            </button>
+          );
+        })}
+        {/* Anomaly jump buttons */}
+        {anomalyIndices.length > 0 && (
+          <>
+            <div style={{ flex: 1 }} />
+            <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#d63031", marginRight: 2 }}>Jump to anomaly:</span>
+            <button onClick={() => jumpToAnomaly("prev")} style={{ padding: "5px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", border: "1px solid rgba(214,48,49,0.3)", background: "rgba(214,48,49,0.07)", color: "#d63031", display: "flex", alignItems: "center", gap: 5 }}>
+              <ArrowLeft size={11} /> Prev
+            </button>
+            <button onClick={() => jumpToAnomaly("next")} style={{ padding: "5px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", border: "1px solid rgba(214,48,49,0.3)", background: "rgba(214,48,49,0.07)", color: "#d63031", display: "flex", alignItems: "center", gap: 5 }}>
+              Next <ArrowRightIcon size={11} />
+            </button>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#d63031", background: "rgba(214,48,49,0.1)", padding: "5px 10px", borderRadius: 8, border: "1px solid rgba(214,48,49,0.25)" }}>
+              {anomalyIndices.length} total
+            </span>
+          </>
+        )}
+      </div>
+
       {/* ── Main Content: Map + Event Log ── */}
       <div
         style={{
@@ -760,12 +808,12 @@ function ChronologicalReplay() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 16px" }}>
               {[
-                { label: "Timestamp", value: activeEvent?.timeLabel || "N/A", color: "var(--color-text)" },
-                { label: "Type", value: activeEvent?.type || "N/A", color: activeEvent?.isAnomaly ? "#d63031" : "#6c5ce7" },
-                { label: "IMEI", value: activeEvent?.imei || "N/A", color: "#6c5ce7", mono: true },
-                { label: "Roaming Circle", value: activeEvent?.roam || "N/A", color: "var(--color-text)" },
-                { label: "Cell CGI", value: activeEvent?.cgi || "N/A", color: "var(--color-gold)", mono: true },
-                { label: "Counterparty", value: activeEvent?.bParty || "N/A", color: "var(--color-text)", mono: true },
+                { label: "Date & Time", value: activeEvent?.timeLabel || "N/A", color: "var(--color-text)" },
+                { label: "Activity Type", value: evtPlain(activeEvent?.type).label, color: evtPlain(activeEvent?.type).color },
+                { label: "Direction", value: DIR_PLAIN[activeEvent?.direction] || activeEvent?.direction || "N/A", color: "var(--color-text)" },
+                { label: "Roaming Circle", value: activeEvent?.roam || "Home Circle", color: "var(--color-text)" },
+                { label: "Phone Device (IMEI)", value: activeEvent?.imei || "N/A", color: "#6c5ce7", mono: true },
+                { label: "Contact Number", value: activeEvent?.bParty || "N/A", color: "var(--color-text)", mono: true },
               ].map((item) => (
                 <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                   <span
@@ -932,10 +980,10 @@ function ChronologicalReplay() {
                   className="scrollbar-thin"
                 >
                   {replayEvents.map((evt, idx) => {
+                    if (filterType && evt.type !== filterType) return null;
                     const isActive = idx === activeEventIndex;
-                    let evtColor = "#6c5ce7";
-                    if (evt.type === "UPI_REG" || evt.type === "FINANCIAL") evtColor = "#d63031";
-                    if (evt.type === "VOICE") evtColor = "#636e72";
+                    const meta = evtPlain(evt.type);
+                    const EvtIcon = meta.icon;
 
                     return (
                       <div
@@ -947,84 +995,33 @@ function ChronologicalReplay() {
                           setViewMode("center");
                         }}
                         style={{
-                          padding: "12px 20px",
+                          padding: "11px 16px",
                           borderBottom: "1px solid var(--color-border-subtle)",
                           cursor: "pointer",
-                          background: isActive
-                            ? "rgba(108, 92, 231, 0.08)"
-                            : "transparent",
+                          background: isActive ? `${meta.color}08` : "transparent",
                           transition: "background 0.15s ease",
-                          borderLeft: isActive
-                            ? "3px solid #6c5ce7"
-                            : "3px solid transparent",
+                          borderLeft: `3px solid ${isActive ? meta.color : "transparent"}`,
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                          <span
-                            style={{
-                              fontSize: 9,
-                              fontWeight: 700,
-                              fontFamily: "var(--font-mono)",
-                              color: "var(--color-text-subtle)",
-                              minWidth: 24,
-                            }}
-                          >
+                        <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
+                          <span style={{ fontSize: 9, fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--color-text-subtle)", minWidth: 24 }}>
                             #{idx + 1}
                           </span>
-                          <span
-                            style={{
-                              fontSize: 8,
-                              fontWeight: 700,
-                              fontFamily: "sans-serif",
-                              letterSpacing: "0.06em",
-                              padding: "2px 6px",
-                              borderRadius: 4,
-                              background: `${evtColor}15`,
-                              color: evtColor,
-                              border: `1px solid ${evtColor}25`,
-                            }}
-                          >
-                            {evt.type}
-                          </span>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 9, fontWeight: 800, letterSpacing: "0.05em", padding: "2px 7px", borderRadius: 5, background: `${meta.color}12`, color: meta.color, border: `1px solid ${meta.color}22` }}>
+                            <EvtIcon size={9} strokeWidth={2.5} />
+                            {meta.label}
+                          </div>
                           {evt.isAnomaly && (
-                            <span
-                              style={{
-                                marginLeft: "auto",
-                                fontSize: 9,
-                                fontWeight: 700,
-                                color: "#d63031",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 3,
-                              }}
-                            >
-                              <AlertTriangle size={9} />
-                              FLAG
+                            <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, color: "#d63031", display: "flex", alignItems: "center", gap: 3 }}>
+                              <AlertTriangle size={9} /> Flag
                             </span>
                           )}
                         </div>
-                        <div
-                          style={{
-                            fontSize: 10,
-                            fontFamily: "var(--font-mono)",
-                            color: "var(--color-text-muted)",
-                            marginBottom: 3,
-                          }}
-                        >
+                        <div style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--color-text-muted)", marginBottom: 3 }}>
                           {evt.timeLabel}
+                          {evt.bParty && <span style={{ marginLeft: 6, color: "var(--color-text-subtle)" }}>→ {evt.bParty}</span>}
                         </div>
-                        <div
-                          style={{
-                            fontSize: 11,
-                            color: "var(--color-text)",
-                            fontWeight: isActive ? 600 : 400,
-                            lineHeight: 1.5,
-                            overflow: "hidden",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                          }}
-                        >
+                        <div style={{ fontSize: 11, color: "var(--color-text)", fontWeight: isActive ? 600 : 400, lineHeight: 1.5, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
                           {evt.details}
                         </div>
                       </div>
