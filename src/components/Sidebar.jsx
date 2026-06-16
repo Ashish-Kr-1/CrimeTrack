@@ -103,9 +103,9 @@ function Sidebar({ isOpen, onClose }) {
       style={{
         width: sidebarWidth,
         transform: `translateX(${isOpen ? "0" : "var(--sidebar-translate)"})`,
-        background: "linear-gradient(180deg, #faf8f5 0%, #f4f1eb 100%)",
-        borderRight: "1px solid rgba(0,0,0,0.07)",
-        boxShadow: "2px 0 24px rgba(0,0,0,0.06)",
+        background: "linear-gradient(180deg, #090d16 0%, #05070f 100%)",
+        borderRight: "1px solid rgba(255,255,255,0.05)",
+        boxShadow: "2px 0 24px rgba(0,0,0,0.4)",
         transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         overflow: "hidden",
         whiteSpace: "nowrap",
@@ -140,7 +140,7 @@ function Sidebar({ isOpen, onClose }) {
                 fontSize: 15,
                 fontWeight: 800,
                 letterSpacing: "-0.03em",
-                color: "#0f172a",
+                color: "#f8fafc",
                 lineHeight: 1.2,
               }}
             >
@@ -199,12 +199,12 @@ function Sidebar({ isOpen, onClose }) {
                     fontSize: 13,
                     fontWeight: isActive ? 700 : 500,
                     letterSpacing: isActive ? "-0.02em" : "-0.01em",
-                    color: isActive ? "#6c5ce7" : "#475569",
+                    color: isActive ? brand.textColor : "#cbd5e1",
                     backgroundColor: isActive
-                      ? "rgba(108, 92, 231, 0.10)"
+                      ? "rgba(255, 255, 255, 0.04)"
                       : "transparent",
-                    border: `1px solid ${isActive ? "rgba(108, 92, 231, 0.18)" : "transparent"}`,
-                    boxShadow: isActive ? "0 1px 4px rgba(108,92,231,0.10), inset 0 1px 0 rgba(255,255,255,0.6)" : "none",
+                    border: `1px solid ${isActive ? "rgba(255, 255, 255, 0.08)" : "transparent"}`,
+                    boxShadow: isActive ? "0 1px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.02)" : "none",
                     transition: "all 0.18s cubic-bezier(0.4, 0, 0.2, 1)",
                     cursor: "pointer",
                     overflow: "hidden", // Prevents the active rect from stretching
@@ -212,8 +212,8 @@ function Sidebar({ isOpen, onClose }) {
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.backgroundColor = "rgba(108, 92, 231, 0.05)";
-                      e.currentTarget.style.color = "#6c5ce7";
+                      e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.03)";
+                      e.currentTarget.style.color = brand.textColor;
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -234,8 +234,8 @@ function Sidebar({ isOpen, onClose }) {
                         height: "72%",
                         width: 3,
                         borderRadius: "0 4px 4px 0",
-                        background: "linear-gradient(180deg, #6c5ce7 0%, #a29bfe 100%)",
-                        boxShadow: "2px 0 12px rgba(108, 92, 231, 0.45)",
+                        background: brand.gradient,
+                        boxShadow: brand.shadow,
                       }}
                       transition={{ type: "spring", stiffness: 480, damping: 38 }}
                     />
@@ -257,7 +257,7 @@ function Sidebar({ isOpen, onClose }) {
                         textTransform: "uppercase",
                         padding: "2px 6px",
                         borderRadius: 99,
-                        background: "linear-gradient(135deg, #6c5ce7, #a29bfe)",
+                        background: brand.gradient,
                         color: "white",
                         flexShrink: 0,
                       }}
@@ -279,7 +279,7 @@ function Sidebar({ isOpen, onClose }) {
       {/* ── Bottom status ── */}
       <div style={{ marginTop: "auto", padding: `16px ${paddingX}px 20px`, transition: "padding 0.3s ease", overflow: "hidden" }}>
         {/* Thin divider */}
-        <div style={{ height: 1, background: "rgba(0,0,0,0.06)", marginBottom: 14 }} />
+        <div style={{ height: 1, background: "rgba(255,255,255,0.06)", marginBottom: 14 }} />
 
         <div style={{
           display: "flex",
@@ -287,8 +287,8 @@ function Sidebar({ isOpen, onClose }) {
           gap: 10,
           padding: "10px 12px",
           borderRadius: 10,
-          background: "rgba(0,184,148,0.06)",
-          border: "1px solid rgba(0,184,148,0.14)",
+          background: "rgba(34,197,94,0.04)",
+          border: "1px solid rgba(34,197,94,0.14)",
         }}>
           {/* Pulse dot */}
           <div style={{ position: "relative", width: 8, height: 8, flexShrink: 0 }}>
@@ -316,7 +316,7 @@ function Sidebar({ isOpen, onClose }) {
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                color: "#0f172a",
+                color: "#f8fafc",
                 display: "flex",
                 alignItems: "center",
                 gap: 5,

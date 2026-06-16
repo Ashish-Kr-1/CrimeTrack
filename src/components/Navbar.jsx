@@ -53,10 +53,10 @@ function Navbar({ onToggleSidebar }) {
         padding: "0 20px",
         gap: 16,
         flexShrink: 0,
-        background: "rgba(255, 255, 255, 0.82)",
+        background: "rgba(15, 23, 42, 0.65)",
         backdropFilter: "blur(28px) saturate(200%)",
         WebkitBackdropFilter: "blur(28px) saturate(200%)",
-        boxShadow: "0 2px 16px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.95), 0 0 0 1px rgba(0,0,0,0.04)",
+        boxShadow: "0 2px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 0 1px rgba(255,255,255,0.04)",
       }}
     >
       {/* ── Left: Hamburger + Search ── */}
@@ -92,10 +92,10 @@ function Navbar({ onToggleSidebar }) {
             placeholder="Search numbers, IMEIs, cells…"
             style={{
               width: "100%",
-              background: "rgba(248, 250, 252, 0.8)",
-              border: "1px solid rgba(0,0,0,0.08)",
+              background: "rgba(15, 23, 42, 0.7)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
               borderRadius: "var(--radius-md)",
-              color: "#0f172a",
+              color: "#f8fafc",
               fontFamily: "var(--font-sans)",
               fontSize: 13,
               fontWeight: 500,
@@ -103,17 +103,17 @@ function Navbar({ onToggleSidebar }) {
               padding: "9px 46px 9px 38px",
               outline: "none",
               transition: "var(--transition-base)",
-              boxShadow: "inset 0 1px 3px rgba(0,0,0,0.04)",
+              boxShadow: "inset 0 1px 3px rgba(0,0,0,0.5)",
             }}
             onFocus={(e) => {
               e.target.style.borderColor = role === "admin" ? "#e17055" : role === "officer" ? "#00b894" : "#6c5ce7";
-              e.target.style.boxShadow = `0 0 0 3px ${role === "admin" ? "rgba(225,112,85,0.13)" : role === "officer" ? "rgba(0,184,148,0.13)" : "rgba(108,92,231,0.13)"}, inset 0 1px 3px rgba(0,0,0,0.02)`;
-              e.target.style.background = "#ffffff";
+              e.target.style.boxShadow = `0 0 0 3px ${role === "admin" ? "rgba(225,112,85,0.18)" : role === "officer" ? "rgba(0,184,148,0.18)" : "rgba(108,92,231,0.18)"}, inset 0 1px 3px rgba(0,0,0,0.3)`;
+              e.target.style.background = "rgba(15, 23, 42, 0.95)";
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = "rgba(0,0,0,0.08)";
-              e.target.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.04)";
-              e.target.style.background = "rgba(248,250,252,0.8)";
+              e.target.style.borderColor = "rgba(255, 255, 255, 0.08)";
+              e.target.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.5)";
+              e.target.style.background = "rgba(15, 23, 42, 0.7)";
             }}
           />
         </div>
@@ -215,21 +215,21 @@ function Navbar({ onToggleSidebar }) {
             gap: 9,
             padding: "5px 12px 5px 5px",
             borderRadius: "var(--radius-md)",
-            border: "1px solid rgba(0,0,0,0.08)",
-            background: "rgba(255,255,255,0.7)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            background: "rgba(15, 23, 42, 0.6)",
             cursor: "pointer",
             transition: "var(--transition-base)",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.02)",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = badge.hoverBorder;
-            e.currentTarget.style.background = "rgba(255,255,255,0.92)";
-            e.currentTarget.style.boxShadow = `0 2px 8px ${role === 'admin' ? 'rgba(225, 112, 85, 0.12)' : role === 'officer' ? 'rgba(0, 184, 148, 0.12)' : 'rgba(108, 92, 231, 0.12)'}, inset 0 1px 0 rgba(255,255,255,0.9)`;
+            e.currentTarget.style.background = "rgba(15, 23, 42, 0.85)";
+            e.currentTarget.style.boxShadow = `0 2px 8px ${role === 'admin' ? 'rgba(225, 112, 85, 0.18)' : role === 'officer' ? 'rgba(0, 184, 148, 0.18)' : 'rgba(108, 92, 231, 0.18)'}, inset 0 1px 0 rgba(255,255,255,0.05)`;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "rgba(0,0,0,0.08)";
-            e.currentTarget.style.background = "rgba(255,255,255,0.7)";
-            e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)";
+            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
+            e.currentTarget.style.background = "rgba(15, 23, 42, 0.6)";
+            e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.02)";
           }}
         >
           <div
@@ -252,7 +252,7 @@ function Navbar({ onToggleSidebar }) {
             style={{
               fontSize: 13,
               fontWeight: 700,
-              color: "#0f172a",
+              color: "#f8fafc",
               letterSpacing: "-0.02em",
             }}
           >

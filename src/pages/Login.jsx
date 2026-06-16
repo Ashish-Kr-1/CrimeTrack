@@ -73,8 +73,8 @@ export default function Login() {
       style={{
         position: "relative",
         minHeight: "100vh",
-        backgroundColor: "#decbb7",
-        color: "#0f172a",
+        backgroundColor: "#020617",
+        color: "#f8fafc",
         fontFamily: "var(--font-sans)",
         display: "flex",
         alignItems: "center",
@@ -92,10 +92,10 @@ export default function Login() {
           inset: 0,
           zIndex: 0,
           background: [
-            "radial-gradient(ellipse 75% 65% at 10% 15%, rgba(108,92,231,0.1) 0%, transparent 70%)",
-            "radial-gradient(ellipse 60% 55% at 90% 80%, rgba(225,112,85,0.07) 0%, transparent 70%)",
-            "radial-gradient(ellipse 50% 50% at 55% 45%, rgba(0,184,148,0.06) 0%, transparent 70%)",
-            "radial-gradient(ellipse 40% 40% at 80% 15%, rgba(9,132,227,0.05) 0%, transparent 70%)",
+            "radial-gradient(ellipse 75% 65% at 10% 15%, rgba(34,197,94,0.08) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 55% at 90% 80%, rgba(225,112,85,0.05) 0%, transparent 70%)",
+            "radial-gradient(ellipse 50% 50% at 55% 45%, rgba(9,132,227,0.06) 0%, transparent 70%)",
+            "radial-gradient(ellipse 40% 40% at 80% 15%, rgba(34,197,94,0.03) 0%, transparent 70%)",
           ].join(", "),
         }}
       />
@@ -106,10 +106,10 @@ export default function Login() {
           position: "absolute",
           inset: 0,
           zIndex: 0,
-          opacity: 0.03,
+          opacity: 0.08,
           pointerEvents: "none",
           backgroundImage:
-            "linear-gradient(rgba(0,0,0,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.5) 1px, transparent 1px)",
+            "linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)",
           backgroundSize: "50px 50px",
         }}
       />
@@ -170,7 +170,7 @@ export default function Login() {
                 lineHeight: "0.95",
                 fontWeight: 900,
                 letterSpacing: "-3px",
-                color: "#0f172a",
+                color: "#f8fafc",
                 margin: "0 0 24px 0",
               }}
             >
@@ -181,7 +181,7 @@ export default function Login() {
               style={{
                 fontSize: "16px",
                 lineHeight: "1.7",
-                color: "#475569",
+                color: "#cbd5e1",
                 maxWidth: "460px",
                 margin: "0 0 40px 0",
                 fontWeight: "500",
@@ -274,11 +274,11 @@ export default function Login() {
             className="glass-card"
             style={{
               width: "100%",
-              background: "rgba(255, 255, 255, 0.94)",
-              border: "1px solid rgba(255, 255, 255, 0.95)",
+              background: "rgba(15, 23, 42, 0.65)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
               borderRadius: "28px",
               padding: "40px",
-              boxShadow: "0 20px 50px rgba(0, 0, 0, 0.12)",
+              boxShadow: "0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
               display: "flex",
               flexDirection: "column",
             }}
@@ -315,7 +315,7 @@ export default function Login() {
                 textAlign: "center",
                 fontSize: "32px",
                 fontWeight: "800",
-                color: "#0f172a",
+                color: "#f8fafc",
                 letterSpacing: "-1px",
                 margin: 0,
               }}
@@ -373,23 +373,23 @@ export default function Login() {
                       textTransform: "uppercase",
                       letterSpacing: "0.05em",
                       borderRadius: "12px",
-                      border: `1px solid ${isActive ? activeColor : "#cbd5e1"}`,
-                      background: isActive ? activeColor : "rgba(248, 250, 252, 0.8)",
-                      color: isActive ? "#ffffff" : "#0f172a",
+                      border: `1px solid ${isActive ? activeColor : "rgba(255, 255, 255, 0.12)"}`,
+                      background: isActive ? activeColor : "rgba(15, 23, 42, 0.6)",
+                      color: isActive ? "#ffffff" : "#cbd5e1",
                       cursor: "pointer",
                       boxShadow: isActive ? `0 4px 12px ${activeShadow}` : "none",
                       transition: "all 0.2s ease",
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.background = "#ffffff";
+                        e.currentTarget.style.background = "rgba(15, 23, 42, 0.85)";
                         e.currentTarget.style.borderColor = activeColor;
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.background = "rgba(248, 250, 252, 0.8)";
-                        e.currentTarget.style.borderColor = "#cbd5e1";
+                        e.currentTarget.style.background = "rgba(15, 23, 42, 0.6)";
+                        e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
                       }
                     }}
                   >
@@ -409,7 +409,7 @@ export default function Login() {
                     fontWeight: "700",
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
-                    color: "#64748b",
+                    color: "#cbd5e1",
                     marginBottom: "8px",
                     display: "block",
                   }}
@@ -422,24 +422,24 @@ export default function Login() {
                   placeholder="Enter username"
                   style={{
                     width: "100%",
-                    background: "#f8fafc",
-                    border: "1px solid #cbd5e1",
+                    background: "rgba(15, 23, 42, 0.7)",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
                     padding: "12px 16px",
                     fontWeight: "600",
                     fontSize: "14px",
-                    color: "#0f172a",
+                    color: "#f8fafc",
                     outline: "none",
                     transition: "all 0.2s ease",
                   }}
                   onFocus={(e) => {
-                    e.target.style.background = "#ffffff";
+                    e.target.style.background = "rgba(15, 23, 42, 0.95)";
                     e.target.style.borderColor = colors.main;
                     e.target.style.boxShadow = `0 0 0 4px ${colors.glow}`;
                   }}
                   onBlur={(e) => {
-                    e.target.style.background = "#f8fafc";
-                    e.target.style.borderColor = "#cbd5e1";
+                    e.target.style.background = "rgba(15, 23, 42, 0.7)";
+                    e.target.style.borderColor = "rgba(255, 255, 255, 0.08)";
                     e.target.style.boxShadow = "none";
                   }}
                 />
@@ -452,7 +452,7 @@ export default function Login() {
                     fontWeight: "700",
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
-                    color: "#64748b",
+                    color: "#cbd5e1",
                     marginBottom: "8px",
                     display: "block",
                   }}
@@ -466,24 +466,24 @@ export default function Login() {
                   placeholder="Enter password"
                   style={{
                     width: "100%",
-                    background: "#f8fafc",
-                    border: "1px solid #cbd5e1",
+                    background: "rgba(15, 23, 42, 0.7)",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
                     padding: "12px 16px",
                     fontWeight: "600",
                     fontSize: "14px",
-                    color: "#0f172a",
+                    color: "#f8fafc",
                     outline: "none",
                     transition: "all 0.2s ease",
                   }}
                   onFocus={(e) => {
-                    e.target.style.background = "#ffffff";
+                    e.target.style.background = "rgba(15, 23, 42, 0.95)";
                     e.target.style.borderColor = colors.main;
                     e.target.style.boxShadow = `0 0 0 4px ${colors.glow}`;
                   }}
                   onBlur={(e) => {
-                    e.target.style.background = "#f8fafc";
-                    e.target.style.borderColor = "#cbd5e1";
+                    e.target.style.background = "rgba(15, 23, 42, 0.7)";
+                    e.target.style.borderColor = "rgba(255, 255, 255, 0.08)";
                     e.target.style.boxShadow = "none";
                   }}
                 />
@@ -528,7 +528,7 @@ export default function Login() {
             <div
               style={{
                 marginTop: "32px",
-                borderTop: "1px solid rgba(226, 232, 240, 0.8)",
+                borderTop: "1px solid rgba(255, 255, 255, 0.08)",
                 paddingTop: "24px",
                 display: "flex",
                 flexDirection: "column",
@@ -553,13 +553,13 @@ export default function Login() {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  background: "rgba(241, 245, 249, 0.7)",
+                  background: "rgba(15, 23, 42, 0.5)",
                   padding: "10px 14px",
                   borderRadius: "10px",
-                  border: "1px solid rgba(226, 232, 240, 0.6)",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
                   fontSize: "12px",
                   fontWeight: "600",
-                  color: "#475569",
+                  color: "#cbd5e1",
                 }}
               >
                 <span style={{ fontWeight: "700", color: "#94a3b8", textTransform: "uppercase", fontSize: "9px" }}>Analyst</span>
@@ -571,13 +571,13 @@ export default function Login() {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  background: "rgba(241, 245, 249, 0.7)",
+                  background: "rgba(15, 23, 42, 0.5)",
                   padding: "10px 14px",
                   borderRadius: "10px",
-                  border: "1px solid rgba(226, 232, 240, 0.6)",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
                   fontSize: "12px",
                   fontWeight: "600",
-                  color: "#475569",
+                  color: "#cbd5e1",
                 }}
               >
                 <span style={{ fontWeight: "700", color: "#94a3b8", textTransform: "uppercase", fontSize: "9px" }}>Admin</span>
@@ -589,13 +589,13 @@ export default function Login() {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  background: "rgba(241, 245, 249, 0.7)",
+                  background: "rgba(15, 23, 42, 0.5)",
                   padding: "10px 14px",
                   borderRadius: "10px",
-                  border: "1px solid rgba(226, 232, 240, 0.6)",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
                   fontSize: "12px",
                   fontWeight: "600",
-                  color: "#475569",
+                  color: "#cbd5e1",
                 }}
               >
                 <span style={{ fontWeight: "700", color: "#94a3b8", textTransform: "uppercase", fontSize: "9px" }}>Officer</span>

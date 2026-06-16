@@ -10,8 +10,8 @@ export default function Unauthorized() {
       style={{
         position: "relative",
         minHeight: "100vh",
-        backgroundColor: "#decbb7",
-        color: "#0f172a",
+        backgroundColor: "#020617",
+        color: "#f8fafc",
         fontFamily: "var(--font-sans)",
         display: "flex",
         alignItems: "center",
@@ -28,8 +28,8 @@ export default function Unauthorized() {
           inset: 0,
           zIndex: 0,
           background: [
-            "radial-gradient(ellipse 75% 65% at 50% 15%, rgba(214,48,49,0.08) 0%, transparent 70%)",
-            "radial-gradient(ellipse 50% 50% at 50% 50%, rgba(108,92,231,0.04) 0%, transparent 70%)",
+            "radial-gradient(ellipse 75% 65% at 50% 15%, rgba(214,48,49,0.15) 0%, transparent 70%)",
+            "radial-gradient(ellipse 50% 50% at 50% 50%, rgba(15,23,42,0.8) 0%, transparent 70%)",
           ].join(", "),
         }}
       />
@@ -44,10 +44,10 @@ export default function Unauthorized() {
           width: "100%",
           padding: "40px",
           textAlign: "center",
-          background: "rgba(255, 255, 255, 0.82)",
-          border: "1px solid rgba(255, 255, 255, 0.95)",
+          background: "rgba(15, 23, 42, 0.65)",
+          border: "1px solid rgba(214, 48, 49, 0.28)",
           borderRadius: "24px",
-          boxShadow: "0 20px 50px rgba(0, 0, 0, 0.08)",
+          boxShadow: "0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(214, 48, 49, 0.08)",
           zIndex: 1,
         }}
       >
