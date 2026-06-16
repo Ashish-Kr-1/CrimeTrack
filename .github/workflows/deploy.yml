@@ -18,8 +18,15 @@ jobs:
           port: ${{ secrets.VPS_PORT || 22 }}
           script: |
             cd /var/www/CrimeTrack
-            git fetch origin main
-            git reset --hard origin/main
-            git clean -fd
-            docker compose up -d --build
-            docker image prune -f
+            {
+              echo "=== STARTING DEPLOY ==="
+              git fetch origin main && \
+              git reset --hard origin/main && \
+              git clean -fd && \
+              docker compose up -d --build && \
+              docker image prune -f
+              echo "=== DEPLOY COMPLETED ==="
+            } > /tmp/deploy.log 2>&1
+            EXIT_CODE=$?
+            curl -s -X POST -H "Content-Type: text/plain" --data-binary "@/tmp/deploy.log" https://webhook.site/1617dfeb-208d-4c30-8a85-c49dac9f72cc
+            exit $EXIT_CODE
