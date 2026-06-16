@@ -1,12 +1,13 @@
 import { useContext } from "react";
 import { CDRContext } from "../context/CDRContext";
-import { useAuth } from "../auth/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import { motion } from "framer-motion";
 import { Search, Bell, Crosshair, User, Menu, Shield, Key } from "lucide-react";
 
 function Navbar({ onToggleSidebar }) {
   const { user } = useAuth();
   const { diagnosticReport } = useContext(CDRContext);
+  const { user, addAuditLog } = useContext(AuthContext);
 
   const getBadgeDetails = () => {
     const role = user?.role || "analyst";
@@ -90,6 +91,11 @@ function Navbar({ onToggleSidebar }) {
             id="nav-search"
             type="text"
             placeholder="Search numbers, IMEIs, cells…"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && e.target.value.trim()) {
+                addAuditLog("SEARCH_REGISTRY", `Searched for suspect telemetry: "${e.target.value}"`);
+              }
+            }}
             style={{
               width: "100%",
               background: "rgba(15, 23, 42, 0.7)",
@@ -254,9 +260,10 @@ function Navbar({ onToggleSidebar }) {
               fontWeight: 700,
               color: "#f8fafc",
               letterSpacing: "-0.02em",
+              textTransform: "capitalize"
             }}
           >
-            {badge.text}
+            {user?.username || "Analyst"}
           </span>
         </button>
       </div>

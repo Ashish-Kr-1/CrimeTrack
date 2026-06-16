@@ -1,124 +1,929 @@
-import { useContext, useState, useEffect, useMemo } from "react";
+import { useContext, useState, useEffect, useMemo, useCallback } from "react";
 import { CDRContext } from "../context/CDRContext";
-import { motion } from "framer-motion";
-import { Radio, Globe, Clock, MapPin, Activity, ChevronRight } from "lucide-react";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Radio, Globe, Clock, MapPin, Activity, ChevronRight,
+  Zap, Thermometer, Navigation, Timer, AlertTriangle, CheckCircle, Info
+} from "lucide-react";
+import {
+  MapContainer, TileLayer, Marker, Popup, Polyline,
+  CircleMarker, useMap, useMapEvents
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+// ─── Animation Variants ──────────────────────────────────────────────────────
 const fadeUp = {
   initial: { opacity: 0, y: 14 },
   animate: { opacity: 1, y: 0, transition: { duration: 0.35 } },
 };
 
-// Map center controller helper
+const tabVariants = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.28 } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.18 } },
+};
+
+// ─── Tile URL Helper ─────────────────────────────────────────────────────────
+function getTileUrl(style) {
+  if (style === "dark")
+    return "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+  if (style === "satellite")
+    return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+  return "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+}
+
+// ─── Map Style Selector Overlay ───────────────────────────────────────────────
+function MapStyleSelector({ mapStyle, setMapStyle }) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 12,
+        right: 12,
+        zIndex: 1000,
+        background: "rgba(255,255,255,0.88)",
+        backdropFilter: "blur(12px)",
+        border: "1px solid rgba(0,0,0,0.08)",
+        borderRadius: 10,
+        padding: 3,
+        display: "flex",
+        gap: 3,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+      }}
+    >
+      {[{ id: "light", label: "Light" }, { id: "dark", label: "Dark" }, { id: "satellite", label: "Satellite" }].map((s) => (
+        <button
+          key={s.id}
+          onClick={() => setMapStyle(s.id)}
+          style={{
+            padding: "4px 10px",
+            borderRadius: 7,
+            fontSize: 10,
+            fontWeight: 700,
+            border: "none",
+            cursor: "pointer",
+            transition: "all 0.15s ease",
+            background: mapStyle === s.id ? "#00b894" : "transparent",
+            color: mapStyle === s.id ? "#fff" : "#475569",
+          }}
+        >
+          {s.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ─── Map Center Controller ────────────────────────────────────────────────────
 function MapController({ center }) {
   const map = useMap();
   useEffect(() => {
-    if (center) {
-      map.setView(center, map.getZoom(), { animate: true });
-    }
+    if (center) map.setView(center, map.getZoom(), { animate: true });
   }, [center, map]);
   return null;
 }
 
-// Custom Leaflet DivIcon creator for numbered sequence badges
-const createNumberedIcon = (number, isSelected) => {
-  return L.divIcon({
-    html: `<div class="flex items-center justify-center rounded-full text-[10px] font-mono font-bold border" 
-      style="width: 22px; height: 22px; 
-             background-color: ${isSelected ? "#ff6b4a" : "#00e5ff"}; 
-             color: #082229; 
-             border-color: ${isSelected ? "#f0f9ff" : "rgba(8, 34, 41, 0.3)"};
-             box-shadow: ${isSelected ? "0 0 10px rgba(255, 107, 74, 0.6)" : "0 2px 4px rgba(0,0,0,0.4)"};">
-      ${number}
-    </div>`,
+// ─── Tile Layer Switcher ──────────────────────────────────────────────────────
+function TileLayerSwitcher({ mapStyle }) {
+  const map = useMap();
+  useEffect(() => {}, [mapStyle, map]);
+  return (
+    <TileLayer url={getTileUrl(mapStyle)} attribution="" />
+  );
+}
+
+// ─── Numbered Icon ────────────────────────────────────────────────────────────
+const createNumberedIcon = (number, isSelected) =>
+  L.divIcon({
+    html: `<div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:9px;font-weight:700;font-family:monospace;border:2px solid ${isSelected ? "#fff" : "rgba(8,34,41,0.3)"};background:${isSelected ? "#e17055" : "#00e5ff"};color:#082229;box-shadow:${isSelected ? "0 0 10px rgba(225,112,85,0.6)" : "0 2px 4px rgba(0,0,0,0.4)"};">${number}</div>`,
     className: "",
     iconSize: [22, 22],
     iconAnchor: [11, 11],
   });
-};
 
+// ─── Helper Functions ─────────────────────────────────────────────────────────
+function parseDateTime(dateStr, timeStr) {
+  if (!dateStr || !timeStr) return null;
+  const dParts = dateStr.split("/");
+  if (dParts.length === 3) {
+    const day = parseInt(dParts[0], 10);
+    const month = parseInt(dParts[1], 10) - 1;
+    const year = parseInt(dParts[2], 10);
+    const tParts = timeStr.split(":");
+    if (tParts.length >= 2) {
+      const hours = parseInt(tParts[0], 10);
+      const minutes = parseInt(tParts[1], 10);
+      const seconds = tParts[2] ? parseInt(tParts[2], 10) : 0;
+      const d = new Date(year, month, day, hours, minutes, seconds);
+      if (!isNaN(d.getTime())) return d;
+    }
+  }
+  const d = new Date(`${dateStr} ${timeStr}`);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function parseCoords(str) {
+  if (!str || str === "-" || str === "0") return null;
+  const parts = str.split("/");
+  if (parts.length === 2) {
+    const lat = parseFloat(parts[0]);
+    const lng = parseFloat(parts[1]);
+    if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) return [lat, lng];
+  }
+  return null;
+}
+
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function pointInPolygon(point, polygon) {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const [xi, yi] = polygon[i], [xj, yj] = polygon[j];
+    const intersect = ((yi > point[0]) !== (yj > point[0])) &&
+      (point[1] < (xj - xi) * (point[0] - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+// ─── GeoFenceLayer (inside MapContainer) ─────────────────────────────────────
+function GeoFenceLayer({ active, vertices, onAddVertex }) {
+  useMapEvents({
+    click(e) {
+      if (!active) return;
+      onAddVertex([e.latlng.lat, e.latlng.lng]);
+    },
+  });
+
+  return (
+    <>
+      {vertices.map((v, i) => (
+        <CircleMarker
+          key={i}
+          center={v}
+          radius={6}
+          pathOptions={{ color: "#f9ca24", fillColor: "#f9ca24", fillOpacity: 1, weight: 2 }}
+        />
+      ))}
+      {vertices.length > 1 && (
+        <Polyline
+          positions={[...vertices, vertices[0]]}
+          pathOptions={{ color: "#f9ca24", weight: 2, dashArray: "6 4", opacity: 0.9 }}
+        />
+      )}
+    </>
+  );
+}
+
+// ─── Tab 1: Path Tracker ──────────────────────────────────────────────────────
+function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, mapStyle, setMapStyle, allGeoRecords }) {
+  const [activeHop, setActiveHop] = useState(null);
+  const [drawingFence, setDrawingFence] = useState(false);
+  const [fenceVertices, setFenceVertices] = useState([]);
+  const [fenceClosed, setFenceClosed] = useState(false);
+  const [fenceResults, setFenceResults] = useState(null);
+
+  useEffect(() => {
+    if (parsedHops.length > 0 && !activeHop) {
+      setActiveHop(parsedHops[parsedHops.length - 1]);
+    }
+  }, [parsedHops, activeHop]);
+
+  const handleAddVertex = useCallback((pt) => {
+    setFenceVertices((prev) => [...prev, pt]);
+  }, []);
+
+  const handleFinishFence = useCallback(() => {
+    if (fenceVertices.length < 3) return;
+    setFenceClosed(true);
+    setDrawingFence(false);
+    const inside = allGeoRecords.filter((rec) => {
+      const coords = parseCoords(rec[9]);
+      if (!coords) return false;
+      return pointInPolygon(coords, fenceVertices);
+    });
+    setFenceResults(inside);
+  }, [fenceVertices, allGeoRecords]);
+
+  const handleClearFence = useCallback(() => {
+    setFenceVertices([]);
+    setFenceClosed(false);
+    setFenceResults(null);
+    setDrawingFence(false);
+  }, []);
+
+  return (
+    <div style={{ display: "flex", gap: 24, alignItems: "stretch", flexWrap: "wrap" }}>
+      {/* LEFT: Timeline */}
+      <div
+        className="glass-card"
+        style={{ flex: "1 1 38%", minWidth: 320, maxWidth: 420, padding: 24, display: "flex", flexDirection: "column", height: 720 }}
+      >
+        <h2 style={{ margin: 0, marginBottom: 8, display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 700, color: "var(--color-text)" }}>
+          <Activity size={18} color="#00e5ff" />
+          Cell Transition Hops
+        </h2>
+        <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginBottom: 16, marginTop: 0 }}>
+          Click a hop below to pan the map. Last 15 movements shown chronologically.
+        </p>
+        <div style={{ flex: 1, overflowY: "auto", paddingRight: 8, paddingTop: 4 }}>
+          {timelineHops.map((hop, idx) => {
+            const isSelected = activeHop && activeHop.seqNumber === hop.seqNumber;
+            return (
+              <div
+                key={idx}
+                onClick={() => setActiveHop(hop)}
+                style={{
+                  marginBottom: 14,
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  border: isSelected ? "1px solid rgba(0,184,148,0.4)" : "1px solid transparent",
+                  background: isSelected ? "rgba(0,184,148,0.08)" : "transparent",
+                  cursor: "pointer",
+                  display: "flex",
+                  gap: 14,
+                  position: "relative",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                {idx !== timelineHops.length - 1 && (
+                  <div style={{ position: "absolute", left: 27, top: 42, bottom: -14, width: 1, background: "rgba(0,184,148,0.2)" }} />
+                )}
+                <div style={{
+                  zIndex: 1,
+                  flexShrink: 0,
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 9,
+                  fontWeight: 700,
+                  fontFamily: "monospace",
+                  background: isSelected ? "#e17055" : "rgba(0,184,148,0.15)",
+                  color: isSelected ? "#fff" : "#00b894",
+                  border: `2px solid ${isSelected ? "#e17055" : "rgba(0,184,148,0.4)"}`,
+                  boxShadow: isSelected ? "0 0 10px rgba(225,112,85,0.3)" : "none",
+                }}>
+                  {hop.seqNumber}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-subtle)" }}>
+                      {hop.date} @ {hop.time}
+                    </span>
+                    {hop.seqNumber === parsedHops.length && (
+                      <span style={{ background: "rgba(0,229,255,0.15)", color: "#00e5ff", fontSize: 8, fontWeight: 700, padding: "2px 6px", borderRadius: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                        LATEST
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ marginTop: 4, fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "var(--color-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    CGI: {hop.cgi}
+                  </div>
+                  <div style={{ marginTop: 6, fontSize: 10, color: "var(--color-text-subtle)", display: "flex", justifyContent: "space-between" }}>
+                    <span>{hop.type} · {hop.service}</span>
+                    <span style={{ display: "flex", alignItems: "center", gap: 3, color: "#00e5ff" }}>
+                      Locate <ChevronRight size={10} />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* RIGHT: Map */}
+      <div style={{ flex: "1 1 55%", minWidth: 480, display: "flex", flexDirection: "column", gap: 20 }}>
+        <div className="glass-card" style={{ overflow: "hidden", borderRadius: 16 }}>
+          {/* Header */}
+          <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <h2 style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 700, color: "var(--color-text)" }}>
+              <MapPin size={16} color="#e17055" />
+              Georeferencing Path Overlay
+            </h2>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {drawingFence && (
+                <button
+                  onClick={handleFinishFence}
+                  style={{
+                    padding: "4px 12px", borderRadius: 7, fontSize: 10, fontWeight: 700,
+                    background: "#f9ca24", color: "#1a1a2e", border: "none", cursor: "pointer",
+                  }}
+                >
+                  Finish Fence
+                </button>
+              )}
+              {(fenceVertices.length > 0 || fenceClosed) && (
+                <button
+                  onClick={handleClearFence}
+                  style={{
+                    padding: "4px 10px", borderRadius: 7, fontSize: 10, fontWeight: 700,
+                    background: "rgba(214,48,49,0.12)", color: "#d63031", border: "1px solid rgba(214,48,49,0.3)", cursor: "pointer",
+                  }}
+                >
+                  Clear
+                </button>
+              )}
+              <button
+                onClick={() => { if (fenceClosed) { handleClearFence(); } else { setDrawingFence((p) => !p); } }}
+                style={{
+                  padding: "4px 12px", borderRadius: 7, fontSize: 10, fontWeight: 700, border: "none", cursor: "pointer",
+                  background: drawingFence ? "rgba(249,202,36,0.2)" : "rgba(0,184,148,0.12)",
+                  color: drawingFence ? "#f9ca24" : "#00b894",
+                  outline: drawingFence ? "1px solid #f9ca24" : "none",
+                }}
+              >
+                {drawingFence ? "Drawing…" : "Draw Geo-fence"}
+              </button>
+              {activeHop && (
+                <span style={{ fontSize: 10, fontFamily: "monospace", fontWeight: 700, color: "#00b894" }}>
+                  Active: Hop #{activeHop.seqNumber}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div style={{ height: 460, position: "relative" }}>
+            {drawingFence && (
+              <div style={{
+                position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)",
+                zIndex: 1000, background: "rgba(249,202,36,0.92)", backdropFilter: "blur(8px)",
+                borderRadius: 8, padding: "6px 14px", fontSize: 11, fontWeight: 700, color: "#1a1a2e",
+                pointerEvents: "none",
+              }}>
+                Click on map to add geo-fence vertices ({fenceVertices.length} added)
+              </div>
+            )}
+            <MapStyleSelector mapStyle={mapStyle} setMapStyle={setMapStyle} />
+
+            {parsedHops.length > 0 ? (
+              <MapContainer center={defaultCenter} zoom={13} scrollWheelZoom style={{ height: "100%", width: "100%" }}>
+                <TileLayer url={getTileUrl(mapStyle)} attribution="" />
+                {polylinePath.length > 1 && (
+                  <Polyline positions={polylinePath} pathOptions={{ color: "#00b894", weight: 3, opacity: 0.6 }} />
+                )}
+                {parsedHops.map((hop, idx) => {
+                  const isSelected = activeHop && activeHop.seqNumber === hop.seqNumber;
+                  return (
+                    <Marker key={idx} position={[hop.lat, hop.lng]} icon={createNumberedIcon(hop.seqNumber, isSelected)}>
+                      <Popup>
+                        <div style={{ fontSize: 11, color: "#082229", fontFamily: "sans-serif" }}>
+                          <strong>Cell Hop #{hop.seqNumber}</strong><br />
+                          CGI: {hop.cgi}<br />
+                          Time: {hop.date} {hop.time}<br />
+                          Type: {hop.type} | Service: {hop.service}<br />
+                          Coords: {hop.lat.toFixed(5)}, {hop.lng.toFixed(5)}
+                        </div>
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+                <GeoFenceLayer active={drawingFence} vertices={fenceVertices} onAddVertex={handleAddVertex} />
+                {activeHop && <MapController center={[activeHop.lat, activeHop.lng]} />}
+              </MapContainer>
+            ) : (
+              <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.6)" }}>
+                <MapPin size={28} color="#94a3b8" />
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginTop: 8 }}>GPS SIGNAL LOST</span>
+                <span style={{ fontSize: 10, color: "#94a3b8", marginTop: 4, textAlign: "center", maxWidth: 200 }}>
+                  No valid cellular sector geolocation coordinates found.
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Geo-fence Results */}
+        {fenceClosed && fenceResults !== null && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-card"
+            style={{ padding: 20 }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+              <div style={{ background: fenceResults.length > 0 ? "rgba(214,48,49,0.1)" : "rgba(0,184,148,0.1)", borderRadius: 8, padding: "4px 10px" }}>
+                <span style={{ fontSize: 20, fontWeight: 800, color: fenceResults.length > 0 ? "#d63031" : "#00b894" }}>
+                  {fenceResults.length}
+                </span>
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)" }}>
+                  event{fenceResults.length !== 1 ? "s" : ""} inside geo-fence
+                </div>
+                <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>
+                  {fenceResults.length === 0 ? "No CDR activity detected within the drawn perimeter." : "CDR events detected within the drawn geo-fence perimeter."}
+                </div>
+              </div>
+            </div>
+            {fenceResults.length > 0 && (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
+                  <thead>
+                    <tr style={{ background: "rgba(0,0,0,0.04)" }}>
+                      {["Date", "Time", "CGI", "Type", "Service"].map((h) => (
+                        <th key={h} style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "var(--color-text-muted)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {fenceResults.slice(0, 30).map((row, i) => (
+                      <tr key={i} style={{ borderTop: "1px solid var(--color-border-subtle)" }}>
+                        <td style={{ padding: "5px 10px", color: "var(--color-text-subtle)" }}>{row[6] || "—"}</td>
+                        <td style={{ padding: "5px 10px", fontFamily: "monospace", color: "var(--color-text)" }}>{row[7] || "—"}</td>
+                        <td style={{ padding: "5px 10px", fontFamily: "monospace", fontSize: 10, color: "#00b894" }}>{row[10] || "—"}</td>
+                        <td style={{ padding: "5px 10px", color: "var(--color-text-subtle)" }}>{row[1] || "—"}</td>
+                        <td style={{ padding: "5px 10px", color: "var(--color-text-subtle)" }}>{row[14] || "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {fenceResults.length > 30 && (
+                  <div style={{ fontSize: 10, color: "var(--color-text-muted)", padding: "8px 10px" }}>
+                    … and {fenceResults.length - 30} more events not shown.
+                  </div>
+                )}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Tab 2: Dwell Heatmap ─────────────────────────────────────────────────────
+function DwellHeatmap({ records, mapStyle, setMapStyle }) {
+  const locationData = useMemo(() => {
+    const counts = {};
+    records.forEach((row) => {
+      const loc = row[9];
+      if (!loc || loc === "-" || loc === "0") return;
+      counts[loc] = (counts[loc] || 0) + 1;
+    });
+    const maxCount = Math.max(...Object.values(counts), 1);
+    return Object.entries(counts)
+      .map(([loc, count]) => {
+        const coords = parseCoords(loc);
+        if (!coords) return null;
+        const ratio = count / maxCount;
+        let color = "#00b894";
+        if (ratio >= 0.75) color = "#d63031";
+        else if (ratio >= 0.50) color = "#e17055";
+        else if (ratio >= 0.25) color = "#fdcb6e";
+        const radius = 8 + ratio * 28;
+        const fillOpacity = 0.3 + ratio * 0.5;
+        return { coords, count, ratio, color, radius, fillOpacity };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.count - a.count);
+  }, [records]);
+
+  const mapCenter = locationData.length > 0 ? locationData[0].coords : [22.5, 78.9];
+  const maxCount = locationData.length > 0 ? locationData[0].count : 1;
+  const estimatedDwell = (count) => Math.round((count * 3) / 60 * 10) / 10;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div className="glass-card" style={{ overflow: "hidden", borderRadius: 16 }}>
+        <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-border)", display: "flex", alignItems: "center", gap: 8 }}>
+          <Thermometer size={16} color="#e17055" />
+          <span style={{ fontSize: 15, fontWeight: 700, color: "var(--color-text)" }}>Dwell Heatmap — Location Frequency Overlay</span>
+        </div>
+        <div style={{ height: 460, position: "relative" }}>
+          <MapStyleSelector mapStyle={mapStyle} setMapStyle={setMapStyle} />
+          {/* Legend */}
+          <div style={{
+            position: "absolute", top: 12, left: 12, zIndex: 1000,
+            background: "rgba(255,255,255,0.9)", backdropFilter: "blur(10px)",
+            border: "1px solid rgba(0,0,0,0.08)", borderRadius: 10, padding: "10px 14px",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+          }}>
+            <div style={{ fontSize: 9, fontWeight: 800, color: "#475569", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>Dwell Density</div>
+            {[
+              { color: "#00b894", label: "Occasional" },
+              { color: "#fdcb6e", label: "Moderate" },
+              { color: "#e17055", label: "Frequent" },
+              { color: "#d63031", label: "Home Base" },
+            ].map((item) => (
+              <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: item.color, flexShrink: 0 }} />
+                <span style={{ fontSize: 10, color: "#475569", fontWeight: 600 }}>{item.label}</span>
+              </div>
+            ))}
+          </div>
+
+          {locationData.length > 0 ? (
+            <MapContainer center={mapCenter} zoom={12} scrollWheelZoom style={{ height: "100%", width: "100%" }}>
+              <TileLayer url={getTileUrl(mapStyle)} attribution="" />
+              {locationData.map((d, i) => (
+                <CircleMarker
+                  key={i}
+                  center={d.coords}
+                  radius={d.radius}
+                  pathOptions={{ color: d.color, fillColor: d.color, fillOpacity: d.fillOpacity, weight: 1.5 }}
+                >
+                  <Popup>
+                    <div style={{ fontSize: 11, color: "#082229" }}>
+                      <strong>~{estimatedDwell(d.count)} hours estimated dwell · {d.count} events</strong><br />
+                      Coords: {d.coords[0].toFixed(5)}, {d.coords[1].toFixed(5)}
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              ))}
+            </MapContainer>
+          ) : (
+            <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.6)" }}>
+              <span style={{ fontSize: 12, color: "#64748b" }}>No coordinate data available for heatmap.</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Plain-English Card */}
+      {locationData.length > 0 && (
+        <div className="glass-card" style={{ padding: 20, borderLeft: "3px solid #e17055" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(225,112,85,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Info size={18} color="#e17055" />
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)", marginBottom: 4 }}>Analyst Interpretation</div>
+              <p style={{ fontSize: 12, color: "var(--color-text-muted)", margin: 0, lineHeight: 1.65 }}>
+                Your most visited location had <strong style={{ color: "var(--color-text)" }}>{maxCount} events</strong> — this is likely a home base or operational zone.
+                The suspect spent an estimated <strong style={{ color: "var(--color-text)" }}>~{estimatedDwell(maxCount)} hours</strong> at this location based on call frequency patterns.
+                {locationData.length > 1 && ` A total of ${locationData.length} unique geographic positions were logged across all CDR records.`}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Tab 3: Velocity Alerts ───────────────────────────────────────────────────
+function VelocityAlerts({ records }) {
+  const { alerts, stats } = useMemo(() => {
+    const geoRows = records
+      .map((row) => {
+        const coords = parseCoords(row[9]);
+        const dt = parseDateTime(row[6], row[7]);
+        if (!coords || !dt) return null;
+        return { coords, dt, cgi: row[10] || "Unknown", date: row[6], time: row[7] };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.dt - b.dt);
+
+    const found = [];
+    let impossible = 0;
+    let suspicious = 0;
+
+    for (let i = 1; i < geoRows.length; i++) {
+      const a = geoRows[i - 1];
+      const b = geoRows[i];
+      const [lat1, lon1] = a.coords;
+      const [lat2, lon2] = b.coords;
+      if (lat1 === lat2 && lon1 === lon2) continue;
+      const distKm = haversineKm(lat1, lon1, lat2, lon2);
+      const timeDiffMs = b.dt - a.dt;
+      const timeDiffHours = timeDiffMs / (1000 * 60 * 60);
+      if (timeDiffHours <= 0) continue;
+      const speed = distKm / timeDiffHours;
+
+      let severity = null;
+      let label = "";
+      let color = "";
+
+      if (speed > 1000) {
+        severity = "IMPOSSIBLE";
+        label = "IMPOSSIBLE — Device Cloning / SIM Sharing";
+        color = "#d63031";
+        impossible++;
+      } else if (speed > 300) {
+        severity = "SUSPICIOUS";
+        label = "SUSPICIOUS — Impossible Human Travel";
+        color = "#e17055";
+        suspicious++;
+      } else if (speed > 100) {
+        severity = "HIGH";
+        label = "HIGH SPEED";
+        color = "#fdcb6e";
+      }
+
+      if (severity) {
+        found.push({
+          severity, label, color,
+          fromCgi: a.cgi, toCgi: b.cgi,
+          distKm: distKm.toFixed(1),
+          timeGapMin: (timeDiffHours * 60).toFixed(1),
+          speed: speed.toFixed(1),
+          fromTime: `${a.date} ${a.time}`,
+          toTime: `${b.date} ${b.time}`,
+        });
+      }
+    }
+
+    return {
+      alerts: found,
+      stats: { total: geoRows.length - 1, impossible, suspicious },
+    };
+  }, [records]);
+
+  const miniCards = [
+    { label: "Total Transitions Checked", value: stats.total, color: "#2563eb", bg: "rgba(37,99,235,0.08)" },
+    { label: "Impossible Speed Events", value: stats.impossible, color: "#d63031", bg: "rgba(214,48,49,0.08)" },
+    { label: "Suspicious Speed Events", value: stats.suspicious, color: "#e17055", bg: "rgba(225,112,85,0.08)" },
+  ];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Mini KPI cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+        {miniCards.map((c, i) => (
+          <div key={i} className="glass-card" style={{ padding: "18px 20px", borderLeft: `3px solid ${c.color}` }}>
+            <div style={{ fontSize: 28, fontWeight: 800, color: c.color, fontFamily: "monospace" }}>{c.value}</div>
+            <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 4, fontWeight: 600 }}>{c.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Alert List */}
+      {alerts.length === 0 ? (
+        <div className="glass-card" style={{ padding: 32, display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+          <CheckCircle size={32} color="#00b894" />
+          <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text)" }}>No Velocity Anomalies Detected</span>
+          <span style={{ fontSize: 12, color: "var(--color-text-muted)", textAlign: "center", maxWidth: 400 }}>
+            All consecutive location transitions fall within physically plausible travel speeds. No device cloning indicators found.
+          </span>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {alerts.map((alert, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.04 }}
+              className="glass-card"
+              style={{ padding: 18, borderLeft: `3px solid ${alert.color}` }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 14, flexWrap: "wrap" }}>
+                <div style={{ flexShrink: 0 }}>
+                  <span style={{
+                    display: "inline-block", padding: "3px 10px", borderRadius: 6, fontSize: 9,
+                    fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em",
+                    background: `${alert.color}20`, color: alert.color, fontFamily: "monospace",
+                  }}>
+                    {alert.severity}
+                  </span>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: alert.color, marginTop: 6 }}>{alert.label}</div>
+                </div>
+                <div style={{ flex: 1, minWidth: 240 }}>
+                  <div style={{ fontSize: 11, color: "var(--color-text-subtle)", fontFamily: "monospace", marginBottom: 4 }}>
+                    FROM <span style={{ color: "var(--color-text)", fontWeight: 700 }}>{alert.fromCgi}</span>
+                    {" → "}
+                    TO <span style={{ color: "var(--color-text)", fontWeight: 700 }}>{alert.toCgi}</span>
+                  </div>
+                  <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+                    {[
+                      { label: "Distance", val: `${alert.distKm} km` },
+                      { label: "Time Gap", val: `${alert.timeGapMin} min` },
+                      { label: "Speed", val: `${alert.speed} km/h`, highlight: true },
+                    ].map((d) => (
+                      <div key={d.label}>
+                        <div style={{ fontSize: 9, color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700 }}>{d.label}</div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: d.highlight ? alert.color : "var(--color-text)", fontFamily: "monospace" }}>{d.val}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: 8, fontSize: 10, color: "var(--color-text-subtle)" }}>
+                    {alert.fromTime} <span style={{ color: "var(--color-text-muted)" }}>→</span> {alert.toTime}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Plain-English Explanation */}
+      <div className="glass-card" style={{ padding: 20, borderLeft: "3px solid #2563eb" }}>
+        <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <Info size={18} color="#2563eb" />
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)", marginBottom: 4 }}>How Velocity Analysis Works</div>
+            <p style={{ fontSize: 12, color: "var(--color-text-muted)", margin: 0, lineHeight: 1.7 }}>
+              If two towers are 500 km apart but the same SIM was used within 5 minutes, that means the physical SIM cannot have moved at that speed.
+              This is a strong indicator of <strong style={{ color: "#d63031" }}>device cloning</strong> or{" "}
+              <strong style={{ color: "#e17055" }}>SIM sharing across multiple handsets</strong>. Speeds above 1,000 km/h are physically impossible
+              for ground-based movement and point definitively to parallel SIM usage.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Tab 4: Time Clusters ─────────────────────────────────────────────────────
+function TimeClusters({ records, mapStyle, setMapStyle }) {
+  const PERIODS = [
+    { label: "Night", range: "22:00–06:00", color: "#6c5ce7", min: 22, max: 6 },
+    { label: "Morning", range: "06:00–12:00", color: "#fdcb6e", min: 6, max: 12 },
+    { label: "Afternoon", range: "12:00–18:00", color: "#0984e3", min: 12, max: 18 },
+    { label: "Evening", range: "18:00–22:00", color: "#e17055", min: 18, max: 22 },
+  ];
+
+  const getPeriod = (hour) => {
+    if (hour >= 22 || hour < 6) return "Night";
+    if (hour >= 6 && hour < 12) return "Morning";
+    if (hour >= 12 && hour < 18) return "Afternoon";
+    return "Evening";
+  };
+
+  const { markers, counts, total } = useMemo(() => {
+    const pts = [];
+    const cnt = { Night: 0, Morning: 0, Afternoon: 0, Evening: 0 };
+    let tot = 0;
+
+    records.forEach((row) => {
+      const coords = parseCoords(row[9]);
+      const dt = parseDateTime(row[6], row[7]);
+      if (!coords || !dt) return;
+      const hour = dt.getHours();
+      const period = getPeriod(hour);
+      const color = PERIODS.find((p) => p.label === period)?.color || "#6c5ce7";
+      pts.push({ coords, period, color });
+      cnt[period]++;
+      tot++;
+    });
+
+    return { markers: pts, counts: cnt, total: tot };
+  }, [records]);
+
+  const mapCenter = markers.length > 0 ? markers[0].coords : [22.5, 78.9];
+  const nightPct = total > 0 ? Math.round((counts.Night / total) * 100) : 0;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div className="glass-card" style={{ overflow: "hidden", borderRadius: 16 }}>
+        <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-border)", display: "flex", alignItems: "center", gap: 8 }}>
+          <Timer size={16} color="#6c5ce7" />
+          <span style={{ fontSize: 15, fontWeight: 700, color: "var(--color-text)" }}>Time-of-Day Activity Clusters</span>
+        </div>
+        <div style={{ height: 460, position: "relative" }}>
+          <MapStyleSelector mapStyle={mapStyle} setMapStyle={setMapStyle} />
+          {/* Legend */}
+          <div style={{
+            position: "absolute", top: 12, left: 12, zIndex: 1000,
+            background: "rgba(255,255,255,0.9)", backdropFilter: "blur(10px)",
+            border: "1px solid rgba(0,0,0,0.08)", borderRadius: 10, padding: "10px 14px",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+          }}>
+            <div style={{ fontSize: 9, fontWeight: 800, color: "#475569", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>Time Period</div>
+            {PERIODS.map((p) => (
+              <div key={p.label} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: p.color, flexShrink: 0 }} />
+                <span style={{ fontSize: 10, color: "#475569", fontWeight: 600 }}>{p.label} <span style={{ color: "#94a3b8", fontWeight: 400 }}>({p.range})</span></span>
+              </div>
+            ))}
+          </div>
+
+          {markers.length > 0 ? (
+            <MapContainer center={mapCenter} zoom={12} scrollWheelZoom style={{ height: "100%", width: "100%" }}>
+              <TileLayer url={getTileUrl(mapStyle)} attribution="" />
+              {markers.map((m, i) => (
+                <CircleMarker
+                  key={i}
+                  center={m.coords}
+                  radius={8}
+                  pathOptions={{ color: m.color, fillColor: m.color, fillOpacity: 0.7, weight: 1 }}
+                >
+                  <Popup>
+                    <div style={{ fontSize: 11, color: "#082229" }}>
+                      <strong>{m.period}</strong><br />
+                      {m.coords[0].toFixed(5)}, {m.coords[1].toFixed(5)}
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              ))}
+            </MapContainer>
+          ) : (
+            <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.6)" }}>
+              <span style={{ fontSize: 12, color: "#64748b" }}>No coordinate data available.</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Stat Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14 }}>
+        {PERIODS.map((p) => {
+          const count = counts[p.label];
+          const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+          return (
+            <div key={p.label} className="glass-card" style={{ padding: "16px 18px", borderLeft: `3px solid ${p.color}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: p.color }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text)" }}>{p.label}</span>
+              </div>
+              <div style={{ fontSize: 9, color: "var(--color-text-muted)", marginBottom: 6, fontWeight: 600 }}>{p.range}</div>
+              <div style={{ fontSize: 26, fontWeight: 800, color: p.color, fontFamily: "monospace" }}>{count}</div>
+              <div style={{ fontSize: 10, color: "var(--color-text-muted)", marginTop: 2 }}>events · <strong style={{ color: p.color }}>{pct}%</strong> of total</div>
+              {/* Bar */}
+              <div style={{ marginTop: 10, height: 3, borderRadius: 2, background: "rgba(0,0,0,0.07)" }}>
+                <div style={{ height: "100%", borderRadius: 2, background: p.color, width: `${pct}%`, transition: "width 0.5s ease" }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Verdict */}
+      <div className="glass-card" style={{ padding: 20, borderLeft: "3px solid #6c5ce7" }}>
+        <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(108,92,231,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <AlertTriangle size={18} color="#6c5ce7" />
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)", marginBottom: 4 }}>Analyst Verdict</div>
+            <p style={{ fontSize: 12, color: "var(--color-text-muted)", margin: 0, lineHeight: 1.7 }}>
+              {nightPct > 30 ? (
+                <>
+                  <strong style={{ color: "#d63031" }}>Over {nightPct}% of activity happens at night</strong> — unusual for a normal user and consistent with criminal operation patterns.
+                  Night-time activity spikes (10 PM–6 AM) in CDR data are a hallmark of operatives attempting to reduce surveillance exposure during off-hours.
+                </>
+              ) : (
+                <>
+                  Night-time activity accounts for <strong style={{ color: "#6c5ce7" }}>{nightPct}%</strong> of total events.
+                  This falls within normal behavioral parameters for a standard user.
+                  {counts.Morning > counts.Afternoon && " Activity is heaviest in morning hours, suggesting a routine daytime usage pattern."}
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 function Mobility() {
   const { cdrData } = useContext(CDRContext);
   const records = cdrData.slice(1);
 
-  const [activeHop, setActiveHop] = useState(null);
+  const [tab, setTab] = useState("path");
   const [mapStyle, setMapStyle] = useState("light");
 
-  // Filter records with valid dates and locations
-  const validRecords = useMemo(() => {
-    return records.filter(
-      (row) => row && row.length > 10 && row[6] && row[7]
-    );
-  }, [records]);
+  const validRecords = useMemo(() => records.filter((row) => row && row.length > 10 && row[6] && row[7]), [records]);
 
-  // Aggregate top cell tower logs
   const towerCounts = useMemo(() => {
     const counts = {};
-    validRecords.forEach((row) => {
-      const tower = row[10];
-      if (!tower) return;
-      counts[tower] = (counts[tower] || 0) + 1;
-    });
+    validRecords.forEach((row) => { if (row[10]) counts[row[10]] = (counts[row[10]] || 0) + 1; });
     return counts;
   }, [validRecords]);
 
-  const topTowers = useMemo(() => {
-    return Object.entries(towerCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-  }, [towerCounts]);
-
+  const topTowers = useMemo(() => Object.entries(towerCounts).sort((a, b) => b[1] - a[1]).slice(0, 5), [towerCounts]);
   const uniqueTowers = Object.keys(towerCounts).length;
   const mostUsedTower = topTowers.length > 0 ? topTowers[0][0] : "Unknown";
 
-  // Parse last 15 tower hops with valid coordinates chronologically
   const parsedHops = useMemo(() => {
     const lastHops = validRecords.slice(-15);
     let seq = 1;
-    return lastHops
-      .map((row) => {
-        const location = row[9];
-        if (!location) return null;
-        const parts = location.split("/");
-        if (parts.length === 2) {
-          const lat = parseFloat(parts[0]);
-          const lng = parseFloat(parts[1]);
-          if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-            return {
-              lat,
-              lng,
-              cgi: row[10] || "Unknown",
-              date: row[6] || "Unknown",
-              time: row[7] || "Unknown",
-              service: row[14] || "Unknown",
-              type: row[1] || "Unknown",
-              seqNumber: seq++,
-            };
-          }
-        }
-        return null;
-      })
-      .filter(Boolean);
+    return lastHops.map((row) => {
+      const coords = parseCoords(row[9]);
+      if (!coords) return null;
+      return {
+        lat: coords[0], lng: coords[1],
+        cgi: row[10] || "Unknown",
+        date: row[6] || "Unknown",
+        time: row[7] || "Unknown",
+        service: row[14] || "Unknown",
+        type: row[1] || "Unknown",
+        seqNumber: seq++,
+      };
+    }).filter(Boolean);
   }, [validRecords]);
 
-  // Timeline list (newest first)
-  const timelineHops = useMemo(() => {
-    return [...parsedHops].reverse();
-  }, [parsedHops]);
-
-  // Polyline pathway coordinates list
-  const polylinePath = useMemo(() => {
-    return parsedHops.map((h) => [h.lat, h.lng]);
-  }, [parsedHops]);
-
-  // Default Map center coordinates (Kolkata/India area or active suspect centers)
+  const timelineHops = useMemo(() => [...parsedHops].reverse(), [parsedHops]);
+  const polylinePath = useMemo(() => parsedHops.map((h) => [h.lat, h.lng]), [parsedHops]);
   const defaultCenter = useMemo(() => {
-    if (parsedHops.length > 0) {
-      return [parsedHops[parsedHops.length - 1].lat, parsedHops[parsedHops.length - 1].lng];
-    }
-    return [22.5697, 88.3697]; // Kolkata default
+    if (parsedHops.length > 0) return [parsedHops[parsedHops.length - 1].lat, parsedHops[parsedHops.length - 1].lng];
+    return [22.5697, 88.3697];
   }, [parsedHops]);
 
   const lastActivity = useMemo(() => {
@@ -129,335 +934,150 @@ function Mobility() {
     return "Unknown";
   }, [parsedHops]);
 
-  // Set default active hop to the latest chronological hop on data load
-  useEffect(() => {
-    if (parsedHops.length > 0 && !activeHop) {
-      setActiveHop(parsedHops[parsedHops.length - 1]);
-    }
-  }, [parsedHops, activeHop]);
-
   const kpis = [
-    {
-      icon: Radio,
-      label: "Unique Towers",
-      value: uniqueTowers,
-      color: "#00b894",
-      bg: "rgba(0, 184, 148, 0.08)",
-    },
-    {
-      icon: Globe,
-      label: "Primary Cell Tower",
-      value: mostUsedTower,
-      isMonospace: true,
-      color: "#e17055",
-      bg: "rgba(225, 112, 85, 0.08)",
-    },
-    {
-      icon: Clock,
-      label: "Last Logged Activity",
-      value: lastActivity,
-      color: "#00b894",
-      bg: "rgba(0, 184, 148, 0.08)",
-    },
+    { icon: Radio, label: "Unique Towers", value: uniqueTowers, color: "#00b894" },
+    { icon: Globe, label: "Primary Cell Tower", value: mostUsedTower, isMonospace: true, color: "#e17055" },
+    { icon: Clock, label: "Last Logged Activity", value: lastActivity, color: "#00b894" },
+  ];
+
+  const TABS = [
+    { id: "path", label: "Path Tracker", icon: Navigation },
+    { id: "dwell", label: "Dwell Heatmap", icon: Thermometer },
+    { id: "velocity", label: "Velocity Alerts", icon: Zap },
+    { id: "clusters", label: "Time Clusters", icon: Timer },
   ];
 
   return (
-    <motion.div 
-      className="page-container theme-mobility" 
-      initial="initial" 
+    <motion.div
+      className="page-container theme-mobility"
+      initial="initial"
       animate="animate"
-      style={{ display: "flex", flexDirection: "column", gap: "32px" }}
+      style={{ display: "flex", flexDirection: "column", gap: 28 }}
     >
       {/* Header */}
-      <motion.div variants={fadeUp} className="page-header" style={{ marginBottom: 0 }}>
-        <h1 className="mb-1 text-[30px] font-bold text-text">
-          Mobility Tracker & Georeferencing
+      <motion.div variants={fadeUp} style={{ marginBottom: 0 }}>
+        <h1 style={{ margin: 0, marginBottom: 4, fontSize: 28, fontWeight: 800, color: "var(--color-text)" }}>
+          Mobility Tracker &amp; Georeferencing
         </h1>
-        <p className="text-sm text-text-muted">
-          Chronological spatial mapping and cell tower transition footprints logged from target activity.
+        <p style={{ margin: 0, fontSize: 13, color: "var(--color-text-muted)" }}>
+          Chronological spatial mapping, dwell analysis, velocity forensics, and time-pattern clustering from cellular CDR.
         </p>
       </motion.div>
 
       {records.length === 0 ? (
-        <div className="glass-card p-10 text-center text-text-muted">
+        <div className="glass-card" style={{ padding: 40, textAlign: "center", color: "var(--color-text-muted)", fontSize: 13 }}>
           No records loaded. Please upload a dataset in the Ingestion Center to trace cellular mobility.
         </div>
       ) : (
         <>
-          {/* KPIs */}
+          {/* KPI Row */}
           <motion.div
             variants={fadeUp}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "24px",
-            }}
+            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}
           >
             {kpis.map((kpi, i) => (
               <motion.div
                 key={i}
-                whileHover={{ y: -3, scale: 1.015 }}
-                className="glass-card flex items-center gap-4 p-5"
-                style={{ padding: "24px", display: "flex", alignItems: "center", gap: "20px" }}
+                whileHover={{ y: -3, scale: 1.012 }}
+                className="glass-card"
+                style={{ padding: 22, display: "flex", alignItems: "center", gap: 18 }}
               >
-                <div
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border"
-                  style={{
-                    backgroundColor: 'var(--primary-transparent-18)',
-                    borderColor: 'rgba(0,184,148,0.25)',
-                  }}
-                >
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                  background: "var(--primary-transparent-18)",
+                  border: "1px solid rgba(0,184,148,0.25)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
                   <kpi.icon size={20} color={kpi.color} strokeWidth={2.2} />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <span className="text-xs font-medium text-text-muted">
-                    {kpi.label}
-                  </span>
-                  <h2
-                    className={`mt-0.5 truncate text-text ${kpi.isMonospace ? "font-mono text-[13px] font-bold" : "text-xl font-bold"}`}
-                    style={kpi.isMonospace ? { color: '#e17055', } : undefined}
-                  >
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-muted)" }}>{kpi.label}</div>
+                  <div style={{
+                    marginTop: 2,
+                    fontFamily: kpi.isMonospace ? "monospace" : undefined,
+                    fontSize: kpi.isMonospace ? 12 : 20,
+                    fontWeight: 800,
+                    color: kpi.isMonospace ? "#e17055" : "var(--color-text)",
+                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                  }}>
                     {kpi.value}
-                  </h2>
+                  </div>
                 </div>
               </motion.div>
             ))}
           </motion.div>
 
-          <div style={{ display: "flex", gap: "32px", alignItems: "stretch", flexWrap: "wrap" }}>
-            {/* LEFT PANEL: TIMELINE (5 cols) */}
-            <motion.div 
-              variants={fadeUp} 
-              className="glass-card p-6 h-[720px] flex flex-col"
-              style={{ padding: "24px", flex: "1 1 40%", minWidth: "350px", display: "flex", flexDirection: "column", height: "720px" }}
+          {/* Tab Bar */}
+          <motion.div variants={fadeUp}>
+            <div
+              style={{
+                display: "flex", gap: 4, padding: 4,
+                background: "rgba(255,255,255,0.5)", backdropFilter: "blur(10px)",
+                borderRadius: 14, border: "1px solid var(--color-border)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                width: "fit-content",
+              }}
             >
-              <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-text" style={{ marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
-                <Activity size={18} color="#00e5ff" />
-                Cell Transition Hops
-              </h2>
-              <p className="text-xs text-text-muted mb-5">
-                Click a chronological cell hop below to pan the georeferenced tracker map on the right.
-              </p>
-
-              <div style={{ flex: 1, overflowY: "auto", paddingRight: "16px", paddingLeft: "8px", paddingTop: "8px", display: "flex", flexDirection: "column" }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  {timelineHops.map((hop, idx) => {
-                    const isSelected = activeHop && activeHop.seqNumber === hop.seqNumber;
-                    return (
-                      <div
-                        key={idx}
-                        onClick={() => setActiveHop(hop)}
-                        className={`relative flex cursor-pointer rounded-xl transition-all border ${
-                          isSelected
-                            ? "bg-accent/10 border-accent/40 shadow-sm"
-                            : "border-transparent hover:bg-dark-surface/30 text-text-muted hover:text-text"
-                        }`}
-                        style={{ marginBottom: 16, padding: "16px", display: "flex", gap: "16px", position: "relative" }}
-                      >
-                        {/* Connecting timeline line */}
-                        {idx !== timelineHops.length - 1 && (
-                          <div
-                            className="absolute left-[24px] top-10 bottom-[-24px] w-[1px]"
-                            style={{ backgroundColor: "rgba(0, 184, 148, 0.2)" }}
-                          />
-                        )}
-
-                        {/* Number Indicator node */}
-                        <div
-                          className="z-10 flex h-[20px] w-[20px] shrink-0 items-center justify-center rounded-full text-[9px] font-bold font-mono"
-                          style={{
-                            backgroundColor: isSelected ? "#e17055" : "rgba(0, 184, 148, 0.15)",
-                            color: isSelected ? "#fff" : "#00b894",
-                            border: `2px solid ${isSelected ? "#e17055" : "rgba(0, 184, 148, 0.4)"}`,
-                            boxShadow: isSelected ? "0 0 10px rgba(225, 112, 85, 0.3)" : "none",
-                          }}
-                        >
-                          {hop.seqNumber}
-                        </div>
-
-                        {/* Hop details */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                            <span className="text-[11px] font-semibold text-text-subtle">
-                              {hop.date} @ {hop.time}
-                            </span>
-                            {hop.seqNumber === parsedHops.length && (
-                              <span className="rounded bg-accent/15 px-1.5 py-0.5 text-[8.5px] font-bold text-accent uppercase tracking-wider">
-                                LATEST
-                              </span>
-                            )}
-                          </div>
-                          <h4 className="font-mono text-sm font-semibold text-text mt-1.5 truncate">
-                            CGI: {hop.cgi}
-                          </h4>
-                          <p className="mt-1 text-[11px] text-text-subtle" style={{ display: "flex", justifyContent: "space-between", marginTop: "8px" }}>
-                            <span>Type: {hop.type} | Service: {hop.service}</span>
-                            <span className="text-accent hover:underline" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                              Locate <ChevronRight size={10} />
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </motion.div>
-
-            {/* RIGHT PANEL: MAP & ANCHORS (7 cols) */}
-            <div style={{ flex: "1 1 55%", minWidth: "500px", display: "flex", flexDirection: "column", gap: "24px" }}>
-              {/* Georeferencing Tracker Map */}
-              <motion.div variants={fadeUp} className="glass-card overflow-hidden" style={{ borderRadius: 16 }}>
-                <div 
-                  className="px-6 pt-5 pb-3 border-b border-border bg-white/40 flex items-center justify-between"
-                  style={{ padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}
-                >
-                  <h2 className="flex items-center gap-2 text-md font-bold text-text" style={{ display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
-                    <MapPin size={16} color="#e17055" />
-                    Georeferencing Path Overlay
-                  </h2>
-                  {activeHop && (
-                    <span className="text-[10px] font-mono font-bold" style={{ color: "#00b894" }}>
-                      Active: Hop #{activeHop.seqNumber}
-                    </span>
-                  )}
-                </div>
-
-                <div style={{ height: 520, position: "relative" }}>
-                  {/* Map Style Selector Overlay */}
-                  <div
+              {TABS.map((t) => {
+                const Icon = t.icon;
+                const active = tab === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setTab(t.id)}
                     style={{
-                      position: "absolute",
-                      top: 12,
-                      right: 12,
-                      zIndex: 1000,
-                      background: "rgba(255, 255, 255, 0.82)",
-                      backdropFilter: "blur(12px)",
-                      border: "1px solid rgba(0, 0, 0, 0.08)",
+                      padding: "8px 18px",
                       borderRadius: 10,
-                      padding: 3,
-                      display: "flex",
-                      gap: 3,
-                      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      border: "none",
+                      cursor: "pointer",
+                      display: "flex", alignItems: "center", gap: 7,
+                      transition: "all 0.18s ease",
+                      background: active ? "#00b894" : "transparent",
+                      color: active ? "#fff" : "var(--color-text-muted)",
+                      boxShadow: active ? "0 2px 10px rgba(0,184,148,0.3)" : "none",
                     }}
                   >
-                    {[
-                      { id: "light", label: "Light" },
-                      { id: "dark", label: "Dark" },
-                      { id: "satellite", label: "Satellite" },
-                    ].map((style) => (
-                      <button
-                        key={style.id}
-                        onClick={() => setMapStyle(style.id)}
-                        style={{
-                          padding: "4px 10px",
-                          borderRadius: 7,
-                          fontSize: 10,
-                          fontWeight: 700,
-                          border: "none",
-                          cursor: "pointer",
-                          transition: "all 0.15s ease",
-                          background: mapStyle === style.id ? "#00b894" : "transparent",
-                          color: mapStyle === style.id ? "#ffffff" : "var(--color-text-muted)",
-                        }}
-                      >
-                        {style.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {parsedHops.length > 0 ? (
-                    <MapContainer
-                      center={defaultCenter}
-                      zoom={13}
-                      scrollWheelZoom={true}
-                      style={{ height: "100%", width: "100%" }}
-                      zoomControl={true}
-                    >
-                      <TileLayer
-                        url={
-                          mapStyle === "dark"
-                            ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                            : mapStyle === "satellite"
-                            ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                            : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                        }
-                        attribution=""
-                      />
-                      {/* Path route connection */}
-                      {polylinePath.length > 1 && (
-                        <Polyline
-                          positions={polylinePath}
-                          pathOptions={{ color: "#00b894", weight: 3, opacity: 0.6 }}
-                        />
-                      )}
-                      {/* Numbered tower markers */}
-                      {parsedHops.map((hop, idx) => {
-                        const isSelected = activeHop && activeHop.seqNumber === hop.seqNumber;
-                        return (
-                          <Marker
-                            key={idx}
-                            position={[hop.lat, hop.lng]}
-                            icon={createNumberedIcon(hop.seqNumber, isSelected)}
-                          >
-                            <Popup>
-                              <div className="text-xs font-sans text-dark font-medium" style={{ color: "#082229" }}>
-                                <strong>Cell Hop #${hop.seqNumber}</strong>
-                                <br />CGI: {hop.cgi}
-                                <br />Time: {hop.date} {hop.time}
-                                <br />Type: {hop.type} | Service: {hop.service}
-                                <br />Coords: {hop.lat.toFixed(5)}, {hop.lng.toFixed(5)}
-                              </div>
-                            </Popup>
-                          </Marker>
-                        );
-                      })}
-                      {activeHop && <MapController center={[activeHop.lat, activeHop.lng]} />}
-                    </MapContainer>
-                  ) : (
-                    <div className="h-full w-full bg-white/60 flex flex-col items-center justify-center text-center p-4">
-                      <MapPin size={28} className="text-text-subtle mb-2 animate-pulse" />
-                      <span className="text-xs font-bold text-text-subtle">GPS SIGNAL LOST</span>
-                      <span className="text-[10px] text-text-subtle/80 mt-1 max-w-[200px]">
-                        Suspect's records contain no valid cellular sector geolocation coordinates.
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-
-              {/* Top Cellular Anchors Table */}
-              <motion.div variants={fadeUp} className="glass-card p-6" style={{ padding: "24px" }}>
-                <h2 className="mb-5 flex items-center gap-2 text-md font-bold text-text" style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <Radio size={16} color="#e17055" />
-                  Top Transceiver Anchors
-                </h2>
-                <div className="overflow-x-auto font-sans">
-                  <table className="ct-table">
-                    <thead>
-                      <tr>
-                        <th>Tower CGI</th>
-                        <th>Total Handshakes</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {topTowers.map(([tower, count], idx) => (
-                        <tr key={idx}>
-                          <td
-                            className="font-mono text-[13px] font-semibold"
-                            style={{ color: "#00b894" }}
-                          >
-                            {tower}
-                          </td>
-                          <td className="font-bold">{count}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </motion.div>
+                    <Icon size={13} />
+                    {t.label}
+                  </button>
+                );
+              })}
             </div>
-          </div>
+          </motion.div>
+
+          {/* Tab Content */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tab}
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              {tab === "path" && (
+                <PathTracker
+                  parsedHops={parsedHops}
+                  timelineHops={timelineHops}
+                  polylinePath={polylinePath}
+                  defaultCenter={defaultCenter}
+                  mapStyle={mapStyle}
+                  setMapStyle={setMapStyle}
+                  allGeoRecords={records}
+                />
+              )}
+              {tab === "dwell" && (
+                <DwellHeatmap records={records} mapStyle={mapStyle} setMapStyle={setMapStyle} />
+              )}
+              {tab === "velocity" && (
+                <VelocityAlerts records={records} />
+              )}
+              {tab === "clusters" && (
+                <TimeClusters records={records} mapStyle={mapStyle} setMapStyle={setMapStyle} />
+              )}
+            </motion.div>
+          </AnimatePresence>
         </>
       )}
     </motion.div>

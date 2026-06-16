@@ -8,7 +8,7 @@ import AIPrediction from "./pages/AIPrediction";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Cases from "./pages/Cases";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import GeoIntelligence from "./pages/GeoIntelligence";
 import Dashboard from "./pages/Dashboard";
 import UploadCenter from "./pages/UploadCenter";
@@ -16,9 +16,11 @@ import RiskCenter from "./pages/RiskCenter";
 import Mobility from "./pages/Mobility";
 import NetworkAnalysis from "./pages/NetworkAnalysis";
 import ChronologicalReplay from "./pages/ChronologicalReplay";
+import LoginPage from "./pages/LoginPage";
+import AdminDashboard from "./pages/AdminDashboard";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
-import { useAuth } from "./auth/AuthContext";
+import { useState, useContext, useEffect } from "react";
+import { AuthContext } from "./context/AuthContext";
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -34,7 +36,39 @@ function App() {
     location.pathname === "/unauthorized";
   const showLayout = user && !isAuthPage;
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, addAuditLog } = useContext(AuthContext);
 
+  // Auto-log page navigation events for the security audit trail
+  useEffect(() => {
+    if (user) {
+      const pageName = location.pathname === "/" 
+        ? "Dashboard" 
+        : location.pathname.slice(1).toUpperCase();
+      addAuditLog("PAGE_VIEW", `Opened workspace view: ${pageName}`);
+    }
+  }, [location.pathname, user]);
+
+  // Case 1: Unauthenticated -> Force Login page
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
+
+  // Case 2: Authenticated as Admin -> Render Admin Dashboard exclusively
+  if (user.role === "admin") {
+    return (
+      <Routes>
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="*" element={<Navigate to="/admin" replace />} />
+      </Routes>
+    );
+  }
+
+  // Case 3: Authenticated as Analyst -> Render standard workspace
   return (
     <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#020617" }}>
 
@@ -107,123 +141,16 @@ function App() {
             className="flex-1"
           >
             <Routes location={location}>
-
-  {/* Public Routes */}
-
-  <Route path="/login" element={<Login />} />
-  <Route path="/unauthorized" element={<Unauthorized />} />
-
-  {/* Protected Routes */}
-
-  <Route
-    index
-    element={
-      <ProtectedRoute allowedRoles={["analyst", "officer", "admin"]}>
-        <Dashboard />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/upload"
-    element={
-      <ProtectedRoute allowedRoles={["analyst", "admin"]}>
-        <UploadCenter />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/risk"
-    element={
-      <ProtectedRoute allowedRoles={["analyst"]}>
-        <RiskCenter />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/mobility"
-    element={
-      <ProtectedRoute allowedRoles={["analyst", "officer"]}>
-        <Mobility />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/cases"
-    element={
-      <ProtectedRoute allowedRoles={["analyst", "officer", "admin"]}>
-        <Cases />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/geo"
-    element={
-      <ProtectedRoute allowedRoles={["analyst", "officer"]}>
-        <GeoIntelligence />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/network"
-    element={
-      <ProtectedRoute allowedRoles={["analyst"]}>
-        <NetworkAnalysis />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/replay"
-    element={
-      <ProtectedRoute allowedRoles={["analyst", "officer"]}>
-        <ChronologicalReplay />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/lookup"
-    element={
-      <ProtectedRoute allowedRoles={["officer"]}>
-        <FieldLookup />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/users"
-    element={
-      <ProtectedRoute allowedRoles={["admin"]}>
-        <AdminUsers />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/audit"
-    element={
-      <ProtectedRoute allowedRoles={["admin"]}>
-        <AdminAudit />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route
-    path="/prediction"
-    element={
-      <ProtectedRoute allowedRoles={["analyst", "officer"]}>
-        <AIPrediction />
-      </ProtectedRoute>
-    }
-  />
-
-</Routes>
+              <Route index element={<Dashboard />} />
+              <Route path="/upload"  element={<UploadCenter />} />
+              <Route path="/risk"    element={<RiskCenter />} />
+              <Route path="/mobility" element={<Mobility />} />
+              <Route path="/cases"  element={<Cases />} />
+              <Route path="/geo"    element={<GeoIntelligence />} />
+              <Route path="/network" element={<NetworkAnalysis />} />
+              <Route path="/replay" element={<ChronologicalReplay />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
           </motion.div>
         </AnimatePresence>
       </div>

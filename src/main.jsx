@@ -4,14 +4,15 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./index.css";
 import { CDRProvider } from "./context/CDRContext";
-import { AuthProvider } from "./auth/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <AuthProvider>
-    <CDRProvider>
+  <CDRProvider>
+    <AuthProvider>
       <BrowserRouter>
         <App />
       </BrowserRouter>
-    </CDRProvider>
-  </AuthProvider>
+    </AuthProvider>
+  </CDRProvider>
 );
