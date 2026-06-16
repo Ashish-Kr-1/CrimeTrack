@@ -7,6 +7,7 @@ import {
   Clock, MapPin, Network, FolderOpen, Wifi, ChevronRight,
   Clapperboard, LogOut, X,
 } from "lucide-react";
+import { useAuth } from "../auth/AuthContext";
 
 const navItems = [
   { to: "/upload",  icon: UploadCloud,    label: "Upload Center",    badge: null },
@@ -20,6 +21,7 @@ const navItems = [
 ];
 
 function Sidebar({ isOpen, onClose }) {
+  const { user } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024);
   const { logout } = useContext(AuthContext);
@@ -39,6 +41,74 @@ function Sidebar({ isOpen, onClose }) {
   const transform = isDesktop
     ? "translateX(0)"
     : `translateX(${isOpen ? "0%" : "-100%"})`;
+
+  const getNavItems = () => {
+    const role = user?.role || "analyst";
+
+    if (role === "admin") {
+      return [
+        { to: "/", icon: LayoutDashboard, label: "Dashboard", end: true, badge: null },
+        { to: "/upload", icon: UploadCloud, label: "Upload Center", badge: null },
+        { to: "/cases", icon: FolderOpen, label: "Active Cases", badge: null },
+        { to: "/users", icon: Users, label: "User Management", badge: null },
+        { to: "/audit", icon: Terminal, label: "Audit Logs", badge: null },
+      ];
+    }
+
+    if (role === "officer") {
+      return [
+        { to: "/", icon: LayoutDashboard, label: "Dashboard", end: true, badge: null },
+        { to: "/lookup", icon: Search, label: "Field Lookup", badge: "NEW" },
+        { to: "/replay", icon: Clapperboard, label: "Chrono Replay", badge: null },
+        { to: "/mobility", icon: Clock, label: "Mobility Tracker", badge: null },
+        { to: "/geo", icon: MapPin, label: "Geo Intelligence", badge: null },
+        { to: "/prediction", icon: Brain, label: "AI Prediction", badge: "LIVE" },
+        { to: "/cases", icon: FolderOpen, label: "Active Cases", badge: null },
+      ];
+    }
+
+    // Default Analyst: full access
+    return [
+      { to: "/upload", icon: UploadCloud, label: "Upload Center", badge: null },
+      { to: "/", icon: LayoutDashboard, label: "Dashboard", end: true, badge: null },
+      { to: "/replay", icon: Clapperboard, label: "Chrono Replay", badge: "NEW" },
+      { to: "/risk", icon: AlertTriangle, label: "Risk Center", badge: null },
+      { to: "/mobility", icon: Clock, label: "Mobility Tracker", badge: null },
+      { to: "/geo", icon: MapPin, label: "Geo Intelligence", badge: null },
+      { to: "/network", icon: Network, label: "Network Analysis", badge: null },
+      { to: "/prediction", icon: Brain, label: "AI Prediction", badge: "LIVE" },
+      { to: "/cases", icon: FolderOpen, label: "Active Cases", badge: null },
+    ];
+  };
+
+  const getBrandDetails = () => {
+    const role = user?.role || "analyst";
+    if (role === "admin") {
+      return {
+        gradient: "linear-gradient(135deg, #e17055 0%, #fab1a0 100%)",
+        icon: <Key size={18} color="white" strokeWidth={2.5} />,
+        shadow: "0 4px 16px rgba(225, 112, 85, 0.35)",
+        textColor: "#e17055",
+      };
+    }
+    if (role === "officer") {
+      return {
+        gradient: "linear-gradient(135deg, #00b894 0%, #55efc4 100%)",
+        icon: <Shield size={18} color="white" strokeWidth={2.5} />,
+        shadow: "0 4px 16px rgba(0, 184, 148, 0.35)",
+        textColor: "#00b894",
+      };
+    }
+    return {
+      gradient: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
+      icon: <Users size={18} color="white" strokeWidth={2.5} />,
+      shadow: "0 4px 16px rgba(108, 92, 231, 0.35)",
+      textColor: "#6c5ce7",
+    };
+  };
+
+  const navItems = getNavItems();
+  const brand = getBrandDetails();
 
   return (
     <div
