@@ -9,21 +9,19 @@ import {
   Eye,
   EyeOff,
   Terminal,
-  Cpu,
-  Globe,
-  ChevronRight,
   Wifi,
   AlertTriangle,
   User,
-  Lock
+  Key,
+  ArrowRight
 } from "lucide-react";
 
 function LoginPage() {
   const { login, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("analyst");
+  const [password, setPassword] = useState("analyst123");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +30,18 @@ function LoginPage() {
     "UPLINK: Establishing satellite signal lock...",
     "CRYPTO: Negotiating 2048-bit RSA keys...",
   ]);
+  const [activeRole, setActiveRole] = useState("analyst");
+
+  const handleRoleSelect = (role) => {
+    setActiveRole(role);
+    const creds = {
+      analyst: { u: "analyst", p: "analyst123" },
+      admin: { u: "admin", p: "admin123" },
+      officer: { u: "officer", p: "officer123" }
+    };
+    setUsername(creds[role].u);
+    setPassword(creds[role].p);
+  };
 
 
 
@@ -120,31 +130,6 @@ function LoginPage() {
     }, 1200);
   };
 
-  const handleBypass = (role) => {
-    setIsLoading(true);
-    setError("");
-
-    const userMap = {
-      admin: { u: "admin", p: "admin123" },
-      analyst: { u: "analyst", p: "analyst123" }
-    };
-
-    const targetCred = userMap[role];
-    setUsername(targetCred.u);
-    setPassword(targetCred.p);
-
-    setTimeout(() => {
-      const res = login(targetCred.u, targetCred.p);
-      setIsLoading(false);
-      if (res.success) {
-        if (role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
-      }
-    }, 800);
-  };
 
   return (
     <div className="cyber-dark-root relative flex flex-col justify-between overflow-hidden h-screen w-screen">
@@ -260,45 +245,71 @@ function LoginPage() {
           </div>
         </div>
 
-        {/* Right Side: New auth card with floating badge */}
+        {/* Right Side: Redesigned Secure Access card */}
         <div className="flex-1 flex items-center justify-center md:justify-end w-full max-w-md md:max-w-none py-6 pointer-events-none">
-          <div className="max-w-md w-full relative mt-10 pointer-events-auto">
-
-            {/* ── Floating Shield Badge ── */}
-            <div className="absolute -top-9 left-1/2 -translate-x-1/2 z-30">
-              <div className="relative w-[68px] h-[68px] flex items-center justify-center">
-                {/* Outer slow-pulse ring */}
-                <div className="absolute inset-0 rounded-full border border-cyan-400/30 animate-ping" style={{ animationDuration: '2.8s' }} />
-                {/* Spinning dashed orbit */}
-                <div className="absolute inset-0 rounded-full border border-dashed border-cyan-500/25 animate-spin-slow" />
-                {/* Shield icon core */}
-                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-slate-900 via-cyan-950/80 to-slate-900 border border-cyan-400/60 flex items-center justify-center shadow-[0_0_28px_rgba(0,229,255,0.45)]">
-                  <Shield className="w-6 h-6 text-cyan-400" />
-                </div>
-              </div>
-            </div>
+          <div className="max-w-md w-full relative pointer-events-auto">
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              className="auth-card-v2"
+              className="secure-access-card"
             >
-              {/* Chrome sheen */}
-              <div className="cyber-chrome-shine" />
+              {/* ── Top User Avatar Well ── */}
+              <div className="flex justify-center mb-5">
+                <div className="w-16 h-16 rounded-[18px] bg-gradient-to-br from-indigo-500/90 to-purple-600/90 flex items-center justify-center shadow-[0_8px_24px_rgba(99,102,241,0.35)] border border-indigo-400/20">
+                  <User className="w-8 h-8 text-white" />
+                </div>
+              </div>
 
               {/* ── Card Header ── */}
-              <div className="text-center mb-7 pt-7">
-                <div className="inline-flex items-center gap-2 bg-cyan-950/50 border border-cyan-400/20 rounded-full px-3 py-1 mb-4">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                  <span className="text-[9px] font-bold text-cyan-400 tracking-widest uppercase">Secure Terminal Active</span>
-                </div>
-                <h2 className="text-xl font-black text-white tracking-tight leading-none mb-2">
-                  INTRUSION ENTRY KEYWAY
+              <div className="text-center mb-6">
+                <h2 className="text-[26px] font-black text-white tracking-tight leading-none mb-2">
+                  Secure Access
                 </h2>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
-                  Authenticate credentials to decrypt telecom investigation matrix.
+                <p className="text-xs text-slate-500 font-semibold tracking-wide">
+                  Analyst &bull; Investigator &bull; Administrator
                 </p>
+              </div>
+
+              {/* ── Role selector tabs ── */}
+              <div className="grid grid-cols-3 gap-2.5 mb-6">
+                <button
+                  type="button"
+                  onClick={() => handleRoleSelect("analyst")}
+                  className={`flex items-center justify-center gap-1.5 py-2.5 px-1 rounded-lg text-[10px] font-extrabold tracking-widest uppercase transition-all duration-200 ${
+                    activeRole === "analyst"
+                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-[0_6px_16px_rgba(99,102,241,0.3)]"
+                      : "border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 bg-transparent"
+                  }`}
+                >
+                  <User className="w-3.5 h-3.5" />
+                  ANALYST
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRoleSelect("admin")}
+                  className={`flex items-center justify-center gap-1.5 py-2.5 px-1 rounded-lg text-[10px] font-extrabold tracking-widest uppercase transition-all duration-200 ${
+                    activeRole === "admin"
+                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-[0_6px_16px_rgba(99,102,241,0.3)]"
+                      : "border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 bg-transparent"
+                  }`}
+                >
+                  <Key className="w-3.5 h-3.5" />
+                  ADMIN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRoleSelect("officer")}
+                  className={`flex items-center justify-center gap-1.5 py-2.5 px-1 rounded-lg text-[10px] font-extrabold tracking-widest uppercase transition-all duration-200 ${
+                    activeRole === "officer"
+                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-[0_6px_16px_rgba(99,102,241,0.3)]"
+                      : "border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 bg-transparent"
+                  }`}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  OFFICER
+                </button>
               </div>
 
               {/* ── Error Alert ── */}
@@ -306,116 +317,101 @@ function LoginPage() {
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="mb-5 p-3.5 bg-red-950/65 border border-red-500/30 rounded-lg flex items-center gap-2.5 overflow-hidden"
+                  className="mb-5 p-3 bg-red-950/45 border border-red-500/20 rounded-lg flex items-center gap-2 overflow-hidden"
                 >
                   <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
-                  <span className="text-xs font-semibold text-red-200">{error}</span>
+                  <span className="text-[11px] font-semibold text-red-200">{error}</span>
                 </motion.div>
               )}
 
               <form onSubmit={handleLoginSubmit} className="flex flex-col gap-4">
-
-                {/* Operator ID field */}
+                {/* Username Input */}
                 <div>
-                  <label htmlFor="login-username" className="cyber-hud-label block mb-2">Operator ID</label>
-                  <div className="relative">
-                    <div className="auth-input-icon-well">
-                      <User className="w-4 h-4 text-cyan-400/70" />
-                    </div>
-                    <input
-                      id="login-username"
-                      type="text"
-                      placeholder="admin / analyst"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="cyber-input-v2"
-                      required
-                    />
-                  </div>
+                  <label htmlFor="login-username" className="text-[10px] font-bold text-slate-400 tracking-widest uppercase block mb-1.5">
+                    USERNAME
+                  </label>
+                  <input
+                    id="login-username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="secure-access-input"
+                    required
+                  />
                 </div>
 
-                {/* Cryptographic Key field */}
+                {/* Password Input */}
                 <div>
-                  <label htmlFor="login-password" className="cyber-hud-label block mb-2">Cryptographic Key</label>
+                  <label htmlFor="login-password" className="text-[10px] font-bold text-slate-400 tracking-widest uppercase block mb-1.5">
+                    PASSWORD
+                  </label>
                   <div className="relative">
-                    <div className="auth-input-icon-well">
-                      <Lock className="w-4 h-4 text-cyan-400/70" />
-                    </div>
                     <input
                       id="login-password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="cyber-input-v2 pr-11"
+                      className="secure-access-input pr-10"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-cyan-400 transition-colors duration-200"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-indigo-400 transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
 
-                {/* Remember / Reset row */}
-                <div className="flex items-center justify-between pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer group select-none">
-                    <span className="w-3.5 h-3.5 rounded border border-cyan-400/30 bg-slate-900/60 flex items-center justify-center group-hover:border-cyan-400/60 transition-colors flex-shrink-0" />
-                    <span className="text-[10px] text-slate-500 group-hover:text-slate-400 transition-colors uppercase tracking-wide font-semibold">Remember Node</span>
-                  </label>
-                  <button type="button" className="text-[10px] text-cyan-500/70 hover:text-cyan-400 transition-colors uppercase tracking-wide font-bold">
-                    Reset Key
-                  </button>
-                </div>
-
-                {/* Primary Submit */}
+                {/* Access Button */}
                 <button
                   type="submit"
-                  id="login-submit-btn"
                   disabled={isLoading}
-                  className="cyber-btn-primary w-full py-3.5 mt-2"
+                  className="secure-access-btn-primary w-full py-3.5 mt-2"
                 >
                   {isLoading ? (
                     <>
                       <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                      DECRYPTING...
+                      AUTHENTICATING...
                     </>
                   ) : (
                     <>
-                      AUTHENTICATE NODE
-                      <ChevronRight className="w-4 h-4" />
+                      ACCESS PLATFORM
+                      <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
               </form>
 
-              {/* ── Sandbox Bypass ── */}
-              <div className="mt-6 pt-5 border-t border-slate-800/50">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-800 to-slate-800" />
-                  <span className="cyber-hud-label whitespace-nowrap">Sandbox Bypass</span>
-                  <div className="flex-1 h-px bg-gradient-to-l from-transparent via-slate-800 to-slate-800" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    id="bypass-admin-btn"
-                    onClick={() => handleBypass("admin")}
-                    className="cyber-btn cyber-btn-amber py-2.5 text-xs"
-                  >
-                    <Cpu className="w-3.5 h-3.5" />
-                    ADMIN PANEL
-                  </button>
-                  <button
-                    id="bypass-analyst-btn"
-                    onClick={() => handleBypass("analyst")}
-                    className="cyber-btn cyber-btn-cyan py-2.5 text-xs"
-                  >
-                    <Globe className="w-3.5 h-3.5" />
-                    ANALYST HUB
-                  </button>
+              {/* Separator line */}
+              <div className="h-px bg-slate-800/40 my-6" />
+
+              {/* ── Demo Credentials List ── */}
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase block mb-3">
+                  DEMO CREDENTIALS
+                </span>
+                <div className="flex flex-col gap-2">
+                  {[
+                    { role: "analyst", label: "ANALYST", creds: "analyst / analyst123" },
+                    { role: "admin", label: "ADMIN", creds: "admin / admin123" },
+                    { role: "officer", label: "OFFICER", creds: "officer / officer123" }
+                  ].map((item) => (
+                    <button
+                      key={item.role}
+                      type="button"
+                      onClick={() => handleRoleSelect(item.role)}
+                      className={`w-full flex items-center justify-between px-3.5 py-3 rounded-lg border text-left transition-all duration-150 ${
+                        activeRole === item.role
+                          ? "bg-indigo-950/20 border-indigo-500/30"
+                          : "bg-[#0b0f19]/30 border-slate-900 hover:border-slate-800"
+                      }`}
+                    >
+                      <span className="text-[10px] font-bold text-slate-400 tracking-wider">{item.label}</span>
+                      <span className="text-[11px] font-mono text-slate-300">{item.creds}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 

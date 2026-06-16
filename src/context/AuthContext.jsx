@@ -105,6 +105,13 @@ export function AuthProvider({ children }) {
       return { success: true, user: u };
     }
 
+    if (cleanUser === "officer" && password === "officer123") {
+      const u = { username: "officer", role: "officer" };
+      setUser(u);
+      addAuditLog("LOGIN", "Officer credentials successfully validated", "SUCCESS", "officer");
+      return { success: true, user: u };
+    }
+
     addAuditLog("LOGIN_FAIL", `Failed login attempt for user: ${username}`, "FAILED", username);
     return { success: false, message: "Invalid credentials. Access Denied." };
   };
