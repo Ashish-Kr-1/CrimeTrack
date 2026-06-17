@@ -2,6 +2,7 @@ import { useContext, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CDRContext } from "../context/CDRContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { jsPDF } from "jspdf";
 import {
   ShieldAlert, FileText, Smartphone, MessageSquare, ChevronRight,
   Zap, Sparkles, Lock, Activity, Phone, AlertTriangle,
@@ -231,6 +232,59 @@ const formatFriendlyDate = (dateStr) => {
   }
   
   return `${dayStr} ${moName} ${yr}${timeStr}`;
+};
+
+/* ─── PDF Section 91 CrPC Notice Generator ───────────────────────────────── */
+const generateCrpcNotice = (targetPhone, bankCount, triggeredIndicators) => {
+  const doc = new jsPDF();
+  
+  // Header
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(15);
+  doc.text("NOTICE UNDER SECTION 91 OF CODE OF CRIMINAL PROCEDURE (CRPC)", 105, 20, { align: "center" });
+  
+  // Date
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text(`DATE: ${new Date().toLocaleDateString()}`, 190, 30, { align: "right" });
+  doc.text("NOTICE ID: FCSA/SEC91/" + Math.floor(Math.random()*90000+10000), 20, 30);
+  
+  // Address
+  doc.setFont("helvetica", "bold");
+  doc.text("TO,", 20, 42);
+  doc.setFont("helvetica", "normal");
+  doc.text("The Nodal Officer / Cyber Fraud Investigation Division,\nAssociated Banking Entities / UPI Aggregator Gateway Operations,", 20, 48);
+  
+  // Subject
+  doc.setFont("helvetica", "bold");
+  doc.text(`SUBJECT: Requisition to freeze accounts linked to suspicious MSISDN: +91 ${targetPhone}`, 20, 62);
+  
+  // Body text
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10.5);
+  const bodyText = `Whereas, an investigation is currently being conducted by the Forensics Cyber Security Agency (FCSA) concerning organised financial cybercrimes, illicit money routing network operations (mule account syndicates), and burner communication lines.
+
+During cellular data forensics, the mobile subscriber MSISDN +91 ${targetPhone} was flagged under automated threat indicators scoring high suspicion parameters (Score: ${triggeredIndicators.length} rules triggered). The subscriber telemetry database reveals critical forensic indicators:
+- Aggregated financial transaction alerts from ${bankCount} distinct banking sender IDs.
+- Outgoing UPI bindings burst sequences matching transaction mule handset swaps.
+- Sparse personal communications footprint indicative of an inorganic, transaction-only burner SIM.
+
+Therefore, in exercise of the powers vested under Section 91 of the Code of Criminal Procedure (CrPC), you are hereby requested to:
+1. Immediately FREEZE all bank accounts, virtual wallets, and UPI handles associated with or linked to the phone number +91 ${targetPhone} to prevent further siphoning of illicit funds.
+2. Furnish KYC documentation, account opening forms, IP addresses used during registration, and complete bank transaction logs for the linked accounts from the date of activation.
+3. Supply these files to this command in digital format within 48 hours of receipt of this notice.
+
+Failure to comply with this notice may attract penal proceedings under Section 175 and 188 of the Indian Penal Code (IPC) for non-compliance with public authority orders.`;
+
+  doc.text(bodyText, 20, 72, { maxWidth: 170 });
+  
+  // Sign-off
+  doc.setFont("helvetica", "bold");
+  doc.text("Investigating Officer,", 20, 245);
+  doc.setFont("helvetica", "normal");
+  doc.text("Cyber Crime Cell / Forensics Command\nForensics Cyber Security Agency (FCSA)", 20, 251);
+  
+  doc.save(`CrPC_Section_91_Notice_${targetPhone}.pdf`);
 };
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -722,7 +776,13 @@ function Dashboard() {
                           {rec.category}
                         </span>
                         <button
-                          onClick={() => alert(`Initiating: ${rec.action}`)}
+                          onClick={() => {
+                            if (rec.action === "Freeze Accounts") {
+                              generateCrpcNotice(diagnosticReport.target_phone, diagnosticReport.feature_vector.bank_sender_count, diagnosticReport.triggered_indicators);
+                            } else {
+                              alert(`Initiating action: ${rec.action}`);
+                            }
+                          }}
                           style={{ fontSize: 11, fontWeight: 700, borderRadius: 8, padding: "6px 14px", color: "white", backgroundColor: btnColor, border: "none", cursor: "pointer", transition: "all 0.15s ease", display: "flex", alignItems: "center", gap: 6 }}>
                           {rec.action}
                           <ChevronRight size={12} />
