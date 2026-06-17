@@ -1,224 +1,214 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
 /* ============================================================
    FCSA — Forensics Cyber Security Agency
-   Login Page Theme — Dark Secure Gateway
-   FCSA Blue palette: #16425b  #2f6690  #3a7ca5  #5a94bb
+   Login Page Theme — High-Tech Cyber-Security Dark Mode
    ============================================================ */
 
-.cyber-dark-root {
-  background-color: #060e18 !important;
-  color: #e2e8f0 !important;
-  font-family: "Inter", sans-serif;
-  overflow: hidden;
+:root {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --color-hud-blue: #3a7ca5;
+  --color-hud-dim: #50728a;
+  --color-hud-dark: #060e18;
+  --color-hud-card-bg: rgba(6, 14, 24, 0.75);
+  --color-hud-border: rgba(90, 148, 187, 0.22);
+  --color-hud-glow: rgba(58, 124, 165, 0.3);
+}
+
+/* ── Page Root ── */
+.login-page-root {
+  background-color: var(--color-hud-dark);
+  color: #c8dce8;
+  font-family: var(--font-sans);
   height: 100vh;
   width: 100vw;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
-/* ── Starfield ── */
-.cyber-starfield {
+/* ── Full Screen Spline 3D Scene ── */
+.login-3d-scene {
   position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.5), rgba(0,0,0,0)),
-    radial-gradient(1.5px 1.5px at 120px 100px, rgba(255,255,255,0.6), rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 200px 150px, rgba(255,255,255,0.6), rgba(0,0,0,0)),
-    radial-gradient(2px 2px at 300px 240px, #5a94bb, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 450px 320px, rgba(255,255,255,0.5), rgba(0,0,0,0));
-  background-repeat: repeat;
-  background-size: 550px 550px;
-  opacity: 0.3;
-  pointer-events: none;
+  inset-y: 0;
+  left: 0;
   z-index: 0;
+  height: 100%;
+  pointer-events: none;
+  filter: invert(1) hue-rotate(180deg) brightness(0.90) contrast(1) saturate(0.7);
+  width: 115%;
+  transform: translateX(-10%);
 }
 
-/* Scanline effect */
-.cyber-scanline {
+/* Vignette overlay */
+.login-vignette {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.18) 50%
-  );
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 30%, #060e18 92%);
+}
+
+/* Scanline overlay */
+.login-scanlines {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.12;
+  background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%);
   background-size: 100% 4px;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0.35;
 }
 
-/* ── FCSA Glass Panels ── */
-.cyber-glass-panel {
-  background: rgba(8, 20, 35, 0.76) !important;
-  border: 1px solid rgba(90, 148, 187, 0.22) !important;
-  border-radius: 16px !important;
-  backdrop-filter: blur(20px) saturate(150%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 15px rgba(58, 124, 165, 0.06) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* ── Header ── */
+.login-header {
   position: relative;
-  padding: 24px !important;
-  box-sizing: border-box !important;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  flex-shrink: 0;
 }
 
-.cyber-glass-panel.telemetry-card {
-  padding: 20px 24px !important;
+.login-header-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(22, 66, 91, 0.6);
+  border: 1px solid rgba(90, 148, 187, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(58, 124, 165, 0.3);
 }
 
-.cyber-header {
-  padding: 20px 28px !important;
+.login-tls-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(6, 14, 24, 0.6);
+  padding: 5px 10px;
+  border: 1px solid rgba(90, 148, 187, 0.18);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
 }
 
-@media (min-width: 768px) {
-  .cyber-header {
-    padding: 28px 48px !important;
-  }
-}
-
-.cyber-footer {
-  padding: 20px 28px !important;
-}
-
-@media (min-width: 768px) {
-  .cyber-footer {
-    padding: 28px 48px !important;
-  }
-}
-
-.cyber-glass-panel::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(90, 148, 187, 0.45), transparent);
-  pointer-events: none;
-}
-
-.cyber-glass-panel:hover {
-  border-color: rgba(90, 148, 187, 0.40) !important;
-  box-shadow:
-    0 15px 50px rgba(0, 0, 0, 0.65),
-    inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    0 0 22px rgba(58, 124, 165, 0.12) !important;
-}
-
-/* FCSA accent borders */
-.border-glow-cyan {
-  border: 1px solid rgba(90, 148, 187, 0.38) !important;
-  box-shadow: 0 0 20px rgba(58, 124, 165, 0.14), inset 0 0 12px rgba(58, 124, 165, 0.07) !important;
-}
-
-.border-glow-amber {
-  border: 1px solid rgba(214, 137, 16, 0.38) !important;
-  box-shadow: 0 0 20px rgba(214, 137, 16, 0.12), inset 0 0 12px rgba(214, 137, 16, 0.07) !important;
-}
-
-/* ── HUD Telemetry Elements ── */
-.cyber-hud-label {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #50728a;
-}
-
-.cyber-hud-value {
-  font-family: "JetBrains Mono", monospace;
-  font-weight: 700;
-  color: #e2e8f0;
-}
-
-/* Rotating keyframes */
-@keyframes spin-clockwise {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes spin-counter-clockwise {
-  to { transform: rotate(-360deg); }
-}
-
-@keyframes pulse-fcsa {
-  0%, 100% { opacity: 0.35; transform: scale(1); }
-  50% { opacity: 0.95; transform: scale(1.15); }
-}
-
-.animate-spin-slow {
-  animation: spin-clockwise 24s linear infinite;
-}
-
-.animate-spin-reverse-slow {
-  animation: spin-counter-clockwise 32s linear infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-fcsa 3s ease-in-out infinite;
-}
-
-/* Chrome shine on hover */
-.cyber-chrome-shine {
-  position: absolute;
-  top: -150%;
-  left: -150%;
-  width: 300%;
-  height: 300%;
-  background: linear-gradient(
-    135deg,
-    transparent 45%,
-    rgba(255, 255, 255, 0.04) 48%,
-    rgba(58, 124, 165, 0.07) 50%,
-    rgba(255, 255, 255, 0.04) 52%,
-    transparent 55%
-  );
-  transform: rotate(-15deg);
-  pointer-events: none;
+/* ── Three-Column Layout Grid ── */
+.login-grid-container {
+  position: relative;
   z-index: 10;
-  transition: all 0.6s ease;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 24px;
+  gap: 32px;
+  box-sizing: border-box;
 }
 
-.cyber-glass-panel:hover .cyber-chrome-shine {
-  top: 50%;
-  left: 50%;
+@media (min-width: 1024px) {
+  .login-grid-container {
+    grid-template-columns: 1.1fr 1.2fr;
+    padding: 24px 48px;
+    gap: 40px;
+  }
 }
 
-/* ============================================================
-   FCSA SECURE ACCESS CARD
-   ============================================================ */
+@media (min-width: 1280px) {
+  .login-grid-container {
+    grid-template-columns: 1.05fr 1.1fr 1.15fr;
+    gap: 48px;
+  }
+}
+
+/* ── Left Panel (Credentials Form) ── */
+.login-left-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
 
 .secure-access-card {
-  background: #080f1c !important;
-  border: 1px solid rgba(90, 148, 187, 0.16) !important;
+  background: rgba(8, 15, 28, 0.88) !important;
+  border: 1px solid rgba(90, 148, 187, 0.2) !important;
   border-radius: 20px !important;
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.65),
-    0 0 40px rgba(0, 0, 0, 0.45),
+    0 0 60px rgba(0, 0, 0, 0.35),
     0 0 0 1px rgba(58, 124, 165, 0.06) !important;
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
   padding: 36px !important;
   width: 100%;
-  max-width: 440px;
+  max-width: 420px;
   box-sizing: border-box !important;
   position: relative;
-  z-index: 10;
 }
 
 .secure-access-card::before {
   content: '';
   position: absolute;
-  top: 0; left: 10%; right: 10%;
+  top: 0;
+  left: 10%;
+  right: 10%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(90, 148, 187, 0.50), transparent);
+  background: linear-gradient(90deg, transparent, rgba(90, 148, 187, 0.45), transparent);
+}
+
+.login-card-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(22,66,91,0.85) 0%, rgba(47,102,144,0.85) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(22,66,91,0.45), 0 0 0 1px rgba(90,148,187,0.20);
+  border: 1px solid rgba(90,148,187,0.20);
+}
+
+.login-security-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(22, 66, 91, 0.12);
+  border: 1px solid rgba(90, 148, 187, 0.12);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #a5b4fc;
+  letter-spacing: 0.02em;
+}
+
+.login-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-hud-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
 }
 
 .secure-access-input {
   width: 100% !important;
   height: 48px !important;
-  background: rgba(6, 14, 24, 0.8) !important;
+  background: rgba(6, 14, 24, 0.7) !important;
   border: 1px solid rgba(90, 148, 187, 0.14) !important;
   border-radius: 10px !important;
   color: #ffffff !important;
-  font-family: inherit;
+  font-family: var(--font-mono);
   font-size: 14px !important;
   font-weight: 500 !important;
   padding: 0 16px !important;
@@ -227,9 +217,34 @@
   box-sizing: border-box !important;
 }
 
+.secure-access-input::placeholder {
+  color: rgba(90, 148, 187, 0.4);
+}
+
 .secure-access-input:focus {
   border-color: #3a7ca5 !important;
-  box-shadow: 0 0 0 2px rgba(58, 124, 165, 0.20), 0 0 14px rgba(58, 124, 165, 0.16) !important;
+  box-shadow: 0 0 0 2px rgba(58, 124, 165, 0.20), 0 0 14px rgba(58, 124, 165, 0.12) !important;
+  background: rgba(6, 14, 24, 0.9) !important;
+}
+
+.login-eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-hud-dim);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.login-eye-btn:hover {
+  color: #5a94bb;
 }
 
 .secure-access-btn-primary {
@@ -264,11 +279,421 @@
 }
 
 .secure-access-btn-primary:disabled {
-  opacity: 0.6 !important;
+  opacity: 0.65 !important;
   cursor: not-allowed !important;
+  transform: none !important;
 }
 
-/* Hide Spline watermark */
+.login-spinner {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+.login-error {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: rgba(192, 57, 43, 0.12);
+  border: 1px solid rgba(192, 57, 43, 0.25);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #e57373;
+}
+
+/* ── Center Panel (Telemetry components) ── */
+.login-center-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 500px;
+  justify-self: center;
+}
+
+@media (min-width: 1024px) {
+  .login-center-panel {
+    justify-self: stretch;
+  }
+}
+
+/* Telemetry Cards */
+.hud-telemetry-card {
+  background: var(--color-hud-card-bg);
+  border: 1px solid var(--color-hud-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.hud-telemetry-card::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+
+.hud-telemetry-card.amber::after {
+  background: #e17055;
+}
+
+.hud-telemetry-card.cyan::after {
+  background: #3b82f6;
+}
+
+.hud-telemetry-header {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-hud-dim);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hud-telemetry-value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.hud-telemetry-value.glowing-amber {
+  color: #f19066;
+  text-shadow: 0 0 8px rgba(241, 144, 102, 0.4);
+}
+
+.hud-telemetry-value.glowing-cyan {
+  color: #4fc3f7;
+  text-shadow: 0 0 8px rgba(79, 195, 247, 0.4);
+}
+
+.hud-telemetry-footer {
+  font-size: 10px;
+  color: var(--color-hud-dim);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.hud-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.hud-grid-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-grid-label {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--color-hud-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1px;
+}
+
+.hud-grid-value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.hud-grid-value.glowing-green {
+  color: #00b894;
+  text-shadow: 0 0 6px rgba(0, 184, 148, 0.4);
+}
+
+/* Terminal intrusion logger */
+.hud-terminal-box {
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(22, 66, 91, 0.5);
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  padding: 14px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+}
+
+.hud-terminal-header {
+  font-size: 9px;
+  font-weight: 800;
+  color: #5a94bb;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-terminal-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--color-hud-dim);
+  max-height: 95px;
+  overflow: hidden;
+}
+
+.hud-terminal-row {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Blinking cursor */
+.hud-terminal-cursor {
+  display: inline-block;
+  width: 5px;
+  height: 10px;
+  background: #5a94bb;
+  margin-left: 3px;
+  animation: blink-cursor 1s step-end infinite;
+  vertical-align: middle;
+}
+
+/* ── Dial Gauge ── */
+.hud-dial-section {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.hud-dial-wrapper {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hud-dial-dashed-ring {
+  position: absolute;
+  inset: 0;
+  border: 1.5px dashed rgba(90, 148, 187, 0.3);
+  border-radius: 50%;
+  animation: spin-clockwise 24s linear infinite;
+}
+
+.hud-dial-glow-ring {
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(90, 148, 187, 0.55);
+  border-radius: 50%;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  animation: spin-counter-clockwise 32s linear infinite;
+}
+
+.hud-dial-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-dial-number {
+  font-size: 13px;
+  font-weight: 800;
+  color: #5a94bb;
+  font-family: var(--font-mono);
+  line-height: 1;
+}
+
+.hud-dial-label {
+  font-size: 6px;
+  color: var(--color-hud-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.hud-dial-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-dial-title {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--color-hud-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+
+.hud-dial-subtitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: var(--font-mono);
+}
+
+/* ── Right Column (Platform Core Features) ── */
+.login-features-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 500px;
+  justify-self: center;
+}
+
+@media (min-width: 1024px) {
+  .login-features-panel {
+    justify-self: stretch;
+  }
+}
+
+.hud-feature-card {
+  background: var(--color-hud-card-bg);
+  border: 1px solid var(--color-hud-border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.hud-feature-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.22s ease;
+}
+
+.hud-feature-card:hover {
+  transform: translateX(4px);
+  background: rgba(6, 14, 24, 0.88);
+  border-color: rgba(90, 148, 187, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.hud-feature-card:hover::before {
+  background: #3b82f6;
+}
+
+.hud-feature-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.hud-feature-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-feature-icon-well {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+  opacity: 0.9;
+}
+
+.hud-feature-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.hud-feature-badge {
+  font-size: 7.5px;
+  font-weight: 800;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hud-feature-badge.analyst {
+  background: rgba(59, 130, 246, 0.12);
+  color: #4fc3f7;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.hud-feature-badge.admin {
+  background: rgba(225, 112, 85, 0.12);
+  color: #f19066;
+  border: 1px solid rgba(225, 112, 85, 0.2);
+}
+
+.hud-feature-desc {
+  font-size: 10.5px;
+  color: var(--color-hud-dim);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ── Footer ── */
+.login-footer {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 28px;
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(90, 148, 187, 0.45);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.login-footer-sep {
+  opacity: 0.3;
+}
+
+/* ── Animations ── */
+@keyframes spin-clockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-counter-clockwise {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes blink-cursor {
+  from, to { background-color: transparent }
+  50% { background-color: #5a94bb }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 a[href*="spline.design"] {
   display: none !important;
 }

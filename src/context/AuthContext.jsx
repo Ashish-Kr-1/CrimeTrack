@@ -50,10 +50,32 @@ const MOCK_INITIAL_LOGS = [
   }
 ];
 
+/* Generate a random session token */
+function generateSessionToken() {
+  const arr = new Uint8Array(32);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => b.toString(16).padStart(2, "0")).join("");
+}
+
+/* Credential store — kept server-side in a real app */
+const CREDENTIALS = [
+  { username: "admin",   password: "admin123",   role: "admin" },
+  { username: "analyst", password: "analyst123", role: "analyst" },
+  { username: "officer", password: "officer123", role: "officer" },
+];
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("cybertrack_user");
-    return saved ? JSON.parse(saved) : null;
+    const savedUser = localStorage.getItem("cybertrack_user");
+    const savedToken = localStorage.getItem("cybertrack_session_token");
+    // Only restore session if both user and token exist
+    if (savedUser && savedToken) {
+      return JSON.parse(savedUser);
+    }
+    // Clear stale data
+    localStorage.removeItem("cybertrack_user");
+    localStorage.removeItem("cybertrack_session_token");
+    return null;
   });
 
   const [auditLogs, setAuditLogs] = useState(() => {
@@ -66,6 +88,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem("cybertrack_user", JSON.stringify(user));
     } else {
       localStorage.removeItem("cybertrack_user");
+      localStorage.removeItem("cybertrack_session_token");
     }
   }, [user]);
 
@@ -91,24 +114,16 @@ export function AuthProvider({ children }) {
   const login = (username, password) => {
     const cleanUser = username.trim().toLowerCase();
     
-    if (cleanUser === "admin" && password === "admin123") {
-      const u = { username: "admin", role: "admin" };
-      setUser(u);
-      addAuditLog("LOGIN", "Admin credentials successfully validated", "SUCCESS", "admin");
-      return { success: true, user: u };
-    }
-    
-    if (cleanUser === "analyst" && password === "analyst123") {
-      const u = { username: "analyst", role: "analyst" };
-      setUser(u);
-      addAuditLog("LOGIN", "Analyst credentials successfully validated", "SUCCESS", "analyst");
-      return { success: true, user: u };
-    }
+    const matched = CREDENTIALS.find(
+      c => c.username === cleanUser && c.password === password
+    );
 
-    if (cleanUser === "officer" && password === "officer123") {
-      const u = { username: "officer", role: "officer" };
+    if (matched) {
+      const token = generateSessionToken();
+      const u = { username: matched.username, role: matched.role };
       setUser(u);
-      addAuditLog("LOGIN", "Officer credentials successfully validated", "SUCCESS", "officer");
+      localStorage.setItem("cybertrack_session_token", token);
+      addAuditLog("LOGIN", `${matched.role.charAt(0).toUpperCase() + matched.role.slice(1)} credentials successfully validated`, "SUCCESS", matched.username);
       return { success: true, user: u };
     }
 
@@ -123,6 +138,11 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  /* Check if session is valid */
+  const isAuthenticated = () => {
+    return !!user && !!localStorage.getItem("cybertrack_session_token");
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -130,7 +150,8 @@ export function AuthProvider({ children }) {
         login,
         logout,
         auditLogs,
-        addAuditLog
+        addAuditLog,
+        isAuthenticated
       }}
     >
       {children}

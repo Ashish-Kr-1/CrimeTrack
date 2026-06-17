@@ -59,25 +59,25 @@ function Navbar({ onToggleSidebar }) {
               <path d="M 59 62 L 59 72" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" fill="none" />
               <path d="M 48 55 A 2 3 0 0 1 52 55" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" fill="none" />
 
-              <path d="M 50 15 L 25 23 L 25 58 Q 25 75 50 85" stroke="#3b82f6" strokeWidth="3.2" strokeLinecap="round" stroke-linejoin="round" fill="none" />
-              <path d="M 50 15 L 75 23 L 75 58 Q 75 75 50 85" stroke="#0f3347" strokeWidth="3.2" strokeLinecap="round" stroke-linejoin="round" fill="none" />
+              <path d="M 50 15 L 25 23 L 25 58 Q 25 75 50 85" stroke="#3b82f6" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+              <path d="M 50 15 L 75 23 L 75 58 Q 75 75 50 85" stroke="#0f3347" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               
-              <path d="M 25 38 L 18 38 L 13 32" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" fill="none" />
+              <path d="M 25 38 L 18 38 L 13 32" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               <circle cx="13" cy="32" r="2.8" fill="#3b82f6" />
               
-              <path d="M 25 48 L 16 48 L 13 51 L 9 51" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" fill="none" />
+              <path d="M 25 48 L 16 48 L 13 51 L 9 51" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               <circle cx="9" cy="51" r="2.8" fill="#3b82f6" />
               
-              <path d="M 25 58 L 20 58 L 13 65" stroke="#3b82f6" stroke-width="2.5" strokeLinecap="round" stroke-linejoin="round" fill="none" />
+              <path d="M 25 58 L 20 58 L 13 65" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               <circle cx="13" cy="65" r="2.8" fill="#3b82f6" />
 
-              <path d="M 75 38 L 82 38 L 87 32" stroke="#0f3347" stroke-width="2.5" strokeLinecap="round" stroke-linejoin="round" fill="none" />
+              <path d="M 75 38 L 82 38 L 87 32" stroke="#0f3347" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               <circle cx="87" cy="32" r="2.8" fill="#0f3347" />
               
-              <path d="M 75 48 L 84 48 L 87 51 L 91 51" stroke="#0f3347" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" fill="none" />
+              <path d="M 75 48 L 84 48 L 87 51 L 91 51" stroke="#0f3347" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               <circle cx="91" cy="51" r="2.8" fill="#0f3347" />
               
-              <path d="M 75 58 L 80 58 L 87 65" stroke="#0f3347" stroke-width="2.5" strokeLinecap="round" stroke-linejoin="round" fill="none" />
+              <path d="M 75 58 L 80 58 L 87 65" stroke="#0f3347" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               <circle cx="87" cy="65" r="2.8" fill="#0f3347" />
             </svg>
           </div>

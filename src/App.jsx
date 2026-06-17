@@ -24,7 +24,7 @@ const pageVariants = {
 function App() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, addAuditLog } = useContext(AuthContext);
+  const { user, addAuditLog, isAuthenticated } = useContext(AuthContext);
 
   // Auto-log page navigation events for the security audit trail
   useEffect(() => {
@@ -37,7 +37,7 @@ function App() {
   }, [location.pathname, user]);
 
   // Case 1: Unauthenticated -> Force Login page
-  if (!user) {
+  if (!user || !isAuthenticated()) {
     return (
       <Routes>
         <Route path="/login" element={<LoginPage />} />
@@ -58,18 +58,18 @@ function App() {
 
   // Case 3: Authenticated as Analyst -> Render standard workspace
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#231942" }}>
+    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#070b13" }}>
 
-      {/* ── Ambient Background — rich layered radials ── */}
+      {/* ── Ambient Background — soft layered radials ── */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background: [
-            "radial-gradient(ellipse 75% 65% at 10% 15%, rgba(47,102,144,0.07) 0%, transparent 70%)",
-            "radial-gradient(ellipse 60% 55% at 90% 80%, rgba(22,66,91,0.05) 0%, transparent 70%)",
-            "radial-gradient(ellipse 50% 50% at 55% 45%, rgba(58,124,165,0.04) 0%, transparent 70%)",
-            "radial-gradient(ellipse 40% 40% at 80% 15%, rgba(90,148,187,0.03) 0%, transparent 70%)",
+            "radial-gradient(ellipse 75% 65% at 10% 15%, rgba(22, 66, 91, 0.12) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 55% at 90% 80%, rgba(58, 124, 165, 0.08) 0%, transparent 70%)",
+            "radial-gradient(ellipse 50% 50% at 55% 45%, rgba(22, 66, 91, 0.04) 0%, transparent 70%)",
+            "radial-gradient(ellipse 40% 40% at 80% 15%, rgba(58, 124, 165, 0.03) 0%, transparent 70%)",
           ].join(", "),
         }}
       />

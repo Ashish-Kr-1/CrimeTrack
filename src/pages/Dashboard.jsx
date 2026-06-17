@@ -324,7 +324,7 @@ function Dashboard() {
         return (
           <motion.div variants={fadeUp} style={{
             borderRadius: 16, padding: "20px 24px", marginBottom: 24,
-            background: "#415a77", border: "1px solid rgba(255, 255, 255, 0.15)",
+            background: "#1a2e3f", border: "1px solid rgba(255, 255, 255, 0.12)",
             boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.2)",
             display: "flex", alignItems: "flex-start", gap: 16,
           }}>
@@ -559,7 +559,7 @@ function Dashboard() {
       {/* ══════════════════════════════════════════════════════
           SECTION 4 — TABBED WORKSPACE
       ══════════════════════════════════════════════════════ */}
-      <motion.div variants={fadeUp} style={{ overflow: "hidden", marginBottom: 24, background: "#415a77", border: "1px solid rgba(255, 255, 255, 0.15)", borderRadius: 14, boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.15)" }}>
+      <motion.div variants={fadeUp} style={{ overflow: "hidden", marginBottom: 24, background: "#1a2e3f", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: 14, boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.15)" }}>
         <div className="tab-bar" style={{ margin: "16px 16px 0", background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.12)" }}>
           {[
             { id: "narrative", label: "Full Story" },
@@ -570,7 +570,7 @@ function Dashboard() {
               className={`tab-item${activeTab === tab.id ? " active" : ""}`}
               style={{
                 background: activeTab === tab.id ? "#ffffff" : "transparent",
-                color: activeTab === tab.id ? "#415a77" : "rgba(255, 255, 255, 0.8)",
+                color: activeTab === tab.id ? "#1a2e3f" : "rgba(255, 255, 255, 0.8)",
                 fontWeight: activeTab === tab.id ? 800 : 600,
                 transition: "all 0.2s ease"
               }}>
@@ -614,16 +614,16 @@ function Dashboard() {
                           <div style={{ background: "#faf9f6", border: "1px solid rgba(255, 255, 255, 0.8)", borderRadius: 14, padding: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, flexWrap: "wrap", gap: 8 }}>
                               <span style={{ fontSize: 14, fontWeight: 800, color: "#0f2635" }}>{phase.phase}</span>
-                              <span style={{ padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 800, fontFamily: "var(--font-mono)", background: "rgba(65, 90, 119, 0.08)", border: "1px solid rgba(65, 90, 119, 0.18)", color: "#415a77" }}>
+                              <span style={{ padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 800, fontFamily: "var(--font-mono)", background: "rgba(26, 46, 63, 0.12)", border: "1px solid rgba(26, 46, 63, 0.22)", color: "#2a5470" }}>
                                 {phase.event_count} events
                               </span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: "var(--color-text-muted)", borderTop: "1px dashed rgba(65, 90, 119, 0.15)", paddingTop: 10, fontFamily: "var(--font-mono)", flexWrap: "wrap", gap: 8 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                 <Smartphone size={13} color="var(--color-text-subtle)" />
-                                Phone: <span style={{ color: "#415a77", fontWeight: 700 }}>{phase.imei || "Unknown"}</span>
+                                Phone: <span style={{ color: "#2a5470", fontWeight: 700 }}>{phase.imei || "Unknown"}</span>
                               </div>
-                              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#415a77", fontWeight: 600 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#2a5470", fontWeight: 600 }}>
                                 <span style={{ background: "rgba(65, 90, 119, 0.06)", padding: "4px 10px", borderRadius: 6 }}>
                                   {formatFriendlyDate(phase.start)}
                                 </span>

@@ -9,8 +9,8 @@
 
 @theme {
   /* ── FCSA Core Palette ── */
-  --color-bg:              #231942;
-  --color-bg-warm:         #cdd0ca;
+  --color-bg:              #070b13;
+  --color-bg-warm:         #16425b;
 
   /* Surfaces */
   --color-surface:         #ffffff;
@@ -256,7 +256,7 @@
   html, body, #root {
     width: 100%;
     height: 100%;
-    background-color: #231942;
+    background-color: #0f1923;
     color: var(--color-text);
     font-family: var(--font-sans);
     overflow: hidden;
@@ -865,14 +865,14 @@
   padding: 18px 20px;
 }
 
-/* ── Premium Dark Purple (#231942) Text Contrast & Header Adjustments ── */
+/* ── FCSA Dark Theme Contrast & Header Adjustments ── */
 .page-container > div:first-child h1,
 .page-container > h1,
 .page-header h1,
 .page-title,
 h1.text-text,
 h1[style*="var(--color-text)"] {
-  color: #ffffff !important;
+  color: #ffffff !important; /* White for main titles */
 }
 
 .page-container > div:first-child p,
@@ -881,11 +881,160 @@ h1[style*="var(--color-text)"] {
 .page-subtitle,
 p.text-text-muted,
 p[style*="var(--color-text-muted)"] {
-  color: #c0b9cc !important; /* soft pastel light purple/lavender */
+  color: #d9dcd6 !important; /* Alabaster Grey for subtitles */
 }
 
 /* Ensure sub-labels outside cards are visible */
 .page-container > div:not(.glass-card) .label,
 .page-container > .label {
-  color: #9d96bb !important;
+  color: #5a94bb !important; /* Cerulean Blue */
+}
+
+/* ── Cohesive Dark Slate-Navy Theme Overrides ── */
+
+/* Glass Cards: dark transparent styling */
+.glass-card {
+  background: rgba(14, 22, 38, 0.72) !important;
+  border: 1px solid rgba(22, 66, 91, 0.25) !important; /* Yale Blue border tint */
+  box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(14px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(120%) !important;
+}
+
+.glass-card:hover {
+  border-color: rgba(58, 124, 165, 0.45) !important; /* Cerulean Blue hover */
+  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Card titles, headers and general texts inside cards */
+.glass-card h2, 
+.glass-card h3, 
+.glass-card h4, 
+.glass-card h5,
+.glass-card .card-title,
+.glass-card strong {
+  color: #ffffff !important; /* High contrast white headers */
+}
+
+.glass-card p,
+.glass-card span:not(.label):not(.badge):not(.hud-grid-value) {
+  color: #d9dcd6 !important; /* Alabaster Grey body text */
+}
+
+.glass-card .label {
+  color: #50728a !important; /* Slate Blue labels */
+}
+
+.glass-card .unit {
+  color: #5a94bb !important;
+}
+
+.glass-card .help {
+  color: #5a94bb !important;
+}
+
+/* Mini Statistics Cards */
+.stat-mini {
+  background: rgba(7, 10, 19, 0.6) !important;
+  border: 1px solid rgba(22, 66, 91, 0.18) !important; /* Yale Blue tint */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.stat-mini:hover {
+  background: rgba(7, 10, 19, 0.8) !important;
+  border-color: rgba(58, 124, 165, 0.3) !important; /* Cerulean */
+}
+
+.stat-mini span {
+  color: #d9dcd6 !important; /* Alabaster Grey label */
+}
+
+.stat-mini strong, 
+.stat-mini span.font-mono {
+  color: #ffffff !important;
+}
+
+.stat-mini p {
+  color: #50728a !important;
+}
+
+/* Section Panel updates */
+.section-panel {
+  background: rgba(14, 22, 38, 0.72) !important;
+  border: 1px solid rgba(22, 66, 91, 0.25) !important;
+}
+
+.section-panel-header {
+  background: rgba(22, 66, 91, 0.15) !important;
+  border-bottom: 1px solid rgba(22, 66, 91, 0.25) !important;
+}
+
+.section-panel-header h2,
+.section-panel-header h3 {
+  color: #ffffff !important;
+}
+
+/* Tables in dark theme */
+.ct-table th {
+  color: #d9dcd6 !important; /* Alabaster text */
+  background: rgba(22, 66, 91, 0.15) !important;
+  border-bottom: 1px solid rgba(22, 66, 91, 0.25) !important;
+}
+
+.ct-table td {
+  color: #e2e8f0 !important;
+  border-bottom: 1px solid rgba(22, 66, 91, 0.08) !important;
+}
+
+.ct-table tr:hover td {
+  background: rgba(58, 124, 165, 0.1) !important;
+}
+
+/* Form inputs & controls inside analyst dashboard */
+input[type="text"], 
+input[type="search"], 
+select, 
+textarea {
+  background: rgba(7, 10, 19, 0.7) !important;
+  border: 1px solid rgba(22, 66, 91, 0.2) !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+}
+
+input[type="text"]:focus, 
+input[type="search"]:focus, 
+select:focus, 
+textarea:focus {
+  border-color: #3a7ca5 !important; /* Cerulean accent */
+  box-shadow: 0 0 0 3px rgba(58, 124, 165, 0.35) !important;
+  background: rgba(7, 10, 19, 0.9) !important;
+}
+
+/* Recharts / SVG SVG styling overrides for Dark Theme */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(255, 255, 255, 0.06) !important;
+}
+
+.recharts-text {
+  fill: #50728a !important;
+}
+
+.recharts-legend-item-text {
+  color: #d9dcd6 !important;
+}
+
+/* Recharts Tooltips overrides */
+.recharts-default-tooltip,
+.recharts-tooltip-wrapper > div,
+div[style*="background: rgba(255, 255, 255, 0.97)"] {
+  background: #0e1322 !important;
+  border: 1px solid rgba(58, 124, 165, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+}
+
+div[style*="background: rgba(255, 255, 255, 0.97)"] p {
+  color: #d9dcd6 !important;
 }
