@@ -142,7 +142,7 @@ function TowerDetailPanel({ location, onClose }) {
           <div>
             <h3 style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)", marginBottom: 10 }}>Activity by Time of Day</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {[["Morning","#fdcb6e"], ["Afternoon","#0984e3"], ["Evening","#e17055"], ["Night","#6c5ce7"]].map(([period, c]) => {
+              {[["Morning","#fdcb6e"], ["Afternoon","#0984e3"], ["Evening","#e17055"], ["Night","#3a7ca5"]].map(([period, c]) => {
                 const cnt = timeDist[period] || 0;
                 const pct = totalEvents ? (cnt/totalEvents*100).toFixed(0) : 0;
                 return (

@@ -58,7 +58,7 @@ function App() {
 
   // Case 3: Authenticated as Analyst -> Render standard workspace
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#decbb7" }}>
+    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#d9dcd6" }}>
 
       {/* ── Ambient Background — rich layered radials ── */}
       <div
@@ -66,10 +66,10 @@ function App() {
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background: [
-            "radial-gradient(ellipse 75% 65% at 10% 15%, rgba(108,92,231,0.07) 0%, transparent 70%)",
-            "radial-gradient(ellipse 60% 55% at 90% 80%, rgba(225,112,85,0.05) 0%, transparent 70%)",
-            "radial-gradient(ellipse 50% 50% at 55% 45%, rgba(0,184,148,0.04) 0%, transparent 70%)",
-            "radial-gradient(ellipse 40% 40% at 80% 15%, rgba(9,132,227,0.03) 0%, transparent 70%)",
+            "radial-gradient(ellipse 75% 65% at 10% 15%, rgba(47,102,144,0.07) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 55% at 90% 80%, rgba(22,66,91,0.05) 0%, transparent 70%)",
+            "radial-gradient(ellipse 50% 50% at 55% 45%, rgba(58,124,165,0.04) 0%, transparent 70%)",
+            "radial-gradient(ellipse 40% 40% at 80% 15%, rgba(90,148,187,0.03) 0%, transparent 70%)",
           ].join(", "),
         }}
       />

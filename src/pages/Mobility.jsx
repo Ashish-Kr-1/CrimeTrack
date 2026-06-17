@@ -741,7 +741,7 @@ function VelocityAlerts({ records }) {
 // ─── Tab 4: Time Clusters ─────────────────────────────────────────────────────
 function TimeClusters({ records, mapStyle, setMapStyle }) {
   const PERIODS = [
-    { label: "Night", range: "22:00–06:00", color: "#6c5ce7", min: 22, max: 6 },
+    { label: "Night", range: "22:00–06:00", color: "#3a7ca5", min: 22, max: 6 },
     { label: "Morning", range: "06:00–12:00", color: "#fdcb6e", min: 6, max: 12 },
     { label: "Afternoon", range: "12:00–18:00", color: "#0984e3", min: 12, max: 18 },
     { label: "Evening", range: "18:00–22:00", color: "#e17055", min: 18, max: 22 },
@@ -765,7 +765,7 @@ function TimeClusters({ records, mapStyle, setMapStyle }) {
       if (!coords || !dt) return;
       const hour = dt.getHours();
       const period = getPeriod(hour);
-      const color = PERIODS.find((p) => p.label === period)?.color || "#6c5ce7";
+      const color = PERIODS.find((p) => p.label === period)?.color || "#3a7ca5";
       pts.push({ coords, period, color });
       cnt[period]++;
       tot++;
@@ -781,7 +781,7 @@ function TimeClusters({ records, mapStyle, setMapStyle }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div className="glass-card" style={{ overflow: "hidden", borderRadius: 16 }}>
         <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-border)", display: "flex", alignItems: "center", gap: 8 }}>
-          <Timer size={16} color="#6c5ce7" />
+          <Timer size={16} color="#3a7ca5" />
           <span style={{ fontSize: 15, fontWeight: 700, color: "var(--color-text)" }}>Time-of-Day Activity Clusters</span>
         </div>
         <div style={{ height: 460, position: "relative" }}>
@@ -853,10 +853,10 @@ function TimeClusters({ records, mapStyle, setMapStyle }) {
       </div>
 
       {/* Verdict */}
-      <div className="glass-card" style={{ padding: 20, borderLeft: "3px solid #6c5ce7" }}>
+      <div className="glass-card" style={{ padding: 20, borderLeft: "3px solid #3a7ca5" }}>
         <div style={{ display: "flex", gap: 12 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(108,92,231,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <AlertTriangle size={18} color="#6c5ce7" />
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(58,124,165,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <AlertTriangle size={18} color="#3a7ca5" />
           </div>
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)", marginBottom: 4 }}>Analyst Verdict</div>
@@ -868,7 +868,7 @@ function TimeClusters({ records, mapStyle, setMapStyle }) {
                 </>
               ) : (
                 <>
-                  Night-time activity accounts for <strong style={{ color: "#6c5ce7" }}>{nightPct}%</strong> of total events.
+                  Night-time activity accounts for <strong style={{ color: "#3a7ca5" }}>{nightPct}%</strong> of total events.
                   This falls within normal behavioral parameters for a standard user.
                   {counts.Morning > counts.Afternoon && " Activity is heaviest in morning hours, suggesting a routine daytime usage pattern."}
                 </>

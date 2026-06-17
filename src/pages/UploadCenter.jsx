@@ -299,7 +299,7 @@ function UploadCenter() {
 
   /* ── Export simulated PCAP file ── */
   const handleExportPCAP = () => {
-    const text = `PCAP Packet Trace Summary - CrimeTrack Ingestion v5.0
+    const text = `PCAP Packet Trace Summary - FCSA Ingestion v5.0
 -----------------------------------------------------------
 [2026-06-16 22:30:11] TCP 192.168.1.102:51223 -> 185.220.101.5:443 [Tor Exit Node] - FLAG: CRITICAL
 [2026-06-16 22:30:15] TCP 192.168.1.102:51224 -> 104.244.42.1:443 [Twitter/X] - FLAG: NOMINAL
@@ -448,7 +448,7 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
               <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 18 }}>What happens after you upload</h3>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
                 {[
-                  { step: "1", title: "Analysis runs automatically", body: uploadType === "CDR" ? "7 telecom heuristic checks execute instantly to detect burner SIMs and money mule networks." : "Packet correlation runs to inspect proxy tunnels, SIP VoIP logins, and IP routing hops.", color: "#6c5ce7" },
+                  { step: "1", title: "Analysis runs automatically", body: uploadType === "CDR" ? "7 telecom heuristic checks execute instantly to detect burner SIMs and money mule networks." : "Packet correlation runs to inspect proxy tunnels, SIP VoIP logins, and IP routing hops.", color: "#3a7ca5" },
                   { step: "2", title: "Plain-English results appear", body: uploadType === "CDR" ? "The Dashboard shows exactly what was found in simple language, mapping risk score metrics." : "Generates a dedicated Data Auditing ledger detailing proxy alerts, SIEM integration endpoints, and PCAP file maps.", color: "#00b894" },
                 ].map(s => (
                   <div key={s.step} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
@@ -525,8 +525,8 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
             
             {/* Action Bar */}
             <div style={{ display: "flex", alignItems: "center", justifyItems: "center", gap: 14, padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.9)", backdropFilter: "blur(12px)", flexWrap: "wrap" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(108,92,231,0.08)", border: "1px solid rgba(108,92,231,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <Shield size={20} color="#6c5ce7" strokeWidth={1.8} />
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(58,124,165,0.08)", border: "1px solid rgba(58,124,165,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <Shield size={20} color="#3a7ca5" strokeWidth={1.8} />
               </div>
               <div style={{ flex: 1, minWidth: 200 }}>
                 <p style={{ margin: "0 0 3px", fontSize: 14, fontWeight: 800, color: "var(--color-text)" }}>Zeek/Wireshark IPDR Network Traffic Log</p>
@@ -544,7 +544,7 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
             {/* KPI Cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
               {[
-                { label: "IPDR Packets", value: ipdrRecords.length.toString(), icon: Database, color: "#6c5ce7", desc: "Total network packet headers analysed" },
+                { label: "IPDR Packets", value: ipdrRecords.length.toString(), icon: Database, color: "#3a7ca5", desc: "Total network packet headers analysed" },
                 { label: "Critical Anomalies", value: criticalCount.toString(), icon: AlertTriangle, color: "#d63031", desc: "Tor exit nodes & commercial VPNs detected" },
                 { label: "Trace Integrity", value: "99.84%", icon: Shield, color: "#00b894", desc: "Digital verification signature matches" }
               ].map((kpi) => {
@@ -594,12 +594,12 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
             {/* Ingestion audit log table */}
             <div className="glass-card" style={{ padding: "20px 24px" }}>
               <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 12, display: "flex", alignItems: "center", gap: 8, margin: "0 0 10px" }}>
-                <Terminal size={13} color="#6c5ce7" /> Parsed IPDR Records (Wireshark/Zeek Schema)
+                <Terminal size={13} color="#3a7ca5" /> Parsed IPDR Records (Wireshark/Zeek Schema)
               </h3>
               <div style={{ overflowX: "auto", borderRadius: 10, border: "1px solid var(--color-border)" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
                   <thead>
-                    <tr style={{ background: "rgba(108,92,231,0.04)", borderBottom: "1px solid var(--color-border)" }}>
+                    <tr style={{ background: "rgba(58,124,165,0.04)", borderBottom: "1px solid var(--color-border)" }}>
                       {["Time", "Source IP", "Destination IP", "Protocol", "Port", "Identified Service", "Severity Indicator"].map((h) => (
                         <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontWeight: 800, fontSize: 10, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--color-text-muted)" }}>{h}</th>
                       ))}

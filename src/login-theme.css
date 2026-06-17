@@ -1,45 +1,35 @@
 /* ============================================================
-   CYBER-DEFEND SECURITY CORE — Sci-Fi Dark Theme
-   Exact implementation matching visual requirements
+   FCSA — Forensics Cyber Security Agency
+   Login Page Theme — Dark Secure Gateway
+   FCSA Blue palette: #16425b  #2f6690  #3a7ca5  #5a94bb
    ============================================================ */
 
 .cyber-dark-root {
-  background-color: #030712 !important;
+  background-color: #060e18 !important;
   color: #e2e8f0 !important;
-  font-family: "Lexend", sans-serif;
+  font-family: "Inter", sans-serif;
   overflow: hidden;
   height: 100vh;
   width: 100vw;
   position: relative;
 }
 
-/* ── Starfield & Grid Layer ── */
+/* ── Starfield ── */
 .cyber-starfield {
   position: absolute;
   inset: 0;
-  background-image: 
-    radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
-    radial-gradient(1.5px 1.5px at 120px 100px, #fff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 200px 150px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
-    radial-gradient(2px 2px at 300px 240px, #00e5ff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 450px 320px, #fff, rgba(0,0,0,0));
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.5), rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 120px 100px, rgba(255,255,255,0.6), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 200px 150px, rgba(255,255,255,0.6), rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 300px 240px, #5a94bb, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 450px 320px, rgba(255,255,255,0.5), rgba(0,0,0,0));
   background-repeat: repeat;
   background-size: 550px 550px;
-  opacity: 0.35;
+  opacity: 0.3;
   pointer-events: none;
   z-index: 0;
-}
-
-.cyber-grid-overlay {
-  position: absolute;
-  inset: 0;
-  background-size: 50px 50px;
-  background-image: 
-    linear-gradient(to right, rgba(0, 229, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 229, 255, 0.04) 1px, transparent 1px);
-  pointer-events: none;
-  z-index: 1;
 }
 
 /* Scanline effect */
@@ -47,174 +37,82 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.25) 50%
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.18) 50%
   );
   background-size: 100% 4px;
   z-index: 2;
   pointer-events: none;
-  opacity: 0.45;
+  opacity: 0.35;
 }
 
-/* ── Sci-Fi Glass Panels ── */
+/* ── FCSA Glass Panels ── */
 .cyber-glass-panel {
-  background: rgba(10, 20, 32, 0.72) !important;
-  border: 1px solid rgba(0, 229, 255, 0.2) !important;
+  background: rgba(8, 20, 35, 0.76) !important;
+  border: 1px solid rgba(90, 148, 187, 0.22) !important;
   border-radius: 16px !important;
-  backdrop-filter: blur(20px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
-  box-shadow: 
-    0 10px 40px rgba(0, 0, 0, 0.6), 
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 15px rgba(0, 229, 255, 0.05) !important;
+  backdrop-filter: blur(20px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 15px rgba(58, 124, 165, 0.06) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  
-  /* Safe fallback padding */
   padding: 24px !important;
   box-sizing: border-box !important;
 }
 
-/* Explicit spacious padding for authentication card */
-.cyber-glass-panel.auth-card {
-  padding: 36px 32px !important;
-}
-
-/* Precise padding for telemetry cards */
 .cyber-glass-panel.telemetry-card {
   padding: 20px 24px !important;
 }
 
-/* Unified header padding */
 .cyber-header {
-  padding: 24px 32px !important;
+  padding: 20px 28px !important;
 }
 
 @media (min-width: 768px) {
   .cyber-header {
-    padding: 32px 48px !important;
+    padding: 28px 48px !important;
   }
 }
 
-/* Unified footer padding */
 .cyber-footer {
-  padding: 24px 32px !important;
+  padding: 20px 28px !important;
 }
 
 @media (min-width: 768px) {
   .cyber-footer {
-    padding: 32px 48px !important;
+    padding: 28px 48px !important;
   }
 }
 
 .cyber-glass-panel::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.45), transparent);
+  background: linear-gradient(90deg, transparent, rgba(90, 148, 187, 0.45), transparent);
   pointer-events: none;
 }
 
 .cyber-glass-panel:hover {
-  border-color: rgba(0, 229, 255, 0.4) !important;
-  box-shadow: 
-    0 15px 50px rgba(0, 0, 0, 0.75), 
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 0 25px rgba(0, 229, 255, 0.15) !important;
+  border-color: rgba(90, 148, 187, 0.40) !important;
+  box-shadow:
+    0 15px 50px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 0 22px rgba(58, 124, 165, 0.12) !important;
 }
 
-/* Accent borders for specific cards */
+/* FCSA accent borders */
 .border-glow-cyan {
-  border: 1px solid rgba(0, 229, 255, 0.35) !important;
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.12), inset 0 0 12px rgba(0, 229, 255, 0.08) !important;
+  border: 1px solid rgba(90, 148, 187, 0.38) !important;
+  box-shadow: 0 0 20px rgba(58, 124, 165, 0.14), inset 0 0 12px rgba(58, 124, 165, 0.07) !important;
 }
 
 .border-glow-amber {
-  border: 1px solid rgba(245, 158, 11, 0.35) !important;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.12), inset 0 0 12px rgba(245, 158, 11, 0.08) !important;
-}
-
-/* ── Inputs & Terminals ── */
-.cyber-input {
-  width: 100%;
-  background: rgba(4, 10, 20, 0.6) !important;
-  border: 1px solid rgba(0, 229, 255, 0.15) !important;
-  border-radius: 8px !important;
-  color: #e2e8f0 !important;
-  font-family: var(--font-sans);
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  padding: 12px 14px !important;
-  outline: none !important;
-  transition: all 0.2s ease;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4) !important;
-}
-
-.cyber-input:focus {
-  border-color: #00e5ff !important;
-  background: rgba(4, 10, 20, 0.8) !important;
-  box-shadow: 
-    0 0 12px rgba(0, 229, 255, 0.22), 
-    inset 0 2px 4px rgba(0,0,0,0.5) !important;
-}
-
-.cyber-input::placeholder {
-  color: #475569 !important;
-}
-
-/* ── Cyber Buttons ── */
-.cyber-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  border: 1px solid transparent;
-  outline: none;
-  user-select: none;
-}
-
-.cyber-btn-cyan {
-  background: linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(0, 168, 255, 0.3) 100%);
-  border: 1px solid rgba(0, 229, 255, 0.4);
-  color: #00e5ff;
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
-  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
-}
-
-.cyber-btn-cyan:hover {
-  background: linear-gradient(135deg, rgba(0, 229, 255, 0.3) 0%, rgba(0, 168, 255, 0.5) 100%);
-  border-color: #00e5ff;
-  box-shadow: 0 0 25px rgba(0, 229, 255, 0.35);
-  transform: translateY(-1px);
-}
-
-.cyber-btn-cyan:active {
-  transform: translateY(0);
-}
-
-.cyber-btn-amber {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.25) 100%);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #f59e0b;
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.08);
-  text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
-}
-
-.cyber-btn-amber:hover {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.45) 100%);
-  border-color: #f59e0b;
-  box-shadow: 0 0 25px rgba(245, 158, 11, 0.3);
-  transform: translateY(-1px);
+  border: 1px solid rgba(214, 137, 16, 0.38) !important;
+  box-shadow: 0 0 20px rgba(214, 137, 16, 0.12), inset 0 0 12px rgba(214, 137, 16, 0.07) !important;
 }
 
 /* ── HUD Telemetry Elements ── */
@@ -222,9 +120,9 @@
   font-family: "JetBrains Mono", monospace;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #475569;
+  color: #50728a;
 }
 
 .cyber-hud-value {
@@ -233,7 +131,7 @@
   color: #e2e8f0;
 }
 
-/* Rotating keyframes for radar/grids */
+/* Rotating keyframes */
 @keyframes spin-clockwise {
   to { transform: rotate(360deg); }
 }
@@ -242,7 +140,7 @@
   to { transform: rotate(-360deg); }
 }
 
-@keyframes pulse-cyan {
+@keyframes pulse-fcsa {
   0%, 100% { opacity: 0.35; transform: scale(1); }
   50% { opacity: 0.95; transform: scale(1.15); }
 }
@@ -256,10 +154,10 @@
 }
 
 .animate-pulse-glow {
-  animation: pulse-cyan 3s ease-in-out infinite;
+  animation: pulse-fcsa 3s ease-in-out infinite;
 }
 
-/* Chrome reflections overlay on glass cards */
+/* Chrome shine on hover */
 .cyber-chrome-shine {
   position: absolute;
   top: -150%;
@@ -269,9 +167,9 @@
   background: linear-gradient(
     135deg,
     transparent 45%,
-    rgba(255, 255, 255, 0.05) 48%,
-    rgba(0, 229, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.05) 52%,
+    rgba(255, 255, 255, 0.04) 48%,
+    rgba(58, 124, 165, 0.07) 50%,
+    rgba(255, 255, 255, 0.04) 52%,
     transparent 55%
   );
   transform: rotate(-15deg);
@@ -285,154 +183,19 @@
   left: 50%;
 }
 
-/* ── Auth Card V2 (redesigned with floating badge) ── */
-.auth-card-v2 {
-  background: rgba(8, 18, 30, 0.82) !important;
-  border: 1px solid rgba(0, 229, 255, 0.22) !important;
-  border-radius: 20px !important;
-  backdrop-filter: blur(24px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
-  box-shadow:
-    0 0 0 1px rgba(0, 229, 255, 0.06),
-    0 20px 60px rgba(0, 0, 0, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 0 30px rgba(0, 229, 255, 0.07) !important;
-  position: relative;
-  overflow: hidden;
-  padding: 32px 32px 28px !important;
-  box-sizing: border-box !important;
-  width: 100%;
-}
-
-.auth-card-v2::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 5%, rgba(0, 229, 255, 0.5) 50%, transparent 95%);
-  pointer-events: none;
-}
-
-/* Icon well — left column of icon-prefixed inputs */
-.auth-input-icon-well {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid rgba(0, 229, 255, 0.12);
-  background: rgba(0, 229, 255, 0.04);
-  border-radius: 10px 0 0 10px;
-  pointer-events: none;
-}
-
-/* Input V2 — with left icon well space */
-.cyber-input-v2 {
-  width: 100%;
-  background: rgba(4, 10, 20, 0.55) !important;
-  border: 1px solid rgba(0, 229, 255, 0.15) !important;
-  border-radius: 10px !important;
-  color: #e2e8f0 !important;
-  font-family: var(--font-sans);
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  padding: 13px 14px 13px 52px !important;
-  outline: none !important;
-  transition: all 0.2s ease;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35) !important;
-}
-
-.cyber-input-v2:focus {
-  border-color: rgba(0, 229, 255, 0.6) !important;
-  background: rgba(4, 10, 20, 0.75) !important;
-  box-shadow:
-    0 0 0 3px rgba(0, 229, 255, 0.08),
-    0 0 14px rgba(0, 229, 255, 0.18),
-    inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
-}
-
-.cyber-input-v2::placeholder {
-  color: #3d4f65 !important;
-}
-
-/* Primary submit button */
-.cyber-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  outline: none;
-  user-select: none;
-  border: 1px solid rgba(0, 229, 255, 0.5);
-  background: linear-gradient(135deg, rgba(0, 180, 220, 0.28) 0%, rgba(0, 100, 200, 0.38) 100%);
-  color: #ffffff;
-  text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
-  box-shadow:
-    0 0 20px rgba(0, 229, 255, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.cyber-btn-primary::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(0, 229, 255, 0.1) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.cyber-btn-primary:hover:not(:disabled) {
-  border-color: rgba(0, 229, 255, 0.85);
-  background: linear-gradient(135deg, rgba(0, 200, 240, 0.38) 0%, rgba(0, 130, 220, 0.5) 100%);
-  box-shadow:
-    0 0 35px rgba(0, 229, 255, 0.38),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-}
-
-.cyber-btn-primary:hover:not(:disabled)::before {
-  opacity: 1;
-}
-
-.cyber-btn-primary:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.cyber-btn-primary:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-/* Hide Spline watermark logo */
-a[href*="spline.design"] {
-  display: none !important;
-}
-
 /* ============================================================
-   SECURE ACCESS CARD STYLE (Matching screenshot exactly)
+   FCSA SECURE ACCESS CARD
    ============================================================ */
 
 .secure-access-card {
-  background: #0d1222 !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  border-radius: 24px !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
-              0 0 40px rgba(0, 0, 0, 0.5) !important;
-  padding: 40px !important;
+  background: #080f1c !important;
+  border: 1px solid rgba(90, 148, 187, 0.16) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.65),
+    0 0 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(58, 124, 165, 0.06) !important;
+  padding: 36px !important;
   width: 100%;
   max-width: 440px;
   box-sizing: border-box !important;
@@ -440,12 +203,20 @@ a[href*="spline.design"] {
   z-index: 10;
 }
 
+.secure-access-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(90, 148, 187, 0.50), transparent);
+}
+
 .secure-access-input {
   width: 100% !important;
-  height: 52px !important;
-  background: #070b16 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 12px !important;
+  height: 48px !important;
+  background: rgba(6, 14, 24, 0.8) !important;
+  border: 1px solid rgba(90, 148, 187, 0.14) !important;
+  border-radius: 10px !important;
   color: #ffffff !important;
   font-family: inherit;
   font-size: 14px !important;
@@ -457,8 +228,8 @@ a[href*="spline.design"] {
 }
 
 .secure-access-input:focus {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 1px #6366f1, 0 0 14px rgba(99, 102, 241, 0.25) !important;
+  border-color: #3a7ca5 !important;
+  box-shadow: 0 0 0 2px rgba(58, 124, 165, 0.20), 0 0 14px rgba(58, 124, 165, 0.16) !important;
 }
 
 .secure-access-btn-primary {
@@ -467,25 +238,25 @@ a[href*="spline.design"] {
   justify-content: center !important;
   gap: 8px !important;
   width: 100% !important;
-  height: 52px !important;
-  background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%) !important;
-  border: none !important;
-  border-radius: 12px !important;
+  height: 48px !important;
+  background: linear-gradient(135deg, #3a7ca5 0%, #16425b 100%) !important;
+  border: 1px solid rgba(90, 148, 187, 0.35) !important;
+  border-radius: 10px !important;
   color: #ffffff !important;
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 800 !important;
-  letter-spacing: 0.08em !important;
+  letter-spacing: 0.09em !important;
   text-transform: uppercase !important;
   cursor: pointer !important;
   transition: all 0.2s ease-in-out !important;
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35) !important;
+  box-shadow: 0 4px 16px rgba(22, 66, 91, 0.40) !important;
   outline: none !important;
 }
 
 .secure-access-btn-primary:hover {
   transform: translateY(-1px) !important;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45) !important;
-  filter: brightness(1.05) !important;
+  background: linear-gradient(135deg, #4a8cb5 0%, #2f6690 100%) !important;
+  box-shadow: 0 6px 22px rgba(58, 124, 165, 0.42) !important;
 }
 
 .secure-access-btn-primary:active {
@@ -495,4 +266,9 @@ a[href*="spline.design"] {
 .secure-access-btn-primary:disabled {
   opacity: 0.6 !important;
   cursor: not-allowed !important;
+}
+
+/* Hide Spline watermark */
+a[href*="spline.design"] {
+  display: none !important;
 }

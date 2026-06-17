@@ -12,7 +12,7 @@ import {
 /* ── Plain-English event types ────────────────────────────────────────────── */
 const EVT_PLAIN = {
   SMS:       { label: "Text Message",    icon: MessageSquare, color: "#0984e3" },
-  VOICE:     { label: "Phone Call",      icon: Phone,         color: "#6c5ce7" },
+  VOICE:     { label: "Phone Call",      icon: Phone,         color: "#3a7ca5" },
   UPI_REG:   { label: "Payment Setup",   icon: Zap,           color: "#d63031" },
   FINANCIAL: { label: "Bank Alert",      icon: CreditCard,    color: "#e17055" },
 };
@@ -229,7 +229,7 @@ function ChronologicalReplay() {
   const activeEvent = replayEvents[activeEventIndex];
   const activeCoordinates = activeEvent?.coordinates;
   const isMule = diagnosticReport.classification === "HIGHLY_SUSPECT_FINANCIAL_MULE";
-  const statusColor = isMule ? "#d63031" : "#6c5ce7";
+  const statusColor = isMule ? "#d63031" : "#3a7ca5";
 
   const historicalTrail = useMemo(() => {
     return replayEvents
@@ -286,7 +286,7 @@ function ChronologicalReplay() {
               flexShrink: 0,
             }}
           >
-            <Activity size={18} color="#6c5ce7" strokeWidth={2.2} />
+            <Activity size={18} color="#3a7ca5" strokeWidth={2.2} />
           </div>
           <div>
             <h1
@@ -371,7 +371,7 @@ function ChronologicalReplay() {
           style={{
             height: "100%",
             width: `${progress}%`,
-            background: `linear-gradient(90deg, #6c5ce7, #a29bfe)`,
+            background: `linear-gradient(90deg, #3a7ca5, #5a94bb)`,
             borderRadius: 2,
             transition: "width 0.2s ease",
           }}
@@ -432,7 +432,7 @@ function ChronologicalReplay() {
               borderRadius: "50%",
               background: isPlaying
                 ? "var(--color-danger, #d63031)"
-                : "var(--color-accent, #6c5ce7)",
+                : "var(--color-accent, #3a7ca5)",
               border: "none",
               display: "flex",
               alignItems: "center",
@@ -440,7 +440,7 @@ function ChronologicalReplay() {
               cursor: "pointer",
               boxShadow: isPlaying
                 ? "0 2px 12px rgba(214,48,49,0.35)"
-                : "0 2px 12px rgba(108,92,231,0.35)",
+                : "0 2px 12px rgba(58,124,165,0.35)",
               transition: "all 0.2s ease",
               flexShrink: 0,
             }}
@@ -503,7 +503,7 @@ function ChronologicalReplay() {
                     : "transparent",
                 color:
                   playbackSpeed === speed
-                    ? "#6c5ce7"
+                    ? "#3a7ca5"
                     : "var(--color-text-subtle)",
                 border: `1px solid ${
                   playbackSpeed === speed
@@ -539,7 +539,7 @@ function ChronologicalReplay() {
             }}
             style={{
               flex: 1,
-              accentColor: "#6c5ce7",
+              accentColor: "#3a7ca5",
               cursor: "pointer",
               height: 4,
             }}
@@ -577,11 +577,11 @@ function ChronologicalReplay() {
           style={{
             padding: "5px 12px",
             borderRadius: 8,
-            border: viewMode === "fit" ? "1px solid rgba(108,92,231,0.4)" : "1px solid var(--color-border)",
+            border: viewMode === "fit" ? "1px solid rgba(58,124,165,0.4)" : "1px solid var(--color-border)",
             background: viewMode === "fit"
-              ? "rgba(108,92,231,0.12)"
+              ? "rgba(58,124,165,0.12)"
               : "rgba(255,255,255,0.5)",
-            color: viewMode === "fit" ? "#6c5ce7" : "var(--color-text-muted)",
+            color: viewMode === "fit" ? "#3a7ca5" : "var(--color-text-muted)",
             fontSize: 11,
             fontWeight: 600,
             cursor: "pointer",
@@ -603,8 +603,8 @@ function ChronologicalReplay() {
             padding: "5px 12px",
             borderRadius: 8,
             border: "1px solid var(--color-border)",
-            background: showLog ? "rgba(108,92,231,0.08)" : "rgba(255,255,255,0.5)",
-            color: showLog ? "#6c5ce7" : "var(--color-text-muted)",
+            background: showLog ? "rgba(58,124,165,0.08)" : "rgba(255,255,255,0.5)",
+            color: showLog ? "#3a7ca5" : "var(--color-text-muted)",
             fontSize: 11,
             fontWeight: 600,
             cursor: "pointer",
@@ -623,7 +623,7 @@ function ChronologicalReplay() {
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexShrink: 0, flexWrap: "wrap" }}>
         <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)", marginRight: 4 }}>Show:</span>
         {[null, "VOICE", "SMS", "UPI_REG", "FINANCIAL"].map(type => {
-          const meta = type ? evtPlain(type) : { label: "All Events", color: "#6c5ce7" };
+          const meta = type ? evtPlain(type) : { label: "All Events", color: "#3a7ca5" };
           const cnt  = type ? replayEvents.filter(e => e.type === type).length : replayEvents.length;
           const active = filterType === type;
           return (
@@ -707,7 +707,7 @@ function ChronologicalReplay() {
                   border: "none",
                   cursor: "pointer",
                   transition: "all 0.15s ease",
-                  background: mapStyle === style.id ? "#6c5ce7" : "transparent",
+                  background: mapStyle === style.id ? "#3a7ca5" : "transparent",
                   color: mapStyle === style.id ? "#ffffff" : "var(--color-text-muted)",
                 }}
               >
@@ -740,7 +740,7 @@ function ChronologicalReplay() {
                 <Polyline
                   positions={historicalTrail}
                   pathOptions={{
-                    color: "#6c5ce7",
+                    color: "#3a7ca5",
                     weight: 3,
                     opacity: 0.55,
                     dashArray: activeEvent?.isAnomaly ? "6 4" : null,
@@ -768,8 +768,8 @@ function ChronologicalReplay() {
                   center={coord}
                   radius={5}
                   pathOptions={{
-                    color: "#a29bfe",
-                    fillColor: "#a29bfe",
+                    color: "#5a94bb",
+                    fillColor: "#5a94bb",
                     fillOpacity: 0.35,
                     weight: 1,
                   }}
@@ -796,8 +796,8 @@ function ChronologicalReplay() {
                 center={activeCoordinates}
                 radius={12}
                 pathOptions={{
-                  color: activeEvent?.isAnomaly ? "#d63031" : "#6c5ce7",
-                  fillColor: activeEvent?.isAnomaly ? "#ff6b4a" : "#6c5ce7",
+                  color: activeEvent?.isAnomaly ? "#d63031" : "#3a7ca5",
+                  fillColor: activeEvent?.isAnomaly ? "#ff6b4a" : "#3a7ca5",
                   fillOpacity: 0.85,
                   weight: 2,
                 }}
@@ -816,7 +816,7 @@ function ChronologicalReplay() {
                       {activeCoordinates[0].toFixed(5)}, {activeCoordinates[1].toFixed(5)}
                     </span>
                     <br />
-                    <span style={{ color: activeEvent?.isAnomaly ? "#d63031" : "#6c5ce7", fontWeight: 600 }}>
+                    <span style={{ color: activeEvent?.isAnomaly ? "#d63031" : "#3a7ca5", fontWeight: 600 }}>
                       {activeEvent?.type}
                     </span>
                     {activeEvent?.isAnomaly && (
@@ -876,7 +876,7 @@ function ChronologicalReplay() {
                 <Polyline
                   positions={[activeCoordinates, activeEvent.deviceCoords]}
                   pathOptions={{
-                    color: activeEvent.isSpoofed ? "#d63031" : "#a29bfe",
+                    color: activeEvent.isSpoofed ? "#d63031" : "#5a94bb",
                     weight: 2,
                     dashArray: "5 5",
                     opacity: 0.8
@@ -935,7 +935,7 @@ function ChronologicalReplay() {
                 marginBottom: 14,
               }}
             >
-              <Terminal size={13} color="#6c5ce7" />
+              <Terminal size={13} color="#3a7ca5" />
               <span
                 style={{
                   fontSize: 9,
@@ -976,7 +976,7 @@ function ChronologicalReplay() {
                 { label: "Activity Type", value: evtPlain(activeEvent?.type).label, color: evtPlain(activeEvent?.type).color },
                 { label: "Direction", value: DIR_PLAIN[activeEvent?.direction] || activeEvent?.direction || "N/A", color: "var(--color-text)" },
                 { label: "Roaming Circle", value: activeEvent?.roam || "Home Circle", color: "var(--color-text)" },
-                { label: "Phone Device (IMEI)", value: activeEvent?.imei || "N/A", color: "#6c5ce7", mono: true },
+                { label: "Phone Device (IMEI)", value: activeEvent?.imei || "N/A", color: "#3a7ca5", mono: true },
                 { label: "Contact Number", value: activeEvent?.bParty || "N/A", color: "var(--color-text)", mono: true },
                 ...(cellebriteIngested && activeEvent?.deviceCoords ? [
                   { label: "Device GPS Coords", value: `${activeEvent.deviceCoords[0].toFixed(4)}, ${activeEvent.deviceCoords[1].toFixed(4)}`, color: "#00b894", mono: true },
@@ -1066,7 +1066,7 @@ function ChronologicalReplay() {
           >
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", marginBottom: 3 }}>Event</div>
-              <div style={{ fontSize: 16, fontWeight: 800, fontFamily: "var(--font-mono)", color: "#6c5ce7", letterSpacing: "-0.04em" }}>
+              <div style={{ fontSize: 16, fontWeight: 800, fontFamily: "var(--font-mono)", color: "#3a7ca5", letterSpacing: "-0.04em" }}>
                 {activeEventIndex + 1}
               </div>
             </div>
@@ -1127,12 +1127,12 @@ function ChronologicalReplay() {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <Radio size={12} color="#6c5ce7" />
+                    <Radio size={12} color="#3a7ca5" />
                     <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>
                       Event Stream Log
                     </span>
                   </div>
-                  <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "#6c5ce7" }}>
+                  <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "#3a7ca5" }}>
                     Active: #{activeEvent?.id}
                   </span>
                 </div>
@@ -1142,7 +1142,7 @@ function ChronologicalReplay() {
                   {!cellebriteIngested ? (
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                        <ShieldAlert size={14} color="#6c5ce7" style={{ marginTop: 2, flexShrink: 0 }} />
+                        <ShieldAlert size={14} color="#3a7ca5" style={{ marginTop: 2, flexShrink: 0 }} />
                         <div style={{ flex: 1 }}>
                           <span style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text)", display: "block" }}>Cellebrite GPS Alignment</span>
                           <span style={{ fontSize: 9, color: "var(--color-text-subtle)", lineHeight: 1.4, display: "block", marginTop: 2 }}>
@@ -1153,11 +1153,11 @@ function ChronologicalReplay() {
                       
                       {cellebriteUploading ? (
                         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                          <span style={{ fontSize: 9, fontWeight: 700, color: "#6c5ce7", display: "flex", alignItems: "center", gap: 4 }}>
+                          <span style={{ fontSize: 9, fontWeight: 700, color: "#3a7ca5", display: "flex", alignItems: "center", gap: 4 }}>
                             <RefreshCw size={10} className="animate-spin" /> Correlating spatiotemporal coordinates...
                           </span>
                           <div style={{ height: 3, background: "rgba(0,0,0,0.06)", borderRadius: 99, overflow: "hidden" }}>
-                            <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 1.2 }} style={{ height: "100%", background: "#6c5ce7" }} />
+                            <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 1.2 }} style={{ height: "100%", background: "#3a7ca5" }} />
                           </div>
                         </div>
                       ) : (
@@ -1165,8 +1165,8 @@ function ChronologicalReplay() {
                           <button
                             onClick={() => cellebriteInputRef.current?.click()}
                             style={{
-                              width: "100%", padding: "7px 10px", borderRadius: 8, border: "1px dashed rgba(108,92,231,0.4)",
-                              background: "rgba(108,92,231,0.05)", color: "#6c5ce7", fontSize: 10, fontWeight: 700,
+                              width: "100%", padding: "7px 10px", borderRadius: 8, border: "1px dashed rgba(58,124,165,0.4)",
+                              background: "rgba(58,124,165,0.05)", color: "#3a7ca5", fontSize: 10, fontWeight: 700,
                               cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                               transition: "all 0.15s ease"
                             }}

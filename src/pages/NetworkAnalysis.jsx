@@ -200,7 +200,7 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
   const isDark = theme === "dark";
   const bg = isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
   const border = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
-  const textTitle = isDark ? "#00e5ff" : "#6c5ce7";
+  const textTitle = isDark ? "#00e5ff" : "#3a7ca5";
   const textMuted = isDark ? "rgba(233,241,248,0.5)" : "var(--color-text-muted)";
   const textBody = isDark ? "#e9f1f8" : "var(--color-text)";
   const textSubtle = isDark ? "rgba(233,241,248,0.35)" : "var(--color-text-subtle)";
@@ -231,7 +231,7 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
             style={{ 
               display: "flex", alignItems: "center", justifyContent: "center", gap: 6, 
               padding: "9px 14px", borderRadius: 8, border: "none", 
-              background: isDark ? "linear-gradient(135deg, #00b894, #00e5ff)" : "linear-gradient(135deg, #6c5ce7, #818cf8)", 
+              background: isDark ? "linear-gradient(135deg, #00b894, #00e5ff)" : "linear-gradient(135deg, #3a7ca5, #818cf8)", 
               color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", 
               boxShadow: "0 2px 10px rgba(0,0,0,0.1)" 
             }}
@@ -298,7 +298,7 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
                   signal: { active: "#6366f1", bg: "rgba(99,102,241,0.08)" },
                   instagram: { active: "#ec4899", bg: "rgba(236,72,153,0.08)" }
                 };
-                const col = colors[platform] || { active: "#6c5ce7", bg: "rgba(108,92,231,0.08)" };
+                const col = colors[platform] || { active: "#3a7ca5", bg: "rgba(58,124,165,0.08)" };
                 return (
                   <div key={platform} style={{ 
                     display: "flex", alignItems: "flex-start", gap: 8, 
@@ -326,9 +326,9 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
               onClick={() => onExportMisp(phone, state.data)}
               style={{ 
                 display: "flex", alignItems: "center", gap: 4, 
-                background: "transparent", border: `1px solid ${isDark ? "#00e5ff50" : "#6c5ce750"}`, 
+                background: "transparent", border: `1px solid ${isDark ? "#00e5ff50" : "#3a7ca550"}`, 
                 padding: "6px 12px", borderRadius: 6, cursor: "pointer", 
-                fontSize: 10, fontWeight: 700, color: isDark ? "#00e5ff" : "#6c5ce7",
+                fontSize: 10, fontWeight: 700, color: isDark ? "#00e5ff" : "#3a7ca5",
                 transition: "all 0.15s ease"
               }}
             >
@@ -448,7 +448,7 @@ function AssociateDrawer({ intel, onClose, osintScans, triggerOsintScan, onExpor
   const mapCenter = intel.locEvents.length > 0 ? intel.locEvents[0].coords : [22.5, 78.9];
   const polylineCoords = intel.locEvents.map(e => e.coords);
   const sevColor = (sev) => sev === "CRITICAL" ? "#d63031" : sev === "HIGH" ? "#e17055" : "#fdcb6e";
-  const evtColor = (type) => type === "UPI_REG" || type === "FINANCIAL" ? "#d63031" : type === "VOICE" ? "#6c5ce7" : "#636e72";
+  const evtColor = (type) => type === "UPI_REG" || type === "FINANCIAL" ? "#d63031" : type === "VOICE" ? "#3a7ca5" : "#636e72";
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -527,17 +527,17 @@ function AssociateDrawer({ intel, onClose, osintScans, triggerOsintScan, onExpor
                 <h3 style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", margin: 0 }}>Chrono Location Trail · {intel.locEvents.length} geo-tagged events</h3>
                 <div style={{ display: "flex", gap: 3, background: "rgba(255,255,255,0.7)", border: "1px solid var(--color-border)", borderRadius: 8, padding: 3 }}>
                   {[["light","Light"],["dark","Dark"],["satellite","Sat"]].map(([id, label]) => (
-                    <button key={id} onClick={() => setMapStyle(id)} style={{ padding: "3px 8px", borderRadius: 5, fontSize: 9, fontWeight: 700, border: "none", cursor: "pointer", transition: "all 0.15s", background: mapStyle === id ? "#6c5ce7" : "transparent", color: mapStyle === id ? "#fff" : "var(--color-text-muted)" }}>{label}</button>
+                    <button key={id} onClick={() => setMapStyle(id)} style={{ padding: "3px 8px", borderRadius: 5, fontSize: 9, fontWeight: 700, border: "none", cursor: "pointer", transition: "all 0.15s", background: mapStyle === id ? "#3a7ca5" : "transparent", color: mapStyle === id ? "#fff" : "var(--color-text-muted)" }}>{label}</button>
                   ))}
                 </div>
               </div>
               <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid var(--color-border)", height: 280 }}>
                 <MapContainer center={mapCenter} zoom={9} style={{ height: "100%", width: "100%" }} scrollWheelZoom zoomControl>
                   <TileLayer url={tileUrl} attribution="" />
-                  {polylineCoords.length > 1 && <Polyline positions={polylineCoords} pathOptions={{ color: "#6c5ce7", weight: 2.5, opacity: 0.55, dashArray: "6 4" }} />}
+                  {polylineCoords.length > 1 && <Polyline positions={polylineCoords} pathOptions={{ color: "#3a7ca5", weight: 2.5, opacity: 0.55, dashArray: "6 4" }} />}
                   {intel.locEvents.map((evt, i) => (
                     <CircleMarker key={i} center={evt.coords} radius={i === intel.locEvents.length - 1 ? 10 : 6}
-                      pathOptions={{ color: evt.isAnomaly ? "#d63031" : "#6c5ce7", fillColor: evt.isAnomaly ? "#ff6b4a" : i === intel.locEvents.length - 1 ? "#6c5ce7" : "#a29bfe", fillOpacity: i === intel.locEvents.length - 1 ? 0.95 : 0.5, weight: 2 }}>
+                      pathOptions={{ color: evt.isAnomaly ? "#d63031" : "#3a7ca5", fillColor: evt.isAnomaly ? "#ff6b4a" : i === intel.locEvents.length - 1 ? "#3a7ca5" : "#5a94bb", fillOpacity: i === intel.locEvents.length - 1 ? 0.95 : 0.5, weight: 2 }}>
                       <Popup>
                         <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, color: "#082229" }}>
                           <strong>{evt.dateStr} {evt.timeStr}</strong><br />
@@ -569,7 +569,7 @@ function AssociateDrawer({ intel, onClose, osintScans, triggerOsintScan, onExpor
                     <div style={{ display: "flex", gap: 12, marginTop: 3, flexWrap: "wrap" }}>
                       {evt.imei && <span style={{ fontSize: 9, color: "var(--color-text-subtle)", fontFamily: "var(--font-mono)" }}>IMEI: {evt.imei}</span>}
                       {evt.roam && <span style={{ fontSize: 9, color: "var(--color-text-subtle)" }}>{evt.roam}</span>}
-                      {evt.dur && evt.type === "VOICE" && <span style={{ fontSize: 9, color: "#6c5ce7", fontFamily: "var(--font-mono)" }}>{evt.dur}s</span>}
+                      {evt.dur && evt.type === "VOICE" && <span style={{ fontSize: 9, color: "#3a7ca5", fontFamily: "var(--font-mono)" }}>{evt.dur}s</span>}
                       {evt.coords && <span style={{ fontSize: 9, color: "#00b894", display: "flex", alignItems: "center", gap: 2 }}><MapPin size={8} /> GPS</span>}
                     </div>
                   </div>
@@ -766,7 +766,7 @@ function NetworkAnalysis() {
     });
     const total = voice + sms + upi + fin || 1;
     return [
-      { name: "Phone Calls",    value: voice, fill: "#6c5ce7", pct: ((voice/total)*100).toFixed(0) },
+      { name: "Phone Calls",    value: voice, fill: "#3a7ca5", pct: ((voice/total)*100).toFixed(0) },
       { name: "Text Messages",  value: sms,   fill: "#0984e3", pct: ((sms/total)*100).toFixed(0)   },
       { name: "Payment Nodes",  value: upi,   fill: "#d63031", pct: ((upi/total)*100).toFixed(0)   },
       { name: "Bank Alerts",    value: fin,   fill: "#e17055", pct: ((fin/total)*100).toFixed(0)   },
@@ -904,7 +904,7 @@ function NetworkAnalysis() {
 
   const kpis = [
     { icon: Phone,   label: "Target Suspect",     value: targetNumber,     isMonospace: true, color: "#e17055", bg: "rgba(225,112,85,0.08)" },
-    { icon: Users,   label: "Total Connections",  value: totalContacts,    color: "#6c5ce7",  bg: "rgba(108,92,231,0.08)" },
+    { icon: Users,   label: "Total Connections",  value: totalContacts,    color: "#3a7ca5",  bg: "rgba(58,124,165,0.08)" },
     { icon: Star,    label: "Strongest Node",      value: strongestContact, sub: `${strongestCount} interactions`, isMonospace: true, color: "#e17055", bg: "rgba(225,112,85,0.08)", action: () => setDeepAnalysisTarget(strongestContact) },
   ];
 
@@ -936,13 +936,13 @@ function NetworkAnalysis() {
             PLAIN-ENGLISH NETWORK SUMMARY
         ══════════════════════════════════════════════════════ */}
         {networkSummary && (
-          <motion.div variants={fadeUp} style={{ borderRadius: 16, padding: "18px 24px", background: "rgba(108,92,231,0.06)", border: "1.5px solid rgba(108,92,231,0.18)", display: "flex", alignItems: "flex-start", gap: 14 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(108,92,231,0.12)", border: "1px solid rgba(108,92,231,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <Info size={18} color="#6c5ce7" />
+          <motion.div variants={fadeUp} style={{ borderRadius: 16, padding: "18px 24px", background: "rgba(58,124,165,0.06)", border: "1.5px solid rgba(58,124,165,0.18)", display: "flex", alignItems: "flex-start", gap: 14 }}>
+            <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(58,124,165,0.12)", border: "1px solid rgba(58,124,165,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Info size={18} color="#3a7ca5" />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700, color: "var(--color-text)", lineHeight: 1.6 }}>
-                This suspect contacted <strong style={{ color: "#6c5ce7" }}>{totalContacts} different people</strong>.
+                This suspect contacted <strong style={{ color: "#3a7ca5" }}>{totalContacts} different people</strong>.
                 Their top contact accounts for <strong style={{ color: networkSummary.topPct > 20 ? "#d63031" : "#e17055" }}>{networkSummary.topPct}% of all activity</strong>
                 {networkSummary.topPct > 20 ? " — far above normal for a typical user" : ""}.
                 {networkSummary.critical > 0 && <> <strong style={{ color: "#d63031" }}>{networkSummary.critical} contact{networkSummary.critical > 1 ? "s are" : " is"}</strong> critically high-frequency.</>}
@@ -950,7 +950,7 @@ function NetworkAnalysis() {
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {[
-                  { label: `${totalContacts} contacts`,         color: "#6c5ce7" },
+                  { label: `${totalContacts} contacts`,         color: "#3a7ca5" },
                   { label: `Top contact: ${networkSummary.topPct}%`, color: +networkSummary.topPct > 20 ? "#d63031" : "#e17055" },
                   { label: `${networkSummary.nightCount} night calls`, color: "#e17055" },
                   { label: `${networkSummary.critical} critical nodes`, color: "#d63031" },
@@ -1278,7 +1278,7 @@ function NetworkAnalysis() {
         ══════════════════════════════════════════════════════ */}
         <motion.div variants={fadeUp} className="glass-card" style={{ padding: "22px 24px" }}>
           <h2 style={{ marginBottom: 20, fontSize: 15, fontWeight: 700, color: "var(--color-text)", display: "flex", alignItems: "center", gap: 8 }}>
-            <Users size={15} color="#6c5ce7" /> All Contacts — Ranked by Interaction Count
+            <Users size={15} color="#3a7ca5" /> All Contacts — Ranked by Interaction Count
           </h2>
           <div style={{ overflowX: "auto" }}>
             <table className="ct-table">

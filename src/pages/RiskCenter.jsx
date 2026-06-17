@@ -27,8 +27,8 @@ const RULE_META = {
   HIGH_SMS_RATIO:               { label: "Mostly Text Messages",              icon: MessageSquare, color: "#d63031" },
   MULTI_BANK_AGGREGATION:       { label: "Connected to Too Many Banks",        icon: CreditCard,   color: "#d63031" },
   UPI_BIND_BURST:               { label: "Bulk Payment App Setup",             icon: Zap,          color: "#e17055" },
-  RAPID_DEVICE_SWAPPING:        { label: "Frequent Phone Switching",           icon: Smartphone,   color: "#6c5ce7" },
-  VOICE_CESSATION:              { label: "Stopped Making Calls",               icon: Phone,        color: "#6c5ce7" },
+  RAPID_DEVICE_SWAPPING:        { label: "Frequent Phone Switching",           icon: Smartphone,   color: "#3a7ca5" },
+  VOICE_CESSATION:              { label: "Stopped Making Calls",               icon: Phone,        color: "#3a7ca5" },
   NO_PERSONAL_SOCIAL_FOOTPRINT: { label: "Barely Any Personal Contacts",       icon: Users,        color: "#e17055" },
   HIGH_RISK_GEOGRAPHIC_CIRCLE:  { label: "Active in Fraud Hotspot Area",       icon: MapPin,       color: "#d63031" },
 };
@@ -201,7 +201,7 @@ function RiskCenter() {
         {/* Dimension details */}
         <div className="glass-card" style={{ padding: "20px 24px" }}>
           <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
-            <Shield size={13} color="#6c5ce7" /> What Each Dimension Means
+            <Shield size={13} color="#3a7ca5" /> What Each Dimension Means
           </h3>
           <p style={{ fontSize: 11, color: "var(--color-text-subtle)", marginBottom: 16, marginTop: 0 }}>
             Hover rows to understand. Red = worse than normal.
@@ -275,7 +275,7 @@ function RiskCenter() {
                 <div style={{ flex: 1, height: 6, background: "rgba(0,0,0,0.05)", borderRadius: 3, overflow: "hidden" }}>
                   <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, (step.cumulative / 130) * 100)}%` }}
                     transition={{ duration: 0.6, delay: i * 0.08, ease: "easeOut" }}
-                    style={{ height: "100%", background: step.cumulative >= 100 ? "#d63031" : step.cumulative >= 70 ? "#e17055" : "#6c5ce7", borderRadius: 3 }} />
+                    style={{ height: "100%", background: step.cumulative >= 100 ? "#d63031" : step.cumulative >= 70 ? "#e17055" : "#3a7ca5", borderRadius: 3 }} />
                 </div>
                 {/* Running total */}
                 <span style={{ fontSize: 11, fontWeight: 800, fontFamily: "var(--font-mono)", color: "var(--color-text-muted)", flexShrink: 0, minWidth: 50, textAlign: "right" }}>
@@ -348,7 +348,7 @@ function RiskCenter() {
             const meta = RULE_META[rule.code] || { label: rule.code, icon: AlertTriangle, color: "#95a5a6" };
             const RuleIcon = meta.icon;
             const isCrit = rule.severity === "CRITICAL";
-            const badgeC = isCrit ? "#d63031" : rule.severity === "HIGH" ? "#e17055" : "#6c5ce7";
+            const badgeC = isCrit ? "#d63031" : rule.severity === "HIGH" ? "#e17055" : "#3a7ca5";
             return (
               <motion.div key={idx} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.05 }}
                 whileHover={{ y: -3, boxShadow: `0 12px 32px ${meta.color}18` }}

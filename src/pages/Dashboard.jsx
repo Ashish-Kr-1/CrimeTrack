@@ -18,8 +18,8 @@ const RULE_LABELS = {
   HIGH_SMS_RATIO:               { title: "Mostly Text Messages, Almost No Calls", icon: MessageSquare, color: "#d63031" },
   MULTI_BANK_AGGREGATION:       { title: "Connected to Too Many Banks on One Phone", icon: CreditCard, color: "#d63031" },
   UPI_BIND_BURST:               { title: "Bulk Payment App Setup Detected", icon: Zap, color: "#d63031" },
-  RAPID_DEVICE_SWAPPING:        { title: "Frequently Changing Phones", icon: Smartphone, color: "#6c5ce7" },
-  VOICE_CESSATION:              { title: "Stopped Making Calls Completely", icon: Phone, color: "#6c5ce7" },
+  RAPID_DEVICE_SWAPPING:        { title: "Frequently Changing Phones", icon: Smartphone, color: "#3a7ca5" },
+  VOICE_CESSATION:              { title: "Stopped Making Calls Completely", icon: Phone, color: "#3a7ca5" },
   NO_PERSONAL_SOCIAL_FOOTPRINT: { title: "Barely Any Personal Contacts", icon: Users, color: "#e17055" },
   HIGH_RISK_GEOGRAPHIC_CIRCLE:  { title: "Active in Known Fraud Hotspot Area", icon: MapPin, color: "#e17055" },
   HIGH_BANK_SENDER_RATIO:       { title: "Almost All Contacts Are Banks / Payment Apps", icon: CreditCard, color: "#e17055" },
@@ -61,7 +61,7 @@ const CLASS_PLAIN = {
 };
 
 const EVT_LABELS = { VOICE: "Phone Calls", SMS: "Text Messages", UPI_REG: "Payment App Setup", FINANCIAL: "Bank Alerts" };
-const EVT_COLORS = { VOICE: "#6c5ce7", SMS: "#0984e3", UPI_REG: "#d63031", FINANCIAL: "#e17055" };
+const EVT_COLORS = { VOICE: "#3a7ca5", SMS: "#0984e3", UPI_REG: "#d63031", FINANCIAL: "#e17055" };
 
 /* ─── Custom Tooltip for bar chart ──────────────────────────────────────── */
 const DayTooltip = ({ active, payload, label }) => {
@@ -69,7 +69,7 @@ const DayTooltip = ({ active, payload, label }) => {
   return (
     <div style={{ background: "rgba(255,255,255,0.97)", border: "1px solid rgba(0,0,0,0.09)", borderRadius: 10, padding: "10px 14px", boxShadow: "0 6px 20px rgba(0,0,0,0.1)", fontFamily: "var(--font-sans)" }}>
       <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: "var(--color-text-subtle)", marginBottom: 4 }}>{label}</p>
-      <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#6c5ce7" }}>{payload[0].value} events</p>
+      <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#3a7ca5" }}>{payload[0].value} events</p>
     </div>
   );
 };
@@ -133,7 +133,7 @@ function ActivityCalendar({ events }) {
     if (ratio > 0.75) return "#d63031";
     if (ratio > 0.50) return "#e17055";
     if (ratio > 0.25) return "#fdcb6e";
-    return "#a29bfe";
+    return "#5a94bb";
   };
 
   if (!weeks.length) return null;
@@ -183,7 +183,7 @@ function ActivityCalendar({ events }) {
       {/* Legend */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, justifyContent: "flex-end" }}>
         <span style={{ fontSize: 9, color: "var(--color-text-subtle)" }}>Less</span>
-        {["rgba(0,0,0,0.05)", "#a29bfe", "#fdcb6e", "#e17055", "#d63031"].map((c, i) => (
+        {["rgba(0,0,0,0.05)", "#5a94bb", "#fdcb6e", "#e17055", "#d63031"].map((c, i) => (
           <div key={i} style={{ width: 12, height: 12, borderRadius: 2, background: c }} />
         ))}
         <span style={{ fontSize: 9, color: "var(--color-text-subtle)" }}>More</span>
@@ -277,7 +277,7 @@ function Dashboard() {
   const plain = CLASS_PLAIN[cls] || CLASS_PLAIN.NORMAL_USER;
   const PlainIcon = plain.icon;
   const isMule = cls === "HIGHLY_SUSPECT_FINANCIAL_MULE";
-  const scoreColor = isMule ? "#d63031" : "#6c5ce7";
+  const scoreColor = isMule ? "#d63031" : "#3a7ca5";
 
   return (
     <motion.div className="page-container theme-dashboard" variants={stagger} initial="initial" animate="animate">
@@ -390,7 +390,7 @@ function Dashboard() {
                 value: diagnosticReport.feature_vector.unique_imei_count,
                 unit: "devices",
                 help: "Number of different handsets this SIM was put into",
-                color: "#a29bfe",
+                color: "#5a94bb",
                 icon: Smartphone,
               },
               {
@@ -458,7 +458,7 @@ function Dashboard() {
           {/* Daily Activity Bar Chart */}
           <div className="glass-card" style={{ padding: "20px 24px" }}>
             <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
-              <Activity size={13} color="#6c5ce7" />
+              <Activity size={13} color="#3a7ca5" />
               Activity Per Day
             </h3>
             <p style={{ fontSize: 11, color: "var(--color-text-subtle)", marginBottom: 16, marginTop: 0 }}>
@@ -468,12 +468,12 @@ function Dashboard() {
               <BarChart data={dailyActivity} margin={{ top: 0, right: 4, left: -20, bottom: 0 }}>
                 <XAxis dataKey="date" tick={{ fontSize: 9, fill: "var(--color-text-subtle)", fontFamily: "var(--font-mono)" }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
                 <YAxis tick={{ fontSize: 9, fill: "var(--color-text-subtle)" }} axisLine={false} tickLine={false} />
-                <Tooltip content={<DayTooltip />} cursor={{ fill: "rgba(108,92,231,0.07)" }} />
+                <Tooltip content={<DayTooltip />} cursor={{ fill: "rgba(58,124,165,0.07)" }} />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                   {dailyActivity.map((entry, i) => {
                     const max = Math.max(...dailyActivity.map(d => d.count));
                     const ratio = entry.count / max;
-                    const fill = ratio > 0.7 ? "#d63031" : ratio > 0.4 ? "#e17055" : "#6c5ce7";
+                    const fill = ratio > 0.7 ? "#d63031" : ratio > 0.4 ? "#e17055" : "#3a7ca5";
                     return <Cell key={i} fill={fill} fillOpacity={0.85} />;
                   })}
                 </Bar>
@@ -564,18 +564,18 @@ function Dashboard() {
                       <div style={{ position: "absolute", top: 16, bottom: 16, left: -1, width: 2, background: "rgba(0,0,0,0.06)", zIndex: 0 }} />
                       {diagnosticReport.operational_phases.map((phase, idx) => (
                         <div key={idx} style={{ position: "relative", padding: "16px 20px 16px 28px", zIndex: 1 }}>
-                          <div style={{ position: "absolute", top: 22, left: -5, width: 10, height: 10, borderRadius: "50%", background: "#6c5ce7", boxShadow: "0 0 0 3px rgba(108,92,231,0.2)" }} />
+                          <div style={{ position: "absolute", top: 22, left: -5, width: 10, height: 10, borderRadius: "50%", background: "#3a7ca5", boxShadow: "0 0 0 3px rgba(58,124,165,0.2)" }} />
                           <div style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.9)", borderRadius: 14, padding: 18, backdropFilter: "blur(10px)", boxShadow: "0 4px 16px rgba(0,0,0,0.03)" }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, flexWrap: "wrap", gap: 8 }}>
                               <span style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text)" }}>{phase.phase}</span>
-                              <span style={{ padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 800, fontFamily: "var(--font-mono)", background: "rgba(108,92,231,0.08)", border: "1px solid rgba(108,92,231,0.18)", color: "#6c5ce7" }}>
+                              <span style={{ padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 800, fontFamily: "var(--font-mono)", background: "rgba(58,124,165,0.08)", border: "1px solid rgba(58,124,165,0.18)", color: "#3a7ca5" }}>
                                 {phase.event_count} events
                               </span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: "var(--color-text-muted)", borderTop: "1px dashed var(--color-border-subtle)", paddingTop: 10, fontFamily: "var(--font-mono)", flexWrap: "wrap", gap: 8 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                 <Smartphone size={13} color="var(--color-text-subtle)" />
-                                Phone: <span style={{ color: "#6c5ce7", fontWeight: 700 }}>{phase.imei || "Unknown"}</span>
+                                Phone: <span style={{ color: "#3a7ca5", fontWeight: 700 }}>{phase.imei || "Unknown"}</span>
                               </div>
                               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                 <span style={{ background: "rgba(0,0,0,0.04)", padding: "2px 6px", borderRadius: 4 }}>{phase.start}</span>
@@ -610,7 +610,7 @@ function Dashboard() {
                   const RuleIcon = meta.icon;
                   const isCritical = rule.severity === "CRITICAL";
                   const isHigh = rule.severity === "HIGH";
-                  const badgeColor = isCritical ? "#d63031" : isHigh ? "#6c5ce7" : "#95a5a6";
+                  const badgeColor = isCritical ? "#d63031" : isHigh ? "#3a7ca5" : "#95a5a6";
                   return (
                     <motion.div key={idx} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }}
                       style={{ border: `1px solid ${badgeColor}20`, borderLeft: `4px solid ${badgeColor}`, background: "rgba(255,255,255,0.5)", borderRadius: 12, padding: "16px 20px" }}>
@@ -652,7 +652,7 @@ function Dashboard() {
                 {diagnosticReport.automated_recommendations.map((rec, i) => {
                   const isCrit = rec.urgency === "CRITICAL";
                   const isHi   = rec.urgency === "HIGH";
-                  const c = isCrit ? "#d63031" : isHi ? "#6c5ce7" : "#95a5a6";
+                  const c = isCrit ? "#d63031" : isHi ? "#3a7ca5" : "#95a5a6";
                   const urgLabel = isCrit ? "Do this immediately" : isHi ? "Do this soon" : "When possible";
                   return (
                     <motion.div key={rec.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}

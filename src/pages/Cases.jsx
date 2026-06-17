@@ -46,21 +46,21 @@ function Cases() {
 
   if (totalRecords > 500) {
     riskLevel  = "Critical";
-    riskColor  = "var(--color-gold)";
-    riskBg     = "rgba(255, 107, 74, 0.1)";
-    riskBorder = "rgba(255, 107, 74, 0.25)";
+    riskColor  = "#c0392b";
+    riskBg     = "rgba(192, 57, 43, 0.09)";
+    riskBorder = "rgba(192, 57, 43, 0.22)";
   } else if (totalRecords > 200) {
     riskLevel  = "Suspicious";
-    riskColor  = "var(--color-accent)";
-    riskBg     = "rgba(0, 212, 245, 0.08)";
-    riskBorder = "rgba(0, 212, 245, 0.22)";
+    riskColor  = "#2f6690";
+    riskBg     = "rgba(47, 102, 144, 0.09)";
+    riskBorder = "rgba(47, 102, 144, 0.22)";
   }
 
   const quickStats = [
     { icon: Hash,     label: "Total Events",     value: totalRecords.toLocaleString(), color: "var(--color-accent)" },
     { icon: Activity, label: "Unique Contacts",  value: uniqueContacts,                color: "var(--color-accent)" },
     { icon: MapPin,   label: "Cell Towers",      value: uniqueTowers,                  color: "var(--color-accent)" },
-    { icon: Radio,    label: "Primary Node",     value: `…${topContact[0].slice(-4)}`, color: "var(--color-gold)", sub: `${topContact[1]} calls` },
+    { icon: Radio,    label: "Primary Node",     value: `…${topContact[0].slice(-4)}`, color: "#2f6690", sub: `${topContact[1]} calls` },
   ];
 
   const dossierFields = [
@@ -82,14 +82,14 @@ function Cases() {
               width: 36,
               height: 36,
               borderRadius: 10,
-              background: "rgba(255, 107, 74, 0.1)",
-              border: "1px solid rgba(255, 107, 74, 0.25)",
+              background: "rgba(47, 102, 144, 0.09)",
+              border: "1px solid rgba(47, 102, 144, 0.22)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <FolderOpen size={18} color="var(--color-gold)" strokeWidth={2} />
+            <FolderOpen size={18} color="#2f6690" strokeWidth={2} />
           </div>
           <h1 className="page-title">Investigation Cases</h1>
         </div>
@@ -100,8 +100,8 @@ function Cases() {
 
       {records.length === 0 ? (
         <div className="glass-card empty-state">
-          <div className="empty-state-icon" style={{ background: "rgba(255,107,74,0.08)", borderColor: "rgba(255,107,74,0.2)" }}>
-            <FolderOpen size={30} color="var(--color-gold)" strokeWidth={1.8} />
+          <div className="empty-state-icon" style={{ background: "rgba(47,102,144,0.08)", borderColor: "rgba(47,102,144,0.20)" }}>
+            <FolderOpen size={30} color="#2f6690" strokeWidth={1.8} />
           </div>
           <div className="empty-state-title">No Active Cases</div>
           <p className="empty-state-body">
@@ -134,8 +134,8 @@ function Cases() {
               <div
                 style={{
                   padding: "16px 22px",
-                  background: "linear-gradient(90deg, rgba(255, 107, 74, 0.1), rgba(255, 107, 74, 0.03))",
-                  borderBottom: "1px solid rgba(255, 107, 74, 0.14)",
+                  background: "linear-gradient(90deg, rgba(47, 102, 144, 0.07), rgba(47, 102, 144, 0.02))",
+                  borderBottom: "1px solid rgba(47, 102, 144, 0.12)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
@@ -144,7 +144,7 @@ function Cases() {
               >
                 <div>
                   <h2 style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 700, color: "var(--color-text)", letterSpacing: "-0.015em" }}>
-                    <FileSearch size={16} color="var(--color-gold)" />
+                    <FileSearch size={16} color="#2f6690" />
                     CASE-001 · Target Dossier
                   </h2>
                   <span style={{ fontSize: 11, color: "var(--color-text-subtle)", marginTop: 2, display: "block" }}>
