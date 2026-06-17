@@ -58,7 +58,7 @@ function App() {
 
   // Case 3: Authenticated as Analyst -> Render standard workspace
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#d9dcd6" }}>
+    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: "#231942" }}>
 
       {/* ── Ambient Background — rich layered radials ── */}
       <div

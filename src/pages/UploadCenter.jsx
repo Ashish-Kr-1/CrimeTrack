@@ -347,8 +347,9 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
       </motion.div>
 
       {/* ── Ingestion Type Selector (Visible only in Idle) ── */}
+      {/* ── Ingestion Type Selector (Visible only in Idle) ── */}
       {stage === "idle" && (
-        <motion.div variants={fadeUp} style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+        <motion.div variants={fadeUp} style={{ display: "flex", gap: 10, marginBottom: 20 }}>
           {[
             { id: "CDR", label: "Telecom CDR Ingest", icon: Table2, desc: "Airtel / Jio / BSNL Call Logs" },
             { id: "IPDR", label: "IPDR Traffic Audit", icon: Shield, desc: "Wireshark / Zeek Packet Logs" }
@@ -364,20 +365,22 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "flex-start",
-                  padding: "12px 18px",
-                  borderRadius: 12,
-                  border: active ? "1.5px solid var(--color-accent)" : "1.5px solid var(--color-border)",
-                  background: active ? "rgba(37,99,235,0.06)" : "rgba(255,255,255,0.55)",
+                  padding: "14px 20px",
+                  borderRadius: 14,
+                  border: active ? "1.5px solid #818cf8" : "1px solid rgba(255, 255, 255, 0.08)",
+                  background: active 
+                    ? "linear-gradient(135deg, rgba(129, 140, 248, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)" 
+                    : "rgba(255, 255, 255, 0.03)",
                   cursor: "pointer",
                   textAlign: "left",
                   transition: "all 0.18s ease"
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                  <Icon size={14} color={active ? "var(--color-accent)" : "var(--color-text-muted)"} />
-                  <span style={{ fontSize: 13, fontWeight: 800, color: active ? "var(--color-text)" : "var(--color-text-muted)" }}>{type.label}</span>
+                  <Icon size={14} color={active ? "#818cf8" : "rgba(255,255,255,0.4)"} />
+                  <span style={{ fontSize: 13, fontWeight: 800, color: active ? "#ffffff" : "rgba(255,255,255,0.6)" }}>{type.label}</span>
                 </div>
-                <span style={{ fontSize: 10, color: "var(--color-text-subtle)" }}>{type.desc}</span>
+                <span style={{ fontSize: 10, color: active ? "#c0b9cc" : "rgba(255,255,255,0.35)" }}>{type.desc}</span>
               </button>
             );
           })}
@@ -386,9 +389,7 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
 
       <AnimatePresence mode="wait">
 
-        {/* ══════════════════════════════════════════════════════
-            STAGE: IDLE — Drop Zone
-        ══════════════════════════════════════════════════════ */}
+        {/* ── STAGE: IDLE — Drop Zone ── */}
         {stage === "idle" && (
           <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.98 }}>
 
@@ -400,25 +401,27 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
               onDrop={handleDrop}
               style={{
                 marginBottom: 20, borderRadius: 20, cursor: "pointer", overflow: "hidden",
-                border: isDragging ? "2px solid var(--color-accent)" : "2px dashed rgba(37,99,235,0.3)",
-                background: isDragging ? "rgba(37,99,235,0.05)" : "rgba(255,255,255,0.65)",
-                backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
+                border: isDragging ? "2px solid #818cf8" : "2px dashed rgba(129, 140, 248, 0.35)",
+                background: isDragging 
+                  ? "rgba(129, 140, 248, 0.08)" 
+                  : "linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%)",
+                backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
                 transition: "all 0.22s ease",
-                boxShadow: isDragging ? "0 0 40px rgba(37,99,235,0.1)" : "none",
+                boxShadow: isDragging ? "0 0 40px rgba(129,140,248,0.18)" : "0 8px 32px 0 rgba(0,0,0,0.2)",
               }}>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "56px 40px", gap: 0 }}>
                 <motion.div animate={{ y: isDragging ? -8 : 0, scale: isDragging ? 1.08 : 1 }}
                   transition={{ type: "spring", stiffness: 320, damping: 22 }}
-                  style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(37,99,235,0.08)", border: "2px solid rgba(37,99,235,0.18)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 22 }}>
-                  <UploadCloud size={32} color="var(--color-accent)" strokeWidth={1.5} />
+                  style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(129, 140, 248, 0.08)", border: "2px solid rgba(129, 140, 248, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 22 }}>
+                  <UploadCloud size={32} color="#818cf8" strokeWidth={1.5} />
                 </motion.div>
 
-                <h3 style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.03em", color: "var(--color-text)", marginBottom: 8, textAlign: "center" }}>
+                <h3 style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.03em", color: "#ffffff", marginBottom: 8, textAlign: "center" }}>
                   {isDragging ? "Drop your file here" : (
-                    <>Drag & drop your {uploadType === "CDR" ? "CDR" : "IPDR"} file, or <span style={{ color: "var(--color-accent)" }}>click to browse</span></>
+                    <>Drag & drop your {uploadType === "CDR" ? "CDR" : "IPDR"} file, or <span style={{ color: "#818cf8" }}>click to browse</span></>
                   )}
                 </h3>
-                <p style={{ fontSize: 13, color: "var(--color-text-subtle)", textAlign: "center", lineHeight: 1.7, maxWidth: 380, marginBottom: 20 }}>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", textAlign: "center", lineHeight: 1.7, maxWidth: 380, marginBottom: 20 }}>
                   {uploadType === "CDR" 
                     ? "Works with files from Airtel, Jio, Vi, BSNL, and other operators. Analysis starts automatically the moment you upload."
                     : "Supports Wireshark CSVs, Zeek TSV logs, and NetFlow trace dumps. Parses IP routing anomalies immediately."
@@ -427,7 +430,7 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
 
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
                   {[".CSV", ".XLSX", ".TXT", ".LOG"].map(f => (
-                    <span key={f} style={{ padding: "5px 14px", borderRadius: 99, fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", background: "rgba(37,99,235,0.07)", border: "1px solid rgba(37,99,235,0.18)", color: "var(--color-accent)" }}>{f}</span>
+                    <span key={f} style={{ padding: "5px 14px", borderRadius: 99, fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", background: "rgba(129, 140, 248, 0.08)", border: "1px solid rgba(129, 140, 248, 0.2)", color: "#818cf8" }}>{f}</span>
                   ))}
                 </div>
 
@@ -436,28 +439,36 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
             </motion.div>
 
             {/* What happens to your data */}
-            <motion.div variants={fadeUp} style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 18px", borderRadius: 12, background: "rgba(37,99,235,0.04)", border: "1px solid rgba(37,99,235,0.12)", marginBottom: 24 }}>
-              <Lock size={13} style={{ flexShrink: 0, color: "var(--color-accent)" }} />
-              <span style={{ fontSize: 12, color: "var(--color-text-muted)", lineHeight: 1.6 }}>
-                <strong style={{ color: "var(--color-text)" }}>Your data never leaves this device.</strong> All analysis happens locally in your browser — nothing is sent to any server or stored online.
+            <motion.div variants={fadeUp} style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 18px", borderRadius: 12, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.18)", marginBottom: 24 }}>
+              <Lock size={13} style={{ flexShrink: 0, color: "#34d399" }} />
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }}>
+                <strong style={{ color: "#ffffff" }}>Your data never leaves this device.</strong> All analysis happens locally in your browser — nothing is sent to any server or stored online.
               </span>
             </motion.div>
 
             {/* What to expect */}
-            <motion.div variants={fadeUp} className="glass-card" style={{ padding: "22px 24px", marginBottom: 24 }}>
-              <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 18 }}>What happens after you upload</h3>
+            <motion.div variants={fadeUp} style={{
+              padding: "22px 24px",
+              marginBottom: 24,
+              borderRadius: 20,
+              background: "linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+              backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+              boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.2)",
+            }}>
+              <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#9d96bb", marginBottom: 18 }}>What happens after you upload</h3>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
                 {[
-                  { step: "1", title: "Analysis runs automatically", body: uploadType === "CDR" ? "7 telecom heuristic checks execute instantly to detect burner SIMs and money mule networks." : "Packet correlation runs to inspect proxy tunnels, SIP VoIP logins, and IP routing hops.", color: "#3a7ca5" },
-                  { step: "2", title: "Plain-English results appear", body: uploadType === "CDR" ? "The Dashboard shows exactly what was found in simple language, mapping risk score metrics." : "Generates a dedicated Data Auditing ledger detailing proxy alerts, SIEM integration endpoints, and PCAP file maps.", color: "#00b894" },
+                  { step: "1", title: "Analysis runs automatically", body: uploadType === "CDR" ? "7 telecom heuristic checks execute instantly to detect burner SIMs and money mule networks." : "Packet correlation runs to inspect proxy tunnels, SIP VoIP logins, and IP routing hops.", color: "#818cf8" },
+                  { step: "2", title: "Plain-English results appear", body: uploadType === "CDR" ? "The Dashboard shows exactly what was found in simple language, mapping risk score metrics." : "Generates a dedicated Data Auditing ledger detailing proxy alerts, SIEM integration endpoints, and PCAP file maps.", color: "#34d399" },
                 ].map(s => (
                   <div key={s.step} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 10, background: `${s.color}10`, border: `1px solid ${s.color}25`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 10, background: `${s.color}15`, border: `1px solid ${s.color}30`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <span style={{ fontSize: 13, fontWeight: 900, color: s.color, fontFamily: "var(--font-mono)" }}>{s.step}</span>
                     </div>
                     <div>
-                      <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 700, color: "var(--color-text)" }}>{s.title}</p>
-                      <p style={{ margin: 0, fontSize: 12, color: "var(--color-text-muted)", lineHeight: 1.6 }}>{s.body}</p>
+                      <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 700, color: "#ffffff" }}>{s.title}</p>
+                      <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.65)", lineHeight: 1.6 }}>{s.body}</p>
                     </div>
                   </div>
                 ))}
@@ -467,9 +478,6 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
           </motion.div>
         )}
 
-        {/* ══════════════════════════════════════════════════════
-            STAGE: PROCESSING — Animated steps
-        ══════════════════════════════════════════════════════ */}
         {stage === "processing" && (
           <motion.div key="processing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
             style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyItems: "center", padding: "60px 20px", gap: 40 }}>
@@ -477,15 +485,15 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
             {/* Pulse ring */}
             <div style={{ position: "relative", width: 100, height: 100 }}>
               <motion.div animate={{ scale: [1, 1.35, 1], opacity: [0.35, 0, 0.35] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                style={{ position: "absolute", inset: -10, borderRadius: "50%", border: "2px solid var(--color-accent)" }} />
-              <div style={{ width: 100, height: 100, borderRadius: "50%", background: "rgba(37,99,235,0.07)", border: "2px solid rgba(37,99,235,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Cpu size={38} color="var(--color-accent)" strokeWidth={1.4} />
+                style={{ position: "absolute", inset: -10, borderRadius: "50%", border: "2px solid #818cf8" }} />
+              <div style={{ width: 100, height: 100, borderRadius: "50%", background: "rgba(129, 140, 248, 0.08)", border: "2px solid rgba(129, 140, 248, 0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Cpu size={38} color="#818cf8" strokeWidth={1.4} />
               </div>
             </div>
 
             <div style={{ width: "100%", maxWidth: 420 }}>
-              <p style={{ textAlign: "center", fontSize: 16, fontWeight: 800, color: "var(--color-text)", marginBottom: 6, letterSpacing: "-0.02em" }}>Analysing your log file…</p>
-              <p style={{ textAlign: "center", fontSize: 13, color: "var(--color-text-muted)", marginBottom: 28 }}>This takes a few seconds. Running spatiotemporal and IP footprint engines.</p>
+              <p style={{ textAlign: "center", fontSize: 16, fontWeight: 800, color: "#ffffff", marginBottom: 6, letterSpacing: "-0.02em" }}>Analysing your log file…</p>
+              <p style={{ textAlign: "center", fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 28 }}>This takes a few seconds. Running spatiotemporal and IP footprint engines.</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {(uploadType === "CDR" ? STEPS : IPDR_STEPS).map((step, i) => {
                   const StepIcon = step.icon;
@@ -495,19 +503,24 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
                   return (
                     <motion.div key={step.id}
                       initial={{ opacity: 0, x: -10 }} animate={{ opacity: pending ? 0.35 : 1, x: 0 }} transition={{ delay: i * 0.08 }}
-                      style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, background: active ? "rgba(37,99,235,0.06)" : done ? "rgba(0,184,148,0.04)" : "rgba(0,0,0,0.02)", border: `1px solid ${active ? "rgba(37,99,235,0.2)" : done ? "rgba(0,184,148,0.15)" : "rgba(0,0,0,0.05)"}`, transition: "all 0.3s ease" }}>
-                      <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: done ? "rgba(0,184,148,0.1)" : active ? "rgba(37,99,235,0.1)" : "rgba(0,0,0,0.03)", border: `1px solid ${done ? "rgba(0,184,148,0.25)" : active ? "rgba(37,99,235,0.25)" : "transparent"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      style={{ 
+                        display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, 
+                        background: active ? "rgba(129, 140, 248, 0.08)" : done ? "rgba(16, 185, 129, 0.05)" : "rgba(255,255,255,0.03)", 
+                        border: `1px solid ${active ? "rgba(129, 140, 248, 0.2)" : done ? "rgba(16, 185, 129, 0.2)" : "rgba(255,255,255,0.06)"}`, 
+                        transition: "all 0.3s ease" 
+                      }}>
+                      <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: done ? "rgba(16, 185, 129, 0.1)" : active ? "rgba(129, 140, 248, 0.1)" : "rgba(255,255,255,0.03)", border: `1px solid ${done ? "rgba(16, 185, 129, 0.25)" : active ? "rgba(129, 140, 248, 0.25)" : "transparent"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         {done
-                          ? <CheckCircle2 size={14} color="#00b894" strokeWidth={2.5} />
+                          ? <CheckCircle2 size={14} color="#34d399" strokeWidth={2.5} />
                           : active
-                          ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}><Loader size={14} color="var(--color-accent)" /></motion.div>
-                          : <StepIcon size={14} color="var(--color-text-subtle)" strokeWidth={2} />
+                          ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}><Loader size={14} color="#818cf8" /></motion.div>
+                          : <StepIcon size={14} color="rgba(255,255,255,0.4)" strokeWidth={2} />
                         }
                       </div>
-                      <span style={{ fontSize: 13, fontWeight: done ? 600 : active ? 700 : 500, color: done ? "#00b894" : active ? "var(--color-accent)" : "var(--color-text-subtle)" }}>
+                      <span style={{ fontSize: 13, fontWeight: done ? 600 : active ? 700 : 500, color: done ? "#34d399" : active ? "#818cf8" : "rgba(255,255,255,0.5)" }}>
                         {step.label}
                       </span>
-                      {done && <CheckCircle2 size={13} color="#00b894" style={{ marginLeft: "auto" }} />}
+                      {done && <CheckCircle2 size={13} color="#34d399" style={{ marginLeft: "auto" }} />}
                     </motion.div>
                   );
                 })}
