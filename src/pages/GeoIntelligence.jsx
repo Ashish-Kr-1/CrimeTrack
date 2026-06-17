@@ -360,7 +360,9 @@ function GeoIntelligence() {
       </motion.div>
 
       {records.length === 0 ? (
-        <div className="glass-card p-10 text-center text-text-muted">Upload a CDR file to see the geo intelligence map.</div>
+        <div className="glass-card" style={{ padding: 40, textAlign: "center", color: "var(--color-text-muted)", fontSize: 13 }}>
+          No records loaded. Please upload a dataset in the Ingestion Center to visualize geospatial telemetry.
+        </div>
       ) : (<>
 
         {/* KPIs */}

@@ -198,12 +198,12 @@ function getSTIXPayload(phone, osint) {
 
 function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "dark" }) {
   const isDark = theme === "dark";
-  const bg = isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-  const border = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
-  const textTitle = isDark ? "#00e5ff" : "#3a7ca5";
-  const textMuted = isDark ? "rgba(233,241,248,0.5)" : "var(--color-text-muted)";
+  const bg = isDark ? "rgba(255,255,255,0.04)" : "var(--color-surface-2)";
+  const border = isDark ? "rgba(255,255,255,0.08)" : "var(--color-border)";
+  const textTitle = isDark ? "#00e5ff" : "var(--color-accent)";
+  const textMuted = isDark ? "rgba(233,241,248,0.5)" : "var(--color-text-secondary)";
   const textBody = isDark ? "#e9f1f8" : "var(--color-text)";
-  const textSubtle = isDark ? "rgba(233,241,248,0.35)" : "var(--color-text-subtle)";
+  const textSubtle = isDark ? "rgba(233,241,248,0.35)" : "var(--color-text-muted)";
   const terminalBg = isDark ? "#0b2d35" : "#0f172a";
 
   const state = scanState || { stage: "idle" };
@@ -269,12 +269,12 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
       {state.stage === "completed" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <div style={{ background: isDark ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.5)", border: `1px solid ${border}`, padding: "8px 10px", borderRadius: 8 }}>
+            <div style={{ background: isDark ? "rgba(0,0,0,0.2)" : "#ffffff", border: `1px solid ${border}`, padding: "8px 10px", borderRadius: 8 }}>
               <span style={{ fontSize: 8, color: textSubtle, fontWeight: 700, textTransform: "uppercase", display: "block" }}>Carrier (PhoneInfoga)</span>
               <span style={{ fontSize: 11, fontWeight: 700, color: textBody, display: "block", marginTop: 2 }}>{state.data.carrier}</span>
               <span style={{ fontSize: 9, color: textSubtle, display: "block", marginTop: 1 }}>{state.data.circle} · {state.data.networkType}</span>
             </div>
-            <div style={{ background: isDark ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.5)", border: `1px solid ${border}`, padding: "8px 10px", borderRadius: 8 }}>
+            <div style={{ background: isDark ? "rgba(0,0,0,0.2)" : "#ffffff", border: `1px solid ${border}`, padding: "8px 10px", borderRadius: 8 }}>
               <span style={{ fontSize: 8, color: textSubtle, fontWeight: 700, textTransform: "uppercase", display: "block" }}>Fraud Reputation Score</span>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
                 <div style={{ height: 4, flex: 1, background: "rgba(0,0,0,0.1)", borderRadius: 99, overflow: "hidden" }}>
@@ -929,7 +929,9 @@ function NetworkAnalysis() {
       </motion.div>
 
       {records.length === 0 ? (
-        <div className="glass-card p-10 text-center text-text-muted">No data loaded. Upload a CDR file to see the network.</div>
+        <div className="glass-card" style={{ padding: 40, textAlign: "center", color: "var(--color-text-muted)", fontSize: 13 }}>
+          No records loaded. Please upload a dataset in the Ingestion Center to map suspect network relations.
+        </div>
       ) : (<>
 
         {/* ══════════════════════════════════════════════════════
@@ -1169,7 +1171,7 @@ function NetworkAnalysis() {
                       scanState={osintScans?.[selectedNode.id]} 
                       onTriggerScan={triggerOsintScan} 
                       onExportMisp={(phone, data) => setMispModalTarget({ phone, data })} 
-                      theme="dark" 
+                      theme="light" 
                     />
                   </div>
 
