@@ -269,19 +269,19 @@ function AdminDashboard() {
           alignItems: "center",
           justifyContent: "space-between",
           padding: "0 20px",
-          background: "rgba(10, 20, 32, 0.85)",
-          border: "1px solid rgba(0, 229, 255, 0.15)",
+          background: "rgba(8, 15, 28, 0.88)",
+          border: "1px solid rgba(22, 66, 91, 0.45)",
           boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
           flexShrink: 0
         }}
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-cyan-950 border border-cyan-500 flex items-center justify-center shadow-[0_0_10px_rgba(0,229,255,0.3)]">
+          <div className="w-8 h-8 rounded flex items-center justify-center" style={{ background: "rgba(22, 66, 91, 0.5)", border: "1px solid rgba(58, 124, 165, 0.5)", boxShadow: "0 0 10px rgba(58, 124, 165, 0.20)" }}>
             <Settings className="w-4.5 h-4.5 text-cyan-400 animate-spin-slow" />
           </div>
           <div>
-            <div className="text-sm font-black text-white leading-none">CYBERDEFEND</div>
-            <span className="text-[8px] font-bold text-cyan-400 uppercase tracking-widest">Admin Dev console</span>
+            <div className="text-sm font-black text-white leading-none">FCSA ADMIN</div>
+            <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: "#5a94bb" }}>Forensic Command Console</span>
           </div>
         </div>
 
@@ -298,13 +298,18 @@ function AdminDashboard() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                  active
-                    ? "bg-cyan-950/70 text-cyan-400 border border-cyan-500/40 shadow-[0_0_12px_rgba(0,229,255,0.15)]"
-                    : "text-slate-500 hover:text-slate-300 hover:bg-slate-900/40"
-                }`}
+                style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "6px 16px", fontSize: 11, fontWeight: 700,
+                  borderRadius: 8, cursor: "pointer", transition: "all 0.2s",
+                  background: active ? "rgba(22, 66, 91, 0.55)" : "transparent",
+                  color: active ? "#3a7ca5" : "rgba(217, 220, 214, 0.5)",
+                  border: active ? "1px solid rgba(58, 124, 165, 0.40)" : "1px solid transparent",
+                  boxShadow: active ? "0 0 12px rgba(58, 124, 165, 0.12)" : "none",
+                  letterSpacing: "0.06em", textTransform: "uppercase"
+                }}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon style={{ width: 14, height: 14 }} />
                 {tab.label}
               </button>
             );
@@ -314,8 +319,8 @@ function AdminDashboard() {
         {/* User profile & Logout */}
         <div className="flex items-center gap-3">
           <div className="flex flex-col text-right">
-            <span className="text-xs font-bold text-slate-200">System Developer</span>
-            <span className="text-[9px] text-cyan-400 font-mono">ROLE_ADMIN</span>
+            <span className="text-xs font-bold" style={{ color: "#d9dcd6" }}>System Developer</span>
+            <span className="text-[9px] font-mono" style={{ color: "#5a94bb" }}>ROLE_ADMIN</span>
           </div>
           <button 
             onClick={handleLogoutClick}
@@ -328,146 +333,129 @@ function AdminDashboard() {
       </header>
 
       {/* ── Main Tabbed Content ── */}
-      <main className="flex-1 p-4 overflow-y-auto relative z-10">
+      <main style={{ flex: 1, padding: 16, overflowY: "auto", position: "relative", zIndex: 10, display: "flex", flexDirection: "column" }}>
         
         {/* TAB 1: ML MODEL TUNING */}
         {activeTab === "ml-tuning" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, maxWidth: 1440, width: "100%", margin: "0 auto", flex: 1, alignItems: "start" }}>
             
             {/* Parameters card */}
-            <div className="cyber-glass-panel border-glow-cyan p-6 flex flex-col gap-4">
-              <div className="cyber-chrome-shine" />
-              <div className="flex items-center gap-2.5 border-b border-cyan-950 pb-3 mb-1">
-                <Sliders className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-sm font-black text-white uppercase tracking-tight">Configuration Params</h3>
+            <div style={{ background: "rgba(14, 24, 44, 0.95)", border: "1px solid rgba(58, 124, 165, 0.45)", borderRadius: 14, padding: 24, display: "flex", flexDirection: "column", gap: 16, boxShadow: "0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(90,148,187,0.10)", position: "relative", overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: 0, left: "6%", right: "6%", height: 1, background: "linear-gradient(90deg, transparent, rgba(90,148,187,0.5), transparent)" }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(22,66,91,0.4)", paddingBottom: 12, marginBottom: 4 }}>
+                <Sliders style={{ width: 18, height: 18, color: "#3a7ca5" }} />
+                <h3 style={{ fontSize: 13, fontWeight: 800, color: "#ffffff", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>Configuration Params</h3>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="cyber-hud-label">Training Epochs</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <label style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "#50728a", display: "block", marginBottom: 4 }}>Training Epochs</label>
                 <input
                   type="number"
                   value={epochs}
                   onChange={(e) => setEpochs(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="cyber-input"
+                  style={{ width: "100%", background: "rgba(4,10,20,0.85)", border: "1px solid rgba(22,66,91,0.45)", borderRadius: 8, color: "#e2e8f0", fontFamily: "var(--font-mono)", fontSize: 13, padding: "9px 12px", outline: "none", boxSizing: "border-box" }}
                   disabled={isTraining}
                 />
-                <span className="text-[10px] text-slate-500">Number of forward/backward passes.</span>
+                <span style={{ fontSize: 10, color: "#50728a" }}>Number of forward/backward passes.</span>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="cyber-hud-label">Learning Rate (alpha)</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <label style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "#50728a", display: "block", marginBottom: 4 }}>Learning Rate (alpha)</label>
                 <input
                   type="number"
                   step="0.0001"
                   value={learningRate}
                   onChange={(e) => setLearningRate(Math.max(0.0001, parseFloat(e.target.value) || 0.0001))}
-                  className="cyber-input"
+                  style={{ width: "100%", background: "rgba(4,10,20,0.85)", border: "1px solid rgba(22,66,91,0.45)", borderRadius: 8, color: "#e2e8f0", fontFamily: "var(--font-mono)", fontSize: 13, padding: "9px 12px", outline: "none", boxSizing: "border-box" }}
                   disabled={isTraining}
                 />
-                <span className="text-[10px] text-slate-500">Weight optimization step magnitude.</span>
+                <span style={{ fontSize: 10, color: "#50728a" }}>Weight optimization step magnitude.</span>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="cyber-hud-label">Sequence Length</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <label style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "#50728a", display: "block", marginBottom: 4 }}>Sequence Length</label>
                 <input
                   type="number"
                   value={sequenceLength}
                   onChange={(e) => setSequenceLength(Math.max(10, parseInt(e.target.value) || 10))}
-                  className="cyber-input"
+                  style={{ width: "100%", background: "rgba(4,10,20,0.85)", border: "1px solid rgba(22,66,91,0.45)", borderRadius: 8, color: "#e2e8f0", fontFamily: "var(--font-mono)", fontSize: 13, padding: "9px 12px", outline: "none", boxSizing: "border-box" }}
                   disabled={isTraining}
                 />
-                <span className="text-[10px] text-slate-500">Window size of GPS coordinate tracking points.</span>
+                <span style={{ fontSize: 10, color: "#50728a" }}>Window size of GPS coordinate tracking points.</span>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="cyber-hud-label">Batch Size</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <label style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "#50728a", display: "block", marginBottom: 4 }}>Batch Size</label>
                 <input
                   type="number"
                   value={batchSize}
                   onChange={(e) => setBatchSize(Math.max(8, parseInt(e.target.value) || 8))}
-                  className="cyber-input"
+                  style={{ width: "100%", background: "rgba(4,10,20,0.85)", border: "1px solid rgba(22,66,91,0.45)", borderRadius: 8, color: "#e2e8f0", fontFamily: "var(--font-mono)", fontSize: 13, padding: "9px 12px", outline: "none", boxSizing: "border-box" }}
                   disabled={isTraining}
                 />
-                <span className="text-[10px] text-slate-500">Samples processed per weight correction.</span>
+                <span style={{ fontSize: 10, color: "#50728a" }}>Samples processed per weight correction.</span>
               </div>
 
               <button
                 onClick={handleRunTraining}
                 disabled={isTraining}
-                className="cyber-btn cyber-btn-cyan w-full py-3 mt-4"
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  width: "100%", padding: "12px 16px", marginTop: 8,
+                  background: isTraining ? "rgba(22,66,91,0.5)" : "linear-gradient(135deg, #3a7ca5 0%, #16425b 100%)",
+                  border: "1px solid rgba(90,148,187,0.40)",
+                  borderRadius: 9, color: "#ffffff", fontSize: 11, fontWeight: 800,
+                  letterSpacing: "0.09em", textTransform: "uppercase",
+                  cursor: isTraining ? "not-allowed" : "pointer",
+                  opacity: isTraining ? 0.7 : 1,
+                  boxShadow: "0 4px 14px rgba(22,66,91,0.45)"
+                }}
               >
                 {isTraining ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    OPTIMIZING MODEL...
-                  </>
+                  <><RefreshCw style={{ width: 14, height: 14 }} className="animate-spin" />OPTIMIZING MODEL...</>
                 ) : (
-                  <>
-                    <Play className="w-4 h-4 fill-cyan-400" />
-                    RUN TRAINING SUITE
-                  </>
+                  <><Play style={{ width: 14, height: 14, fill: "#ffffff" }} />RUN TRAINING SUITE</>
                 )}
               </button>
             </div>
 
             {/* Simulated Training Visual Graph Console */}
-            <div className="lg:col-span-2 flex flex-col gap-4">
+            <div style={{ gridColumn: "span 2", display: "flex", flexDirection: "column", gap: 16 }}>
               
               {/* Training graph */}
-              <div className="cyber-glass-panel p-6 flex-1 min-h-[300px] flex flex-col">
-                <div className="flex items-center justify-between border-b border-cyan-950 pb-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-cyan-400" />
-                    <h3 className="text-sm font-black text-white uppercase tracking-tight">Optimization Loss Curve</h3>
+              <div style={{ background: "rgba(14, 24, 44, 0.95)", border: "1px solid rgba(22,66,91,0.40)", borderRadius: 14, padding: 24, display: "flex", flexDirection: "column", minHeight: 280, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(22,66,91,0.35)", paddingBottom: 12, marginBottom: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <Activity style={{ width: 18, height: 18, color: "#3a7ca5" }} />
+                    <h3 style={{ fontSize: 13, fontWeight: 800, color: "#ffffff", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>Optimization Loss Curve</h3>
                   </div>
                   {trainingData.length > 0 && (
-                    <span className="text-xs font-mono text-cyan-400">
+                    <span style={{ fontSize: 11, fontFamily: "monospace", color: "#5a94bb", fontWeight: 700 }}>
                       Loss: {trainingData[trainingData.length - 1].loss.toFixed(4)}
                     </span>
                   )}
                 </div>
 
-                <div className="flex-1 w-full" style={{ minHeight: 220 }}>
+                <div style={{ flex: 1, width: "100%", minHeight: 220 }}>
                   {trainingData.length === 0 ? (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 gap-2 border border-dashed border-slate-900 rounded-lg">
-                      <TrendingDown className="w-8 h-8" />
-                      <span className="text-xs">No active optimization dataset. Run training suite to plot gradient descent.</span>
+                    <div style={{ width: "100%", height: "100%", minHeight: 200, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#50728a", gap: 8, border: "1px dashed rgba(22,66,91,0.35)", borderRadius: 10 }}>
+                      <TrendingDown style={{ width: 28, height: 28 }} />
+                      <span style={{ fontSize: 11 }}>No active optimization dataset. Run training suite to plot gradient descent.</span>
                     </div>
                   ) : (
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height={220}>
                       <AreaChart data={trainingData}>
                         <defs>
-                          <linearGradient id="cyanGlow" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#00e5ff" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#00e5ff" stopOpacity={0} />
+                          <linearGradient id="ceruleanGlow" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3a7ca5" stopOpacity={0.4} />
+                            <stop offset="95%" stopColor="#3a7ca5" stopOpacity={0} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,229,255,0.06)" />
-                        <XAxis 
-                          dataKey="epoch" 
-                          stroke="#475569" 
-                          fontSize={10} 
-                          fontFamily="monospace"
-                          label={{ value: "Epochs", position: "insideBottom", offset: -2, fill: "#475569" }}
-                        />
-                        <YAxis 
-                          stroke="#475569" 
-                          fontSize={10} 
-                          fontFamily="monospace"
-                          label={{ value: "Loss", angle: -90, position: "insideLeft", offset: 10, fill: "#475569" }}
-                        />
-                        <Tooltip 
-                          contentStyle={{ background: "#050e18", borderColor: "#00e5ff", borderRadius: 8 }}
-                          labelStyle={{ color: "#00e5ff", fontWeight: "bold" }}
-                        />
-                        <Area 
-                          type="monotone" 
-                          dataKey="loss" 
-                          stroke="#00e5ff" 
-                          strokeWidth={2}
-                          fillOpacity={1} 
-                          fill="url(#cyanGlow)" 
-                        />
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(22,66,91,0.18)" />
+                        <XAxis dataKey="epoch" stroke="#50728a" fontSize={10} fontFamily="monospace" label={{ value: "Epochs", position: "insideBottom", offset: -2, fill: "#50728a" }} />
+                        <YAxis stroke="#50728a" fontSize={10} fontFamily="monospace" label={{ value: "Loss", angle: -90, position: "insideLeft", offset: 10, fill: "#50728a" }} />
+                        <Tooltip contentStyle={{ background: "#0a1628", borderColor: "#3a7ca5", borderRadius: 8 }} labelStyle={{ color: "#5a94bb", fontWeight: "bold" }} />
+                        <Area type="monotone" dataKey="loss" stroke="#3a7ca5" strokeWidth={2} fillOpacity={1} fill="url(#ceruleanGlow)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   )}
@@ -475,52 +463,52 @@ function AdminDashboard() {
               </div>
 
               {/* Console log terminal & prediction test */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 
                 {/* Monospace terminal console */}
-                <div className="cyber-glass-panel p-4 flex flex-col h-56">
-                  <div className="flex items-center gap-2 border-b border-cyan-950 pb-2 mb-2 text-cyan-400">
-                    <Terminal className="w-4 h-4 animate-pulse" />
-                    <span className="text-[10px] font-bold tracking-wider uppercase font-mono">TENSOR ENGINE OUTPUT</span>
+                <div style={{ background: "rgba(14, 24, 44, 0.95)", border: "1px solid rgba(22,66,91,0.40)", borderRadius: 14, padding: 16, display: "flex", flexDirection: "column", height: 224, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(22,66,91,0.35)", paddingBottom: 8, marginBottom: 8, color: "#5a94bb" }}>
+                    <Terminal style={{ width: 14, height: 14 }} className="animate-pulse" />
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.09em", textTransform: "uppercase", fontFamily: "monospace" }}>TENSOR ENGINE OUTPUT</span>
                   </div>
-                  <div className="flex-1 overflow-y-auto font-mono text-[10px] text-slate-300 flex flex-col gap-1.5 scrollbar-thin">
+                  <div style={{ flex: 1, overflowY: "auto", fontFamily: "monospace", fontSize: 10, color: "#c8dce8", display: "flex", flexDirection: "column", gap: 4 }}>
                     {trainingTerminal.map((line, idx) => (
-                      <div key={idx} className="leading-relaxed whitespace-pre-wrap">{line}</div>
+                      <div key={idx} style={{ lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{line}</div>
                     ))}
                     <div ref={terminalEndRef} />
                   </div>
                 </div>
 
                 {/* Model testing suite */}
-                <div className="cyber-glass-panel p-4 flex flex-col h-56">
-                  <div className="flex items-center justify-between border-b border-cyan-950 pb-2 mb-3">
-                    <div className="flex items-center gap-2 text-cyan-400">
-                      <Sparkles className="w-4 h-4" />
-                      <span className="text-[10px] font-bold tracking-wider uppercase">VALIDATION ENGINE</span>
+                <div style={{ background: "rgba(14, 24, 44, 0.95)", border: "1px solid rgba(22,66,91,0.40)", borderRadius: 14, padding: 16, display: "flex", flexDirection: "column", height: 224, boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(22,66,91,0.35)", paddingBottom: 8, marginBottom: 12 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#5a94bb" }}>
+                      <Sparkles style={{ width: 14, height: 14 }} />
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.09em", textTransform: "uppercase" }}>VALIDATION ENGINE</span>
                     </div>
                     <button
                       onClick={handleTestModel}
-                      className="px-3 py-1 bg-cyan-950/40 hover:bg-cyan-950 border border-cyan-500/40 text-[10px] font-extrabold text-cyan-300 rounded cursor-pointer transition-all"
+                      style={{ padding: "4px 12px", background: "rgba(22,66,91,0.4)", border: "1px solid rgba(58,124,165,0.4)", fontSize: 10, fontWeight: 800, color: "#5a94bb", borderRadius: 6, cursor: "pointer", letterSpacing: "0.06em", textTransform: "uppercase" }}
                     >
                       EXECUTE TEST
                     </button>
                   </div>
 
-                  <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8, overflowY: "auto" }}>
                     {testResults ? (
                       <>
-                        <div className="flex justify-between items-center bg-cyan-950/20 p-2 border border-cyan-500/10 rounded">
-                          <span className="text-[10px] font-bold text-cyan-400">TEST SUITE ACCURACY</span>
-                          <span className="text-xs font-mono font-black text-cyan-300">{testResults.accuracy}</span>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(22,66,91,0.2)", padding: "6px 10px", border: "1px solid rgba(58,124,165,0.15)", borderRadius: 6 }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: "#5a94bb" }}>TEST SUITE ACCURACY</span>
+                          <span style={{ fontSize: 12, fontFamily: "monospace", fontWeight: 900, color: "#c8dce8" }}>{testResults.accuracy}</span>
                         </div>
-                        <div className="flex flex-col gap-1.5 mt-1">
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                           {testResults.samples.map((s) => (
-                            <div key={s.id} className="text-[10px] border-b border-slate-900/60 pb-1.5 flex flex-col gap-0.5">
-                              <div className="flex justify-between text-slate-200">
-                                <span className="font-bold font-mono text-cyan-500/80">{s.id} ({s.target.slice(-4)})</span>
-                                <span className="font-mono text-amber-500">{s.drift} drift</span>
+                            <div key={s.id} style={{ fontSize: 10, borderBottom: "1px solid rgba(22,66,91,0.2)", paddingBottom: 6, display: "flex", flexDirection: "column", gap: 2 }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", color: "#d9dcd6" }}>
+                                <span style={{ fontWeight: 700, fontFamily: "monospace", color: "#5a94bb" }}>{s.id} ({s.target.slice(-4)})</span>
+                                <span style={{ fontFamily: "monospace", color: "#d68910" }}>{s.drift} drift</span>
                               </div>
-                              <div className="flex justify-between text-slate-400 font-mono text-[9px]">
+                              <div style={{ display: "flex", justifyContent: "space-between", color: "#7a96a8", fontFamily: "monospace", fontSize: 9 }}>
                                 <span>ACT: {s.actual}</span>
                                 <span>PRED: {s.predicted}</span>
                               </div>
@@ -529,7 +517,7 @@ function AdminDashboard() {
                         </div>
                       </>
                     ) : (
-                      <div className="flex-1 flex flex-col items-center justify-center text-slate-600 text-[10px] text-center p-4">
+                      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#50728a", fontSize: 10, textAlign: "center", padding: 16 }}>
                         Validation coordinates prediction test is pending. Run testing to verify lat/lon drift metrics.
                       </div>
                     )}
@@ -545,14 +533,14 @@ function AdminDashboard() {
 
         {/* TAB 2: FORMAT NORMALIZATION */}
         {activeTab === "carrier-map" && (
-          <div className="max-w-5xl mx-auto cyber-glass-panel p-6">
-            <div className="cyber-chrome-shine" />
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-cyan-950 pb-4 mb-6 gap-4">
-              <div className="flex items-center gap-3">
-                <Database className="w-5 h-5 text-cyan-400" />
+          <div style={{ maxWidth: 900, margin: "0 auto", background: "rgba(14, 24, 44, 0.95)", border: "1px solid rgba(22,66,91,0.45)", borderRadius: 14, padding: 24, boxShadow: "0 8px 32px rgba(0,0,0,0.4)", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: 0, left: "6%", right: "6%", height: 1, background: "linear-gradient(90deg, transparent, rgba(90,148,187,0.5), transparent)" }} />
+            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(22,66,91,0.35)", paddingBottom: 16, marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <Database style={{ width: 18, height: 18, color: "#3a7ca5" }} />
                 <div>
-                  <h3 className="text-sm font-black text-white uppercase tracking-tight">Ingestion Format Normalization</h3>
-                  <p className="text-[11px] text-slate-400">Define headers mapping to translate Carrier Excel/CSVs to unified database columns.</p>
+                  <h3 style={{ fontSize: 13, fontWeight: 800, color: "#ffffff", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>Ingestion Format Normalization</h3>
+                  <p style={{ fontSize: 11, color: "#7a96a8", marginTop: 2 }}>Define headers mapping to translate Carrier Excel/CSVs to unified database columns.</p>
                 </div>
               </div>
 

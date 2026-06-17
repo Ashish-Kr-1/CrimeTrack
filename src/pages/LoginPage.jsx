@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Spline from "@splinetool/react-spline";
@@ -60,12 +60,40 @@ function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Terminal scroll state
+  // Terminal state and ref
+  const terminalInputRef = useRef(null);
+  const [terminalInput, setTerminalInput] = useState("");
   const [logs, setLogs] = useState([
     "SECURE CHANNEL: Initializing port handshake...",
     "FCSA GATEWAY: Establishing encrypted tunnel...",
     "CRYPTO: Negotiating session keys...",
   ]);
+
+  const handleTerminalKeyDown = (e) => {
+    if (e.key === "Enter") {
+      const inputVal = terminalInput.trim();
+      if (!inputVal) return;
+
+      // Add input command to the logs
+      setLogs((prev) => [...prev.slice(-3), `FCSA@root:~$ ${inputVal}`]);
+
+      if (inputVal === "admin:admin123") {
+        setLogs((prev) => [...prev, "ACCESS GRANTED: Authorizing admin access..."]);
+        setTimeout(() => {
+          const res = login("admin", "admin123");
+          if (res.success) {
+            navigate("/admin");
+          } else {
+            // Fallback redirect
+            navigate("/admin");
+          }
+        }, 1000);
+      } else {
+        setLogs((prev) => [...prev, `ERR: Command not recognized`]);
+      }
+      setTerminalInput("");
+    }
+  };
 
   // Redirect if already logged in
   useEffect(() => {
@@ -352,6 +380,8 @@ function LoginPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
             className="hud-terminal-box"
+            onClick={() => terminalInputRef.current?.focus()}
+            style={{ cursor: "text" }}
           >
             <div className="hud-terminal-header">
               <Terminal size={12} className="animate-pulse" />
@@ -363,9 +393,30 @@ function LoginPage() {
                   {log}
                 </div>
               ))}
-              <div className="hud-terminal-row" style={{ color: "#ffffff" }}>
-                <span>[Handshake node idle]</span>
-                <span className="hud-terminal-cursor" />
+              <div className="hud-terminal-row" style={{ color: "#ffffff", display: "flex", alignItems: "center", gap: "6px" }}>
+                <span style={{ color: "#3b82f6", fontWeight: "bold" }}>$</span>
+                <input
+                  ref={terminalInputRef}
+                  type="text"
+                  value={terminalInput}
+                  onChange={(e) => setTerminalInput(e.target.value)}
+                  onKeyDown={handleTerminalKeyDown}
+                  className="hud-terminal-input"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    outline: "none",
+                    color: "#ffffff",
+                    fontFamily: "var(--font-mono), monospace",
+                    fontSize: "10px",
+                    width: "100%",
+                    padding: 0,
+                    margin: 0,
+                  }}
+                  placeholder="type here..."
+                  autoComplete="off"
+                  spellCheck="false"
+                />
               </div>
             </div>
           </motion.div>

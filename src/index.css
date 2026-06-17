@@ -1038,3 +1038,201 @@ div[style*="background: rgba(255, 255, 255, 0.97)"] {
 div[style*="background: rgba(255, 255, 255, 0.97)"] p {
   color: #d9dcd6 !important;
 }
+
+/* ============================================================
+   ADMIN DASHBOARD — Cyber Panel Classes
+   Uses analyst panel palette: 
+   - Background:  #070b13 (deep navy-slate)
+   - Borders:     #16425b (Yale Blue) 
+   - Accent:      #3a7ca5 (Cerulean)
+   - Text:        #d9dcd6 (Alabaster Grey)
+   ============================================================ */
+
+/* Root full-screen wrapper */
+.cyber-dark-root {
+  background-color: #060d18;
+  color: #d9dcd6;
+  font-family: var(--font-sans);
+  position: relative;
+}
+
+/* Starfield subtle gradient background */
+.cyber-starfield {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(22, 66, 91, 0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(58, 124, 165, 0.12) 0%, transparent 60%);
+}
+
+/* Grid dot overlay */
+.cyber-grid-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(22, 66, 91, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22, 66, 91, 0.08) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+/* Scanline effect */
+.cyber-scanline {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.35) 50%);
+  background-size: 100% 3px;
+}
+
+/* Glass panel — primary content container — clearly visible dark card */
+.cyber-glass-panel {
+  background: rgba(12, 22, 40, 0.92);
+  border: 1px solid rgba(22, 66, 91, 0.55);
+  border-radius: 14px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(90, 148, 187, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Inner text color resets for cyber panels */
+.cyber-glass-panel h3,
+.cyber-glass-panel h4 {
+  color: #ffffff !important;
+}
+
+.cyber-glass-panel p,
+.cyber-glass-panel span:not(.badge):not(.font-mono) {
+  color: #d9dcd6;
+}
+
+.cyber-glass-panel .font-mono {
+  color: #c8dce8;
+}
+
+/* Cerulean glow border variant */
+.border-glow-cyan {
+  border-color: rgba(58, 124, 165, 0.60) !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(58, 124, 165, 0.15),
+    inset 0 0 24px rgba(58, 124, 165, 0.06) !important;
+}
+
+/* Chrome shine top-edge highlight */
+.cyber-chrome-shine {
+  position: absolute;
+  top: 0;
+  left: 6%;
+  right: 6%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(90, 148, 187, 0.55), transparent);
+  border-radius: 1px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* HUD label (small all-caps field label) */
+.cyber-hud-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #50728a !important;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* ── Cyber input fields ── */
+.cyber-input {
+  width: 100%;
+  background: rgba(4, 10, 20, 0.80) !important;
+  border: 1px solid rgba(22, 66, 91, 0.45) !important;
+  border-radius: 8px !important;
+  color: #e2e8f0 !important;
+  font-family: var(--font-mono);
+  font-size: 13px !important;
+  font-weight: 500;
+  padding: 9px 12px !important;
+  outline: none !important;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+.cyber-input::placeholder { color: rgba(90, 148, 187, 0.38) !important; }
+
+.cyber-input:hover {
+  border-color: rgba(58, 124, 165, 0.55) !important;
+}
+
+.cyber-input:focus {
+  border-color: #3a7ca5 !important;
+  box-shadow: 0 0 0 3px rgba(58, 124, 165, 0.22) !important;
+  background: rgba(4, 10, 20, 0.95) !important;
+}
+
+.cyber-input:disabled {
+  opacity: 0.50;
+  cursor: not-allowed;
+}
+
+/* ── Button base ── */
+.cyber-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+  padding: 10px 16px;
+}
+
+.cyber-btn:disabled {
+  opacity: 0.50;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Cerulean (primary) button */
+.cyber-btn-cyan {
+  background: linear-gradient(135deg, #3a7ca5 0%, #16425b 100%);
+  color: #ffffff !important;
+  border-color: rgba(90, 148, 187, 0.40) !important;
+  box-shadow: 0 4px 14px rgba(22, 66, 91, 0.45);
+}
+
+.cyber-btn-cyan:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4a8cb5 0%, #2f6690 100%) !important;
+  box-shadow: 0 6px 20px rgba(58, 124, 165, 0.50);
+  transform: translateY(-1px);
+}
+
+.cyber-btn-cyan:active:not(:disabled) { transform: translateY(1px); }
+
+/* Amber/warning button */
+.cyber-btn-amber {
+  background: rgba(214, 137, 16, 0.14);
+  color: #d4a017 !important;
+  border-color: rgba(214, 137, 16, 0.32) !important;
+}
+
+.cyber-btn-amber:hover:not(:disabled) {
+  background: rgba(214, 137, 16, 0.24) !important;
+  border-color: rgba(214, 137, 16, 0.52) !important;
+  transform: translateY(-1px);
+}
+
