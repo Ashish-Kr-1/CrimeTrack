@@ -697,3 +697,137 @@
 a[href*="spline.design"] {
   display: none !important;
 }
+
+/* ── High-Tech Loader Overlay ── */
+.login-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: #060e18;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* Loader background vignettes */
+.login-loader-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(58, 124, 165, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.login-loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+/* Logo container with radial back-glow */
+.login-loader-logo-container {
+  margin-bottom: 32px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-loader-logo-container::before {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.25) 0%, transparent 70%);
+  z-index: -1;
+  filter: blur(8px);
+}
+
+.login-loader-logo {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  border-radius: 28px;
+  filter: drop-shadow(0 0 25px rgba(59, 130, 246, 0.45));
+  animation: logo-pulse 2s infinite ease-in-out;
+}
+
+/* Status container */
+.login-loader-status-container {
+  display: flex;
+  justify-content: space-between;
+  width: 280px;
+  margin-bottom: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-hud-dim);
+}
+
+.login-loader-text {
+  text-transform: uppercase;
+  color: #a5b4fc;
+}
+
+.login-loader-pct {
+  color: #3b82f6;
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+/* Progress bar styling */
+.login-loader-bar-track {
+  width: 280px;
+  height: 6px;
+  background: rgba(90, 148, 187, 0.12);
+  border: 1px solid rgba(90, 148, 187, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+  margin-bottom: 24px;
+}
+
+.login-loader-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1d4ed8 0%, #3b82f6 50%, #60a5fa 100%);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.75);
+  border-radius: 4px;
+  transition: width 0.05s linear;
+}
+
+/* Nodes indicators */
+.login-loader-nodes {
+  display: flex;
+  gap: 8px;
+}
+
+.node-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(90, 148, 187, 0.25);
+  transition: all 0.3s ease;
+}
+
+.node-dot.active {
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
+}
+
+@keyframes logo-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 25px rgba(59, 130, 246, 0.45));
+  }
+  50% {
+    transform: scale(1.02);
+    filter: drop-shadow(0 0 35px rgba(59, 130, 246, 0.65));
+  }
+}

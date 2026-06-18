@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Spline from "@splinetool/react-spline";
 import { AuthContext } from "../context/AuthContext";
 import "../login-theme.css";
@@ -59,6 +59,51 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // High-tech loader states
+  const [loadingScreen, setLoadingScreen] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [loadingText, setLoadingText] = useState("SECURE CHANNEL: Initializing port handshake...");
+
+  // High-tech loader progress simulation
+  useEffect(() => {
+    let start = null;
+    const duration = 2800; // 2.8 seconds
+    let animationFrameId;
+
+    const animate = (timestamp) => {
+      if (!start) start = timestamp;
+      const elapsed = timestamp - start;
+      const progressVal = Math.min((elapsed / duration) * 100, 100);
+      
+      setProgress(progressVal);
+
+      if (progressVal < 20) {
+        setLoadingText("SECURE CHANNEL: Initializing port handshake...");
+      } else if (progressVal < 45) {
+        setLoadingText("FCSA GATEWAY: Establishing encrypted tunnel...");
+      } else if (progressVal < 70) {
+        setLoadingText("TELEMETRY: Synchronizing prediction matrix...");
+      } else if (progressVal < 90) {
+        setLoadingText("SECURITY: Finalizing token authentication...");
+      } else if (progressVal < 100) {
+        setLoadingText("SYSTEMS ACTIVE: Booting interfaces...");
+      } else {
+        setLoadingText("HANDSHAKE COMPLETE. REDIRECTING...");
+      }
+
+      if (elapsed < duration) {
+        animationFrameId = requestAnimationFrame(animate);
+      } else {
+        setTimeout(() => {
+          setLoadingScreen(false);
+        }, 300);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
 
   // Terminal state and ref
   const terminalInputRef = useRef(null);
@@ -159,6 +204,52 @@ function LoginPage() {
 
   return (
     <div className="login-page-root">
+      
+      {/* ── High-Tech Loading Overlay ── */}
+      <AnimatePresence>
+        {loadingScreen && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="login-loader-overlay"
+          >
+            <div className="login-loader-content">
+              <motion.div
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.7, ease: "easeOut" }}
+                className="login-loader-logo-container"
+              >
+                <img
+                  src="/logo.png"
+                  alt="FCSA Logo"
+                  className="login-loader-logo"
+                />
+              </motion.div>
+              
+              <div className="login-loader-status-container">
+                <span className="login-loader-text">{loadingText}</span>
+                <span className="login-loader-pct">{Math.floor(progress)}%</span>
+              </div>
+              
+              <div className="login-loader-bar-track">
+                <div
+                  className="login-loader-bar-fill"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              
+              <div className="login-loader-nodes">
+                <span className={`node-dot ${progress >= 20 ? "active" : ""}`}></span>
+                <span className={`node-dot ${progress >= 45 ? "active" : ""}`}></span>
+                <span className={`node-dot ${progress >= 70 ? "active" : ""}`}></span>
+                <span className={`node-dot ${progress >= 90 ? "active" : ""}`}></span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* ── Spline 3D Scene (Background) ── */}
       <div className="login-3d-scene">
