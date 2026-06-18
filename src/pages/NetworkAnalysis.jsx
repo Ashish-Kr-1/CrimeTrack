@@ -963,6 +963,25 @@ function NetworkAnalysis() {
     ctx.fillText(label, node.x, node.y + size + fontSize + 2.5);
   }, [labelMode, selectedNode]);
 
+  const nodePointerAreaPaint = useCallback((node, color, ctx, globalScale) => {
+    const size = node.val || 8;
+    const fontSize = Math.max(10 / globalScale, 4.5);
+
+    // Single encompassing circle that covers both the node circle AND
+    // the label text drawn below it. Centre the hit-circle halfway
+    // between the top of the node and the bottom of the label.
+    const labelHeight = fontSize * 2 + 6;          // generous label height
+    const totalHeight = size + labelHeight;         // from node centre to bottom of label
+    const hitCenterY = node.y + totalHeight / 2;   // midpoint of entire hit region
+    const hitRadius  = totalHeight / 2 + size + 6; // encompasses everything
+
+    ctx.beginPath();
+    ctx.arc(node.x, hitCenterY, hitRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = color;   // MUST use the provided unique color
+    ctx.fill();
+  }, []);
+
+
   const nodeNarrative = useMemo(() => {
     if (!selectedNode) return null;
     if (selectedNode.isTarget) return { role: "PRIMARY SUSPECT DOSSIER", description: "Primary node of interest. Direct telemetry source displaying multiple bank triggers, UPI binding operations, and active device swapping patterns in high-risk zones.", recommendation: "Maintain geo-fencing overlays and monitor tower-dumps for concurrent operations." };
@@ -1137,12 +1156,16 @@ function NetworkAnalysis() {
               {/* Canvas */}
               <div ref={containerRef} style={{ borderRadius: 10, overflow: "hidden", background: "#070b13" }}>
                 <ForceGraph2D ref={graphRef} graphData={graphData} width={dimensions.width} height={400}
-                  backgroundColor="#070b13" nodeCanvasObject={nodeCanvasObject}
+                  backgroundColor="#070b13"
+                  nodeCanvasObject={nodeCanvasObject}
+                  nodeCanvasObjectMode={() => "replace"}
+                  nodePointerAreaPaint={nodePointerAreaPaint}
                   linkColor={() => "rgba(0,229,255,0.15)"} linkWidth={(l) => 0.6 + l.ratio * 2.4}
                   linkDirectionalParticles={4} linkDirectionalParticleWidth={1.5}
                   linkDirectionalParticleSpeed={(l) => l.ratio * 0.008 + 0.002}
                   linkDirectionalParticleColor={() => "#ff6b4a"}
                   enableZoomInteraction enablePanInteraction
+                  cooldownTicks={100}
                   onNodeClick={(node) => setSelectedNode(node)}
                   nodeLabel={(node) => node.isTarget
                     ? `<div style="background:#0e1322;border:1px solid rgba(58,124,165,0.3);padding:8px 12px;border-radius:6px;font-family:sans-serif;color:#f0f9ff;font-size:12px;"><strong style="color:#ff6b4a;">Target SIM</strong><br/>Phone: <strong>${node.id}</strong></div>`
@@ -1270,6 +1293,63 @@ function NetworkAnalysis() {
         </div>
 
         {/* ══════════════════════════════════════════════════════
+            CONNECTION TABLE
+        ══════════════════════════════════════════════════════ */}
+        <motion.div variants={fadeUp} className="glass-card" style={{ padding: "22px 24px" }}>
+          <h2 style={{ marginBottom: 20, fontSize: 15, fontWeight: 700, color: "#ffffff", display: "flex", alignItems: "center", gap: 8 }}>
+            <Users size={15} color="#3a7ca5" /> All Contacts — Ranked by Interaction Count
+          </h2>
+          <div style={{ overflowX: "auto" }}>
+            <table className="ct-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Contact Number</th>
+                  <th>Interactions</th>
+                  <th style={{ width: "35%" }}>Share of Total Activity</th>
+                  <th>Threat Level</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topContacts.map(([contact, count], idx) => {
+                  const pct = Math.min((count / strongestCount) * 100, 100);
+                  const isSelected = selectedNode?.id === contact;
+                  const c = count >= 30 ? "#ff6b4a" : count >= 15 ? "#00e5ff" : "#2d8fa5";
+                  const label = count >= 30 ? "High Risk" : count >= 15 ? "Suspicious" : "Normal";
+                  const nodeObj = { id: contact, count, level: count >= 30 ? "critical" : count >= 15 ? "suspicious" : "nominal", val: 6 + (count / strongestCount) * 16 };
+                  return (
+                    <tr key={idx} style={{ cursor: "pointer", background: isSelected ? "rgba(225,112,85,0.06)" : "transparent", transition: "background 0.15s" }} onClick={() => setSelectedNode(nodeObj)}>
+                      <td style={{ color: "rgba(255, 255, 255, 0.5)", fontFamily: "var(--font-mono)", fontSize: 11 }}>{String(idx + 1).padStart(2, "0")}</td>
+                      <td style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: "#ffffff" }}>{contact}</td>
+                      <td style={{ fontWeight: 700, fontFamily: "var(--font-mono)", color: c }}>{count}</td>
+                      <td>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div style={{ height: 5, flex: 1, overflow: "hidden", borderRadius: 99, background: "rgba(255, 255, 255, 0.08)" }}>
+                            <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.6, delay: idx * 0.03 }}
+                              style={{ height: "100%", borderRadius: 99, background: c }} />
+                          </div>
+                          <span style={{ minWidth: 30, textAlign: "right", fontSize: 10, fontWeight: 600, color: "rgba(255, 255, 255, 0.5)" }}>{pct.toFixed(0)}%</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span style={{ padding: "3px 9px", borderRadius: 99, fontSize: 9, fontWeight: 700, textTransform: "uppercase", background: `${c}12`, color: c, border: `1px solid ${c}30` }}>{label}</span>
+                      </td>
+                      <td>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <button onClick={(e) => { e.stopPropagation(); setSelectedNode(nodeObj); }} style={{ fontSize: 10, fontWeight: 700, color: "#00e5ff", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>Inspect <ChevronRight size={10} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setDeepAnalysisTarget(contact); }} style={{ fontSize: 10, fontWeight: 700, color: "#e17055", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}><Zap size={10} /> Analyze</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+
+        {/* ══════════════════════════════════════════════════════
             HOUR-OF-DAY ACTIVITY HEATMAP
         ══════════════════════════════════════════════════════ */}
         <motion.div variants={fadeUp} className="glass-card" style={{ padding: "20px 24px", background: "rgba(14, 22, 38, 0.72)" }}>
@@ -1341,63 +1421,6 @@ function NetworkAnalysis() {
               </strong> — {heatHovered.count} call events
             </div>
           )}
-        </motion.div>
-
-        {/* ══════════════════════════════════════════════════════
-            CONNECTION TABLE
-        ══════════════════════════════════════════════════════ */}
-        <motion.div variants={fadeUp} className="glass-card" style={{ padding: "22px 24px" }}>
-          <h2 style={{ marginBottom: 20, fontSize: 15, fontWeight: 700, color: "#ffffff", display: "flex", alignItems: "center", gap: 8 }}>
-            <Users size={15} color="#3a7ca5" /> All Contacts — Ranked by Interaction Count
-          </h2>
-          <div style={{ overflowX: "auto" }}>
-            <table className="ct-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Contact Number</th>
-                  <th>Interactions</th>
-                  <th style={{ width: "35%" }}>Share of Total Activity</th>
-                  <th>Threat Level</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topContacts.map(([contact, count], idx) => {
-                  const pct = Math.min((count / strongestCount) * 100, 100);
-                  const isSelected = selectedNode?.id === contact;
-                  const c = count >= 30 ? "#ff6b4a" : count >= 15 ? "#00e5ff" : "#2d8fa5";
-                  const label = count >= 30 ? "High Risk" : count >= 15 ? "Suspicious" : "Normal";
-                  const nodeObj = { id: contact, count, level: count >= 30 ? "critical" : count >= 15 ? "suspicious" : "nominal", val: 6 + (count / strongestCount) * 16 };
-                  return (
-                    <tr key={idx} style={{ cursor: "pointer", background: isSelected ? "rgba(225,112,85,0.06)" : "transparent", transition: "background 0.15s" }} onClick={() => setSelectedNode(nodeObj)}>
-                      <td style={{ color: "rgba(255, 255, 255, 0.5)", fontFamily: "var(--font-mono)", fontSize: 11 }}>{String(idx + 1).padStart(2, "0")}</td>
-                      <td style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: "#ffffff" }}>{contact}</td>
-                      <td style={{ fontWeight: 700, fontFamily: "var(--font-mono)", color: c }}>{count}</td>
-                      <td>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <div style={{ height: 5, flex: 1, overflow: "hidden", borderRadius: 99, background: "rgba(255, 255, 255, 0.08)" }}>
-                            <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.6, delay: idx * 0.03 }}
-                              style={{ height: "100%", borderRadius: 99, background: c }} />
-                          </div>
-                          <span style={{ minWidth: 30, textAlign: "right", fontSize: 10, fontWeight: 600, color: "rgba(255, 255, 255, 0.5)" }}>{pct.toFixed(0)}%</span>
-                        </div>
-                      </td>
-                      <td>
-                        <span style={{ padding: "3px 9px", borderRadius: 99, fontSize: 9, fontWeight: 700, textTransform: "uppercase", background: `${c}12`, color: c, border: `1px solid ${c}30` }}>{label}</span>
-                      </td>
-                      <td>
-                        <div style={{ display: "flex", gap: 8 }}>
-                          <button onClick={(e) => { e.stopPropagation(); setSelectedNode(nodeObj); }} style={{ fontSize: 10, fontWeight: 700, color: "#00e5ff", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>Inspect <ChevronRight size={10} /></button>
-                          <button onClick={(e) => { e.stopPropagation(); setDeepAnalysisTarget(contact); }} style={{ fontSize: 10, fontWeight: 700, color: "#e17055", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}><Zap size={10} /> Analyze</button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
         </motion.div>
 
       </>)}
