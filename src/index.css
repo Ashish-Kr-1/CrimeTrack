@@ -894,6 +894,10 @@ p[style*="var(--color-text-muted)"] {
 
 /* Glass Cards: dark transparent styling */
 .glass-card {
+  --color-text:            #ffffff;
+  --color-text-secondary:  #e2e8f0;
+  --color-text-muted:      #c8dce8;
+  --color-text-subtle:     #94a3b8;
   background: rgba(14, 22, 38, 0.72) !important;
   border: 1px solid rgba(22, 66, 91, 0.25) !important; /* Yale Blue border tint */
   box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.25) !important;

@@ -116,23 +116,39 @@ function TowerDetailPanel({ location, onClose }) {
       <motion.div initial={{ x: 420 }} animate={{ x: 0 }} exit={{ x: 420 }}
         transition={{ type: "spring", stiffness: 300, damping: 34 }}
         onClick={e => e.stopPropagation()}
-        style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 400, background: "var(--color-bg)", boxShadow: "-8px 0 40px rgba(0,0,0,0.15)", overflowY: "auto", display: "flex", flexDirection: "column" }}>
+        style={{
+          position: "absolute",
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: 400,
+          background: "#081b29",
+          borderLeft: "1px solid rgba(58, 124, 165, 0.25)",
+          boxShadow: "-8px 0 40px rgba(0,0,0,0.4)",
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+          "--color-text": "#ffffff",
+          "--color-text-secondary": "#e2e8f0",
+          "--color-text-muted": "#c8dce8",
+          "--color-text-subtle": "#94a3b8",
+        }}>
         {/* Header */}
-        <div style={{ padding: "18px 20px", borderBottom: "1px solid var(--color-border)", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <div style={{ padding: "18px 20px", borderBottom: "1px solid rgba(58, 124, 165, 0.2)", background: "rgba(8, 27, 41, 0.85)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>Tower Analysis</span>
             <h2 style={{ fontSize: 13, fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--color-text)", margin: "3px 0 0" }}>{lat.toFixed(5)}, {lng.toFixed(5)}</h2>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ padding: "3px 10px", borderRadius: 99, fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", background: `${color}12`, color, border: `1px solid ${color}30` }}>{label}</span>
-            <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 7, border: "1px solid var(--color-border)", background: "rgba(255,255,255,0.7)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><X size={12} /></button>
+            <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 7, border: "1px solid rgba(58, 124, 165, 0.2)", background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--color-text-muted)" }}><X size={12} /></button>
           </div>
         </div>
         <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Stats */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {[{ label: "Total Events", val: totalEvents }, { label: "Anomalous", val: `${Math.round(anomalyRatio*100)}%` }].map(s => (
-              <div key={s.label} style={{ background: "rgba(255,255,255,0.5)", border: "1px solid var(--color-border)", borderRadius: 10, padding: "10px 12px" }}>
+              <div key={s.label} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(58, 124, 165, 0.2)", borderRadius: 10, padding: "10px 12px" }}>
                 <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)" }}>{s.label}</div>
                 <div style={{ fontSize: 20, fontWeight: 800, color: "var(--color-text)", marginTop: 2 }}>{s.val}</div>
               </div>
@@ -148,7 +164,7 @@ function TowerDetailPanel({ location, onClose }) {
                 return (
                   <div key={period} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <span style={{ width: 70, fontSize: 10, color: "var(--color-text-muted)", fontWeight: 600 }}>{period}</span>
-                    <div style={{ flex: 1, height: 6, borderRadius: 99, background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
+                    <div style={{ flex: 1, height: 6, borderRadius: 99, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
                       <div style={{ width: `${pct}%`, height: "100%", borderRadius: 99, background: c, transition: "width 0.6s ease" }} />
                     </div>
                     <span style={{ width: 40, fontSize: 10, fontWeight: 700, color: c, textAlign: "right" }}>{cnt}</span>
@@ -167,7 +183,7 @@ function TowerDetailPanel({ location, onClose }) {
                   const isBank = BANK_KEYWORDS.some(kw => phone.toUpperCase().includes(kw));
                   const flagColor = isUpi ? "#d63031" : isBank ? "#e17055" : "var(--color-text)";
                   return (
-                    <div key={phone} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "rgba(255,255,255,0.4)", border: `1px solid ${isUpi||isBank ? "#d6303115" : "var(--color-border)"}`, borderRadius: 8, borderLeft: `3px solid ${flagColor}` }}>
+                    <div key={phone} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "rgba(255,255,255,0.03)", border: `1px solid ${isUpi||isBank ? "#d6303125" : "rgba(58, 124, 165, 0.15)"}`, borderRadius: 8, borderLeft: `3px solid ${flagColor}` }}>
                       <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 700, color: flagColor }}>{phone}</span>
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         {(isUpi||isBank) && <span style={{ fontSize: 8, fontWeight: 800, color: "#d63031", textTransform: "uppercase" }}>⚠ {isUpi ? "UPI" : "Bank"}</span>}
@@ -193,11 +209,11 @@ function TowerDetailPanel({ location, onClose }) {
           {/* Event list */}
           <div>
             <h3 style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)", marginBottom: 10 }}>All Events at this Location</h3>
-            <div style={{ maxHeight: 240, overflowY: "auto", background: "rgba(255,255,255,0.4)", border: "1px solid var(--color-border)", borderRadius: 10 }}>
+            <div style={{ maxHeight: 240, overflowY: "auto", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(58, 124, 165, 0.2)", borderRadius: 10 }}>
               {events.slice(0, 50).map((e, i) => {
                 const isFlag = isAnomalous(e);
                 return (
-                  <div key={i} style={{ padding: "8px 12px", borderBottom: i < events.length-1 ? "1px solid var(--color-border-subtle)" : "none", display: "flex", gap: 10, alignItems: "flex-start", background: isFlag ? "rgba(214,48,49,0.03)" : "transparent" }}>
+                  <div key={i} style={{ padding: "8px 12px", borderBottom: i < events.length-1 ? "1px solid rgba(58, 124, 165, 0.1)" : "none", display: "flex", gap: 10, alignItems: "flex-start", background: isFlag ? "rgba(214,48,49,0.06)" : "transparent" }}>
                     <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--color-text-muted)", flexShrink: 0, marginTop: 1 }}>{cleanRaw(e[6])} {cleanRaw(e[7])?.slice(0,5)}</span>
                     <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: isFlag ? "#d63031" : "var(--color-text-subtle)", fontWeight: isFlag ? 700 : 400 }}>{cleanRaw(e[3]) || "—"}</span>
                     {isFlag && <span style={{ fontSize: 8, fontWeight: 800, color: "#d63031", flexShrink: 0 }}>⚠</span>}
@@ -208,7 +224,7 @@ function TowerDetailPanel({ location, onClose }) {
           </div>
           {/* Google Maps link */}
           <a href={`https://www.google.com/maps?q=${lat},${lng}`} target="_blank" rel="noreferrer"
-            style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: "#0984e3", textDecoration: "none" }}>
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: "#00e5ff", textDecoration: "none" }}>
             <ExternalLink size={12} /> View on Google Maps
           </a>
         </div>

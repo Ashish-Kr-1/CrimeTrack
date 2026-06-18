@@ -1001,7 +1001,7 @@ function NetworkAnalysis() {
               <Info size={18} color="#3a7ca5" />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700, color: "var(--color-text)", lineHeight: 1.6 }}>
+              <p style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700, color: "#d9dcd6", lineHeight: 1.6 }}>
                 This suspect contacted <strong style={{ color: "#3a7ca5" }}>{totalContacts} different people</strong>.
                 Their top contact accounts for <strong style={{ color: networkSummary.topPct > 20 ? "#d63031" : "#e17055" }}>{networkSummary.topPct}% of all activity</strong>
                 {networkSummary.topPct > 20 ? " — far above normal for a typical user" : ""}.
