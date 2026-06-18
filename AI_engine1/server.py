@@ -41,6 +41,36 @@ def read_root():
     return {"status": "online", "message": "CrimeTrack Core API Server is active."}
 
 # ─────────────────────────────────────────────────────────
+#  0. AUTH — credentials stored in .env, never in source
+# ─────────────────────────────────────────────────────────
+@app.post("/api/auth/login")
+async def auth_login(payload: dict):
+    username = payload.get("username", "").strip().lower()
+    password = payload.get("password", "")
+
+    user_map = {
+        "admin":   {"env_key": "ADMIN_PASSWORD",   "role": "admin"},
+        "analyst": {"env_key": "ANALYST_PASSWORD",  "role": "analyst"},
+        "officer": {"env_key": "OFFICER_PASSWORD",  "role": "officer"},
+    }
+
+    config = user_map.get(username)
+    if not config:
+        return {"success": False, "message": "Invalid credentials. Access denied."}
+
+    stored = os.getenv(config["env_key"])
+    if not stored:
+        return {
+            "success": False,
+            "message": f"Server misconfiguration: {config['env_key']} not set in .env"
+        }
+
+    if password != stored:
+        return {"success": False, "message": "Invalid credentials. Access denied."}
+
+    return {"success": True, "username": username, "role": config["role"]}
+
+# ─────────────────────────────────────────────────────────
 #  1. LIVE OSINT & HOLEHE SCAN STREAM (Server-Sent Events)
 # ─────────────────────────────────────────────────────────
 async def run_osint_stream(target: str):

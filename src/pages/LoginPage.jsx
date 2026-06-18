@@ -77,19 +77,19 @@ function LoginPage() {
       // Add input command to the logs
       setLogs((prev) => [...prev.slice(-3), `FCSA@root:~$ ${inputVal}`]);
 
-      if (inputVal === "admin:admin123") {
-        setLogs((prev) => [...prev, "ACCESS GRANTED: Authorizing admin access..."]);
-        setTimeout(() => {
-          const res = login("admin", "admin123");
+      if (inputVal.includes(":")) {
+        const [u, p] = inputVal.split(":").map(s => s.trim());
+        setLogs((prev) => [...prev, "Authenticating via auth server..."]);
+        login(u, p).then(res => {
           if (res.success) {
-            navigate("/admin");
+            setLogs((prev) => [...prev, `ACCESS GRANTED: Welcome, ${res.user.username}`]);
+            setTimeout(() => navigate(res.user.role === "admin" ? "/admin" : "/"), 800);
           } else {
-            // Fallback redirect
-            navigate("/admin");
+            setLogs((prev) => [...prev, `ACCESS DENIED: ${res.message}`]);
           }
-        }, 1000);
+        });
       } else {
-        setLogs((prev) => [...prev, `ERR: Command not recognized`]);
+        setLogs((prev) => [...prev, `ERR: Command not recognized. Use format username:password`]);
       }
       setTerminalInput("");
     }
@@ -137,7 +137,7 @@ function LoginPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!username.trim() || !password.trim()) {
       setError("Please enter your username and password.");
@@ -145,18 +145,16 @@ function LoginPage() {
     }
     setIsLoading(true);
     setError("");
-    setTimeout(() => {
-      const res = login(username, password);
-      setIsLoading(false);
-      if (res.success) {
-        setLogs((prev) => [...prev, `[OK] Handshake success for user: ${res.user.username}`]);
-        if (res.user.role === "admin") navigate("/admin");
-        else navigate("/");
-      } else {
-        setError(res.message);
-        setLogs((prev) => [...prev, `[ERROR] Login failure: Access Denied.`]);
-      }
-    }, 1200);
+    const res = await login(username, password);
+    setIsLoading(false);
+    if (res.success) {
+      setLogs((prev) => [...prev, `[OK] Handshake success for user: ${res.user.username}`]);
+      if (res.user.role === "admin") navigate("/admin");
+      else navigate("/");
+    } else {
+      setError(res.message);
+      setLogs((prev) => [...prev, `[ERROR] Login failure: Access Denied.`]);
+    }
   };
 
   return (

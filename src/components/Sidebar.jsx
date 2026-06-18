@@ -180,8 +180,8 @@ function Sidebar({ isOpen, onClose }) {
                     fontWeight: isActive ? 700 : 500,
                     letterSpacing: "-0.01em",
                     color: isActive ? "#ffffff" : "rgba(255,255,255,0.60)",
-                    backgroundColor: isActive ? "rgba(58,124,165,0.28)" : "transparent",
-                    border: `1px solid ${isActive ? "rgba(90,148,187,0.30)" : "transparent"}`,
+                    backgroundColor: isActive ? "rgba(138,181,207,0.20)" : "transparent",
+                    border: `1px solid ${isActive ? "rgba(138,181,207,0.28)" : "transparent"}`,
                     cursor: "pointer",
                     overflow: "hidden",
                     whiteSpace: "nowrap",
@@ -208,7 +208,7 @@ function Sidebar({ isOpen, onClose }) {
                       style={{
                         position: "absolute", left: 0, top: "15%", height: "70%", width: 3,
                         borderRadius: "0 3px 3px 0",
-                        background: "linear-gradient(180deg, #5a94bb 0%, #3a7ca5 100%)",
+                        background: "linear-gradient(180deg, #8ab5cf 0%, #3a7ca5 100%)",
                       }}
                       transition={{ type: "spring", stiffness: 500, damping: 40 }}
                     />
@@ -217,7 +217,7 @@ function Sidebar({ isOpen, onClose }) {
                   <item.icon
                     size={15}
                     strokeWidth={isActive ? 2.5 : 2}
-                    style={{ flexShrink: 0, color: isActive ? "#5a94bb" : "inherit" }}
+                    style={{ flexShrink: 0, color: isActive ? "#8ab5cf" : "inherit" }}
                   />
 
                   <span style={{

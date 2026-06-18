@@ -24,6 +24,7 @@
   --color-blue-deep:       #2f6690;   /* mid-dark — section headers, card tops */
   --color-blue:            #3a7ca5;   /* primary — buttons, links, interactive */
   --color-blue-mid:        #5a94bb;   /* mid-light — hover states, icons */
+  --color-blue-soft:       #8ab5cf;   /* soft — selected states, tinted icon fills */
   --color-blue-pale:       #c8dce8;   /* very pale — tags, badges bg */
   --color-blue-xpale:      #e8f2f8;   /* ultra pale — tinted section backgrounds */
 
@@ -457,7 +458,7 @@
 .badge-accent {
   background: var(--color-blue-xpale);
   color: var(--color-blue-deep);
-  border-color: var(--color-blue-pale);
+  border-color: var(--color-blue-soft);
 }
 
 .badge-navy {
@@ -894,10 +895,6 @@ p[style*="var(--color-text-muted)"] {
 
 /* Glass Cards: dark transparent styling */
 .glass-card {
-  --color-text:            #ffffff;
-  --color-text-secondary:  #e2e8f0;
-  --color-text-muted:      #c8dce8;
-  --color-text-subtle:     #94a3b8;
   background: rgba(14, 22, 38, 0.72) !important;
   border: 1px solid rgba(22, 66, 91, 0.25) !important; /* Yale Blue border tint */
   box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.25) !important;
@@ -916,6 +913,7 @@ p[style*="var(--color-text-muted)"] {
 .glass-card h4, 
 .glass-card h5,
 .glass-card .card-title,
+.glass-card .empty-state-title,
 .glass-card strong {
   color: #ffffff !important; /* High contrast white headers */
 }
@@ -1239,4 +1237,58 @@ div[style*="background: rgba(255, 255, 255, 0.97)"] p {
   border-color: rgba(214, 137, 16, 0.52) !important;
   transform: translateY(-1px);
 }
+
+/* ── Rule Card overrides to prevent global .glass-card text color leakage ── */
+.glass-card .rule-card p,
+.glass-card .rule-card span,
+.glass-card .rule-card strong,
+.glass-card .rule-card div {
+  color: revert !important;
+}
+
+.rule-card .rule-title {
+  color: #0f2635 !important;
+}
+
+.rule-card .rule-detail {
+  color: #50728a !important;
+}
+
+.rule-card .rule-points-label {
+  color: #7a96a8 !important;
+}
+
+/* ── Dimension Row overrides for Risk Center ── */
+.dimension-row .status-bad {
+  color: #ff7675 !important;
+}
+
+.dimension-row .status-good {
+  color: #55efc4 !important;
+}
+
+.dimension-row .status-normal {
+  color: #94a3b8 !important;
+}
+
+.glass-card.dimension-details-card {
+  background: #000b15 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+.theme-dashboard .icon-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: none !important;
+}
+
+.theme-dashboard .icon-btn:hover {
+  background: rgba(58, 124, 165, 0.15) !important;
+  border-color: rgba(58, 124, 165, 0.45) !important;
+  color: #3a7ca5 !important;
+}
+
+
 

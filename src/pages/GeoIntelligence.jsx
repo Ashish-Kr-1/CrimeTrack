@@ -116,54 +116,38 @@ function TowerDetailPanel({ location, onClose }) {
       <motion.div initial={{ x: 420 }} animate={{ x: 0 }} exit={{ x: 420 }}
         transition={{ type: "spring", stiffness: 300, damping: 34 }}
         onClick={e => e.stopPropagation()}
-        style={{
-          position: "absolute",
-          right: 0,
-          top: 0,
-          bottom: 0,
-          width: 400,
-          background: "#081b29",
-          borderLeft: "1px solid rgba(58, 124, 165, 0.25)",
-          boxShadow: "-8px 0 40px rgba(0,0,0,0.4)",
-          overflowY: "auto",
-          display: "flex",
-          flexDirection: "column",
-          "--color-text": "#ffffff",
-          "--color-text-secondary": "#e2e8f0",
-          "--color-text-muted": "#c8dce8",
-          "--color-text-subtle": "#94a3b8",
-        }}>
+        style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 400, background: "var(--color-bg)", boxShadow: "-8px 0 40px rgba(0,0,0,0.15)", overflowY: "auto", display: "flex", flexDirection: "column" }}>
         {/* Header */}
-        <div style={{ padding: "18px 20px", borderBottom: "1px solid rgba(58, 124, 165, 0.2)", background: "rgba(8, 27, 41, 0.85)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <div style={{ padding: "18px 20px", borderBottom: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(255,255,255,0.03)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
-            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>Tower Analysis</span>
-            <h2 style={{ fontSize: 13, fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--color-text)", margin: "3px 0 0" }}>{lat.toFixed(5)}, {lng.toFixed(5)}</h2>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.5)" }}>Tower Analysis</span>
+            <h2 style={{ fontSize: 13, fontWeight: 700, fontFamily: "var(--font-mono)", color: "#ffffff", margin: "3px 0 0" }}>{lat.toFixed(5)}, {lng.toFixed(5)}</h2>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ padding: "3px 10px", borderRadius: 99, fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", background: `${color}12`, color, border: `1px solid ${color}30` }}>{label}</span>
-            <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 7, border: "1px solid rgba(58, 124, 165, 0.2)", background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--color-text-muted)" }}><X size={12} /></button>
+            <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 7, border: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255, 255, 255, 0.6)" }}><X size={12} /></button>
           </div>
         </div>
         <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Stats */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {[{ label: "Total Events", val: totalEvents }, { label: "Anomalous", val: `${Math.round(anomalyRatio*100)}%` }].map(s => (
-              <div key={s.label} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(58, 124, 165, 0.2)", borderRadius: 10, padding: "10px 12px" }}>
-                <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)" }}>{s.label}</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: "var(--color-text)", marginTop: 2 }}>{s.val}</div>
+              <div key={s.label} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 10, padding: "10px 12px" }}>
+                <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255, 255, 255, 0.45)" }}>{s.label}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "#ffffff", marginTop: 2 }}>{s.val}</div>
               </div>
             ))}
           </div>
           {/* Time distribution */}
           <div>
-            <h3 style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)", marginBottom: 10 }}>Activity by Time of Day</h3>
+            <h3 style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255, 255, 255, 0.5)", marginBottom: 10 }}>Activity by Time of Day</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {[["Morning","#fdcb6e"], ["Afternoon","#0984e3"], ["Evening","#e17055"], ["Night","#3a7ca5"]].map(([period, c]) => {
                 const cnt = timeDist[period] || 0;
                 const pct = totalEvents ? (cnt/totalEvents*100).toFixed(0) : 0;
                 return (
                   <div key={period} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ width: 70, fontSize: 10, color: "var(--color-text-muted)", fontWeight: 600 }}>{period}</span>
+                    <span style={{ width: 70, fontSize: 10, color: "rgba(255, 255, 255, 0.6)", fontWeight: 600 }}>{period}</span>
                     <div style={{ flex: 1, height: 6, borderRadius: 99, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
                       <div style={{ width: `${pct}%`, height: "100%", borderRadius: 99, background: c, transition: "width 0.6s ease" }} />
                     </div>
@@ -176,18 +160,18 @@ function TowerDetailPanel({ location, onClose }) {
           {/* Top contacts */}
           {topContacts.length > 0 && (
             <div>
-              <h3 style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)", marginBottom: 10 }}>Top Contacts at this Tower</h3>
+              <h3 style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255, 255, 255, 0.5)", marginBottom: 10 }}>Top Contacts at this Tower</h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {topContacts.map(([phone, count]) => {
                   const isUpi = UPI_GATEWAY_NUMBERS.has(phone);
                   const isBank = BANK_KEYWORDS.some(kw => phone.toUpperCase().includes(kw));
-                  const flagColor = isUpi ? "#d63031" : isBank ? "#e17055" : "var(--color-text)";
+                  const flagColor = isUpi ? "#ff7675" : isBank ? "#e17055" : "#ffffff";
                   return (
-                    <div key={phone} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "rgba(255,255,255,0.03)", border: `1px solid ${isUpi||isBank ? "#d6303125" : "rgba(58, 124, 165, 0.15)"}`, borderRadius: 8, borderLeft: `3px solid ${flagColor}` }}>
+                    <div key={phone} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "rgba(255,255,255,0.03)", border: `1px solid ${isUpi||isBank ? "#d6303115" : "rgba(255, 255, 255, 0.08)"}`, borderRadius: 8, borderLeft: `3px solid ${flagColor}` }}>
                       <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 700, color: flagColor }}>{phone}</span>
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         {(isUpi||isBank) && <span style={{ fontSize: 8, fontWeight: 800, color: "#d63031", textTransform: "uppercase" }}>⚠ {isUpi ? "UPI" : "Bank"}</span>}
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-muted)" }}>{count}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255, 255, 255, 0.6)" }}>{count}</span>
                       </div>
                     </div>
                   );
@@ -197,10 +181,10 @@ function TowerDetailPanel({ location, onClose }) {
           )}
           {/* Analyst recommendation */}
           <div style={{ background: anomalyRatio > 0.3 ? "rgba(214,48,49,0.05)" : "rgba(0,184,148,0.05)", border: `1px solid ${anomalyRatio > 0.3 ? "rgba(214,48,49,0.2)" : "rgba(0,184,148,0.2)"}`, borderRadius: 12, padding: "14px 16px" }}>
-            <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: anomalyRatio > 0.3 ? "#d63031" : "#00b894", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: anomalyRatio > 0.3 ? "#ff7675" : "#00b894", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
               <ShieldAlert size={11} /> Analyst Recommendation
             </div>
-            <p style={{ fontSize: 12, lineHeight: 1.65, color: "var(--color-text-muted)", margin: 0 }}>
+            <p style={{ fontSize: 12, lineHeight: 1.65, color: "rgba(255, 255, 255, 0.7)", margin: 0 }}>
               {anomalyRatio > 0.3
                 ? "This tower had many suspicious events. Consider requesting a tower dump for this CGI from the telecom operator to identify other devices that connected."
                 : "This tower shows normal activity levels. No immediate action required."}
@@ -208,15 +192,15 @@ function TowerDetailPanel({ location, onClose }) {
           </div>
           {/* Event list */}
           <div>
-            <h3 style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)", marginBottom: 10 }}>All Events at this Location</h3>
-            <div style={{ maxHeight: 240, overflowY: "auto", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(58, 124, 165, 0.2)", borderRadius: 10 }}>
+            <h3 style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255, 255, 255, 0.5)", marginBottom: 10 }}>All Events at this Location</h3>
+            <div style={{ maxHeight: 240, overflowY: "auto", background: "rgba(0, 0, 0, 0.25)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 10 }}>
               {events.slice(0, 50).map((e, i) => {
                 const isFlag = isAnomalous(e);
                 return (
-                  <div key={i} style={{ padding: "8px 12px", borderBottom: i < events.length-1 ? "1px solid rgba(58, 124, 165, 0.1)" : "none", display: "flex", gap: 10, alignItems: "flex-start", background: isFlag ? "rgba(214,48,49,0.06)" : "transparent" }}>
-                    <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--color-text-muted)", flexShrink: 0, marginTop: 1 }}>{cleanRaw(e[6])} {cleanRaw(e[7])?.slice(0,5)}</span>
-                    <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: isFlag ? "#d63031" : "var(--color-text-subtle)", fontWeight: isFlag ? 700 : 400 }}>{cleanRaw(e[3]) || "—"}</span>
-                    {isFlag && <span style={{ fontSize: 8, fontWeight: 800, color: "#d63031", flexShrink: 0 }}>⚠</span>}
+                  <div key={i} style={{ padding: "8px 12px", borderBottom: i < events.length-1 ? "1px solid rgba(255, 255, 255, 0.05)" : "none", display: "flex", gap: 10, alignItems: "flex-start", background: isFlag ? "rgba(214, 48, 49, 0.12)" : "transparent" }}>
+                    <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "rgba(255, 255, 255, 0.5)", flexShrink: 0, marginTop: 1 }}>{cleanRaw(e[6])} {cleanRaw(e[7])?.slice(0,5)}</span>
+                    <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: isFlag ? "#ff7675" : "rgba(255, 255, 255, 0.6)", fontWeight: isFlag ? 700 : 400 }}>{cleanRaw(e[3]) || "—"}</span>
+                    {isFlag && <span style={{ fontSize: 8, fontWeight: 800, color: "#ff7675", flexShrink: 0 }}>⚠</span>}
                   </div>
                 );
               })}
@@ -224,7 +208,7 @@ function TowerDetailPanel({ location, onClose }) {
           </div>
           {/* Google Maps link */}
           <a href={`https://www.google.com/maps?q=${lat},${lng}`} target="_blank" rel="noreferrer"
-            style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: "#00e5ff", textDecoration: "none" }}>
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: "#3a7ca5", textDecoration: "none" }}>
             <ExternalLink size={12} /> View on Google Maps
           </a>
         </div>
@@ -264,14 +248,12 @@ function GeoIntelligence() {
 
   /* ── Filtered records by date range ── */
   const filteredRecords = useMemo(() => {
-    const from = dateFrom ? new Date(dateFrom) : null;
-    const to = dateTo ? new Date(dateTo + "T23:59:59") : null;
     return records.filter(row => {
-      if (!from && !to) return true;
       const d = parseDate(cleanRaw(row[6]));
       if (!d) return false;
-      if (from && d < from) return false;
-      if (to && d > to) return false;
+      const dStr = toISO(d);
+      if (dateFrom && dStr < dateFrom) return false;
+      if (dateTo && dStr > dateTo) return false;
       return true;
     });
   }, [records, dateFrom, dateTo]);
@@ -369,14 +351,42 @@ function GeoIntelligence() {
   return (
     <motion.div className="page-container theme-geo" initial="initial" animate="animate" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
 
+      {/* Dynamic styles override for Leaflet Popups to match dark theme */}
+      <style>{`
+        .leaflet-popup-content-wrapper {
+          background: #0e1322 !important;
+          border: 1px solid rgba(58, 124, 165, 0.3) !important;
+          color: #ffffff !important;
+        }
+        .leaflet-popup-tip {
+          background: #0e1322 !important;
+          border: 1px solid rgba(58, 124, 165, 0.3) !important;
+        }
+        .leaflet-container {
+          background: #070b13 !important;
+        }
+        input[type="date"] {
+          color-scheme: dark !important;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+          filter: invert(1) !important;
+          cursor: pointer !important;
+          opacity: 0.85;
+          transition: opacity 0.15s ease;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+          opacity: 1;
+        }
+      `}</style>
+
       {/* Header */}
       <motion.div variants={fadeUp} className="page-header" style={{ marginBottom: 0 }}>
-        <h1 className="mb-1 text-[30px] font-bold text-text">Geo Intelligence Center</h1>
-        <p className="text-sm text-text-muted">Risk-scored cell tower mapping with anomaly detection, co-location analysis, and date filtering.</p>
+        <h1 className="mb-1 text-[30px] font-bold text-white">Geo Intelligence Center</h1>
+        <p className="text-sm text-slate-400">Risk-scored cell tower mapping with anomaly detection, co-location analysis, and date filtering.</p>
       </motion.div>
 
       {records.length === 0 ? (
-        <div className="glass-card" style={{ padding: 40, textAlign: "center", color: "var(--color-text-muted)", fontSize: 13 }}>
+        <div className="glass-card" style={{ padding: 40, textAlign: "center", color: "rgba(255, 255, 255, 0.6)", fontSize: 13 }}>
           No records loaded. Please upload a dataset in the Ingestion Center to visualize geospatial telemetry.
         </div>
       ) : (<>
@@ -399,23 +409,23 @@ function GeoIntelligence() {
 
         {/* ── Date Range Filter Bar ── */}
         <motion.div variants={fadeUp} className="glass-card" style={{ padding: "16px 20px", display: "flex", alignItems: "center", flexWrap: "wrap", gap: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--color-text)", fontSize: 13, fontWeight: 700 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#ffffff", fontSize: 13, fontWeight: 700 }}>
             <Filter size={14} color="var(--color-accent)" /> Date Filter
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-              style={{ border: "1px solid var(--color-border)", borderRadius: 8, padding: "6px 10px", fontSize: 12, fontFamily: "var(--font-mono)", background: "rgba(255,255,255,0.6)", color: "var(--color-text)", cursor: "pointer" }} />
-            <span style={{ color: "var(--color-text-muted)", fontSize: 12 }}>to</span>
+              style={{ border: "1px solid rgba(22, 66, 91, 0.45)", borderRadius: 8, padding: "6px 10px", fontSize: 12, fontFamily: "var(--font-mono)", background: "rgba(7, 10, 19, 0.7)", color: "#ffffff", cursor: "pointer", colorScheme: "dark" }} />
+            <span style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: 12 }}>to</span>
             <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-              style={{ border: "1px solid var(--color-border)", borderRadius: 8, padding: "6px 10px", fontSize: 12, fontFamily: "var(--font-mono)", background: "rgba(255,255,255,0.6)", color: "var(--color-text)", cursor: "pointer" }} />
+              style={{ border: "1px solid rgba(22, 66, 91, 0.45)", borderRadius: 8, padding: "6px 10px", fontSize: 12, fontFamily: "var(--font-mono)", background: "rgba(7, 10, 19, 0.7)", color: "#ffffff", cursor: "pointer", colorScheme: "dark" }} />
           </div>
           {(dateFrom || dateTo) && (
             <button onClick={() => { setDateFrom(""); setDateTo(""); }}
-              style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid var(--color-border)", background: "rgba(255,255,255,0.6)", fontSize: 11, fontWeight: 700, color: "var(--color-text-muted)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+              style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(255,255,255,0.05)", fontSize: 11, fontWeight: 700, color: "rgba(255, 255, 255, 0.7)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
               <X size={10} /> Reset
             </button>
           )}
-          <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--color-text-subtle)" }}>
+          <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255, 255, 255, 0.4)" }}>
             Showing <strong>{filteredRecords.length}</strong> of <strong>{records.length}</strong> events
             {dateRange.min && !dateFrom && !dateTo && <> · {toISO(dateRange.min)} → {toISO(dateRange.max)}</>}
           </span>
@@ -424,22 +434,22 @@ function GeoIntelligence() {
         {/* ── Map ── */}
         {locationData.length > 0 && (
           <motion.div variants={fadeUp} className="glass-card" style={{ padding: 0, overflow: "hidden" }}>
-            <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-border)", background: "rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-              <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text)", display: "flex", alignItems: "center", gap: 8, margin: 0 }}>
+            <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(22, 66, 91, 0.25)", background: "rgba(22, 66, 91, 0.15)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+              <h2 style={{ fontSize: 14, fontWeight: 700, color: "#ffffff", display: "flex", alignItems: "center", gap: 8, margin: 0 }}>
                 <MapPin size={15} color="#0984e3" /> Risk-Scored Tower Map
-                <span style={{ fontSize: 11, fontWeight: 500, color: "var(--color-text-muted)" }}>· click any marker for details</span>
+                <span style={{ fontSize: 11, fontWeight: 500, color: "rgba(255, 255, 255, 0.6)" }}>· click any marker for details</span>
               </h2>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 {/* Cluster toggle */}
                 <button onClick={() => setClusterMode(m => !m)}
-                  style={{ padding: "5px 12px", borderRadius: 8, border: `1px solid ${clusterMode ? "#0984e3" : "var(--color-border)"}`, background: clusterMode ? "rgba(9,132,227,0.1)" : "rgba(255,255,255,0.6)", fontSize: 11, fontWeight: 700, color: clusterMode ? "#0984e3" : "var(--color-text-muted)", cursor: "pointer" }}>
+                  style={{ padding: "5px 12px", borderRadius: 8, border: `1px solid ${clusterMode ? "#0984e3" : "rgba(255, 255, 255, 0.08)"}`, background: clusterMode ? "rgba(9,132,227,0.15)" : "rgba(255,255,255,0.05)", fontSize: 11, fontWeight: 700, color: clusterMode ? "#0984e3" : "rgba(255, 255, 255, 0.7)", cursor: "pointer" }}>
                   {clusterMode ? "Cluster ON" : "Cluster OFF"}
                 </button>
                 {/* Map style */}
-                <div style={{ display: "flex", border: "1px solid var(--color-border)", borderRadius: 8, overflow: "hidden", background: "rgba(255,255,255,0.6)" }}>
+                <div style={{ display: "flex", border: "1px solid rgba(22, 66, 91, 0.25)", borderRadius: 8, overflow: "hidden", background: "rgba(7, 10, 19, 0.7)" }}>
                   {[["light","Light"],["dark","Dark"],["satellite","Sat"]].map(([id,label]) => (
                     <button key={id} onClick={() => setMapStyle(id)}
-                      style={{ padding: "5px 10px", fontSize: 10, fontWeight: 700, border: "none", cursor: "pointer", background: mapStyle === id ? "#0984e3" : "transparent", color: mapStyle === id ? "#fff" : "var(--color-text-muted)", transition: "all 0.15s" }}>
+                      style={{ padding: "5px 10px", fontSize: 10, fontWeight: 700, border: "none", cursor: "pointer", background: mapStyle === id ? "#0984e3" : "transparent", color: mapStyle === id ? "#fff" : "rgba(255, 255, 255, 0.5)", transition: "all 0.15s" }}>
                       {label}
                     </button>
                   ))}
@@ -448,7 +458,7 @@ function GeoIntelligence() {
             </div>
             <div style={{ height: 520, position: "relative" }}>
               {/* Risk legend overlay */}
-              <div style={{ position: "absolute", top: 12, left: 12, zIndex: 1000, background: "rgba(8,34,41,0.88)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "10px 14px", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div style={{ position: "absolute", top: 12, left: 12, zIndex: 1000, background: "rgba(14, 22, 38, 0.92)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "10px 14px", border: "1px solid rgba(22, 66, 91, 0.55)" }}>
                 <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(233,241,248,0.5)", marginBottom: 8 }}>Anomaly Level</div>
                 {[["#00b894","< 10% — Clean"],["#fdcb6e","10–30% — Low Risk"],["#e17055","30–60% — Suspicious"],["#d63031","> 60% — High Risk"]].map(([c,l]) => (
                   <div key={l} style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 5, fontSize: 10, color: "rgba(233,241,248,0.7)" }}>
@@ -470,12 +480,12 @@ function GeoIntelligence() {
                       eventHandlers={{ click: () => setSelectedLocation(loc) }}
                       pathOptions={{ color: "rgba(255,255,255,0.3)", fillColor: color, fillOpacity: 0.72, weight: 1.5 }}>
                       <Popup>
-                        <div style={{ fontFamily: "sans-serif", fontSize: 11, color: "#082229", lineHeight: 1.6 }}>
+                        <div style={{ fontFamily: "sans-serif", fontSize: 11, color: "rgba(255, 255, 255, 0.9)", lineHeight: 1.6 }}>
                           <strong style={{ color }}>{anomalyLabel(loc.anomalyRatio)}</strong>
                           {loc.isCluster && <><br /><em>{loc.clusterSize} towers clustered</em></>}
                           <br />Events: <strong>{loc.totalEvents}</strong>
                           <br />Anomalous: <strong style={{ color }}>{Math.round(loc.anomalyRatio*100)}%</strong>
-                          <br /><span style={{ color: "#0984e3", cursor: "pointer", fontWeight: 700 }}>Click marker to analyze →</span>
+                          <br /><span style={{ color: "#3a7ca5", cursor: "pointer", fontWeight: 700 }}>Click marker to analyze →</span>
                         </div>
                       </Popup>
                     </CircleMarker>
@@ -488,34 +498,34 @@ function GeoIntelligence() {
 
         {/* ── Co-location Analysis ── */}
         <motion.div variants={fadeUp} className="glass-card" style={{ padding: "20px 24px" }}>
-          <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text)", display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <h2 style={{ fontSize: 14, fontWeight: 700, color: "#ffffff", display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
             <Radio size={15} color="#e17055" /> Tower Co-location Analysis
           </h2>
-          <p style={{ fontSize: 12, color: "var(--color-text-muted)", marginBottom: 16 }}>Select a cell tower (CGI) to see which contacts were present at the same physical tower — useful for identifying associates and patterns.</p>
+          <p style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)", marginBottom: 16 }}>Select a cell tower (CGI) to see which contacts were present at the same physical tower — useful for identifying associates and patterns.</p>
           <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 16 }}>
             <div style={{ position: "relative", flex: 1, maxWidth: 360 }}>
-              <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-muted)", pointerEvents: "none" }} />
+              <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "rgba(255, 255, 255, 0.5)", pointerEvents: "none" }} />
               <input type="text" value={colocCGI} onChange={e => setColocCGI(e.target.value)}
                 placeholder="Type or paste a CGI identifier…"
                 list="cgi-list"
-                style={{ width: "100%", padding: "8px 10px 8px 30px", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 13, fontFamily: "var(--font-mono)", background: "rgba(255,255,255,0.6)", color: "var(--color-text)", outline: "none" }} />
+                style={{ width: "100%", padding: "8px 10px 8px 30px", border: "1px solid rgba(22, 66, 91, 0.45)", borderRadius: 8, fontSize: 13, fontFamily: "var(--font-mono)", background: "rgba(7, 10, 19, 0.7)", color: "#ffffff", outline: "none" }} />
               <datalist id="cgi-list">
                 {cgiData.map(([cgi]) => <option key={cgi} value={cgi} />)}
               </datalist>
             </div>
-            {colocCGI && <button onClick={() => setColocCGI("")} style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid var(--color-border)", background: "rgba(255,255,255,0.6)", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 4 }}><X size={10} /> Clear</button>}
+            {colocCGI && <button onClick={() => setColocCGI("")} style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(255,255,255,0.05)", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "rgba(255, 255, 255, 0.7)", display: "flex", alignItems: "center", gap: 4 }}><X size={10} /> Clear</button>}
           </div>
 
           {colocData ? (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "start" }}>
               <div>
-                <div style={{ background: "rgba(9,132,227,0.06)", border: "1px solid rgba(9,132,227,0.15)", borderRadius: 12, padding: "14px 16px", marginBottom: 14 }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)", marginBottom: 4 }}>CGI: {colocData.cgi}</div>
+                <div style={{ background: "rgba(9,132,227,0.12)", border: "1px solid rgba(9,132,227,0.35)", borderRadius: 12, padding: "14px 16px", marginBottom: 14 }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255, 255, 255, 0.5)", marginBottom: 4 }}>CGI: {colocData.cgi}</div>
                   <div style={{ fontSize: 24, fontWeight: 800, color: "#0984e3" }}>{colocData.totalEvents} events</div>
-                  <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 4 }}>{colocData.contacts.length} unique contacts used this tower</div>
+                  <div style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)", marginTop: 4 }}>{colocData.contacts.length} unique contacts used this tower</div>
                 </div>
-                <p style={{ fontSize: 12, lineHeight: 1.7, color: "var(--color-text-muted)", margin: 0 }}>
-                  All phone numbers listed below were physically near <strong style={{ fontFamily: "var(--font-mono)", color: "var(--color-text)" }}>{colocData.cgi}</strong> at some point. This tower co-location is useful for identifying associates and building a presence network around the suspect.
+                <p style={{ fontSize: 12, lineHeight: 1.7, color: "rgba(255, 255, 255, 0.6)", margin: 0 }}>
+                  All phone numbers listed below were physically near <strong style={{ fontFamily: "var(--font-mono)", color: "#ffffff" }}>{colocData.cgi}</strong> at some point. This tower co-location is useful for identifying associates and building a presence network around the suspect.
                 </p>
               </div>
               <div>
@@ -529,9 +539,9 @@ function GeoIntelligence() {
                       const isBank = BANK_KEYWORDS.some(kw => phone.toUpperCase().includes(kw));
                       return (
                         <tr key={phone}>
-                          <td style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: isUpi||isBank ? "#d63031" : "var(--color-text)" }}>{phone}</td>
+                          <td><span style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: isUpi||isBank ? "#ff7675" : "#ffffff" }}>{phone}</span></td>
                           <td style={{ fontWeight: 700 }}>{count}</td>
-                          <td>{(isUpi||isBank) && <span style={{ fontSize: 9, fontWeight: 800, color: "#d63031", textTransform: "uppercase", background: "rgba(214,48,49,0.08)", padding: "2px 7px", borderRadius: 99, border: "1px solid rgba(214,48,49,0.2)" }}>{isUpi ? "UPI" : "Bank"}</span>}</td>
+                          <td>{(isUpi||isBank) && <span style={{ fontSize: 9, fontWeight: 800, color: "#ff7675", textTransform: "uppercase", background: "rgba(214,48,49,0.08)", padding: "2px 7px", borderRadius: 99, border: "1px solid rgba(214,48,49,0.2)" }}>{isUpi ? "UPI" : "Bank"}</span>}</td>
                         </tr>
                       );
                     })}
@@ -540,7 +550,7 @@ function GeoIntelligence() {
               </div>
             </div>
           ) : (
-            <div style={{ textAlign: "center", padding: "28px 20px", color: "var(--color-text-muted)", fontSize: 13 }}>
+            <div style={{ textAlign: "center", padding: "28px 20px", color: "rgba(255, 255, 255, 0.6)", fontSize: 13 }}>
               Select a CGI above to see co-location analysis
             </div>
           )}
@@ -550,7 +560,7 @@ function GeoIntelligence() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px,1fr))", gap: 18 }}>
           {/* Locations table */}
           <motion.div variants={fadeUp} className="glass-card" style={{ padding: "20px 24px" }}>
-            <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text)", display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+            <h2 style={{ fontSize: 14, fontWeight: 700, color: "#ffffff", display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
               <MapPin size={15} color="#0984e3" /> Top Visited Locations
             </h2>
             <table className="ct-table">
@@ -562,13 +572,13 @@ function GeoIntelligence() {
                   const color = anomalyColor(loc.anomalyRatio);
                   return (
                     <tr key={i} style={{ cursor: "pointer" }} onClick={() => setSelectedLocation(loc)}>
-                      <td style={{ color: "var(--color-text-subtle)", fontSize: 11 }}>{i+1}</td>
-                      <td style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--color-text)" }}>{loc.lat.toFixed(4)},{loc.lng.toFixed(4)}</td>
+                      <td><span style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: 11 }}>{i+1}</span></td>
+                      <td><span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "#ffffff" }}>{loc.lat.toFixed(4)},{loc.lng.toFixed(4)}</span></td>
                       <td style={{ fontWeight: 700 }}>{loc.totalEvents}</td>
                       <td><span style={{ fontSize: 9, fontWeight: 800, padding: "2px 8px", borderRadius: 99, background: `${color}12`, color, border: `1px solid ${color}25`, textTransform: "uppercase" }}>{anomalyLabel(loc.anomalyRatio)}</span></td>
                       <td>
                         <a href={`https://www.google.com/maps?q=${loc.lat},${loc.lng}`} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}
-                          style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: "#0984e3", textDecoration: "none" }}>
+                          style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: "#3a7ca5", textDecoration: "none" }}>
                           Maps <ExternalLink size={10} />
                         </a>
                       </td>
@@ -581,9 +591,9 @@ function GeoIntelligence() {
 
           {/* CGI table */}
           <motion.div variants={fadeUp} className="glass-card" style={{ padding: "20px 24px" }}>
-            <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text)", display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+            <h2 style={{ fontSize: 14, fontWeight: 700, color: "#ffffff", display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
               <Layers size={15} color="#e17055" /> Top Cell Towers (CGI)
-              <span style={{ fontSize: 11, fontWeight: 500, color: "var(--color-text-muted)" }}>· click to analyze co-location</span>
+              <span style={{ fontSize: 11, fontWeight: 500, color: "rgba(255, 255, 255, 0.6)" }}>· click to analyze co-location</span>
             </h2>
             <table className="ct-table">
               <thead>
@@ -592,7 +602,7 @@ function GeoIntelligence() {
               <tbody>
                 {cgiData.slice(0,12).map(([cgi, { count }]) => (
                   <tr key={cgi} style={{ cursor: "pointer" }} onClick={() => setColocCGI(cgi)}>
-                    <td style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: "#0984e3" }}>{cgi}</td>
+                    <td><span style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: "#3a7ca5" }}>{cgi}</span></td>
                     <td style={{ fontWeight: 700 }}>{count}</td>
                     <td>
                       <button onClick={e => { e.stopPropagation(); setColocCGI(cgi); }}

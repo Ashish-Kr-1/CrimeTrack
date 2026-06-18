@@ -24,20 +24,20 @@ const RADAR_AXES = [
 ];
 
 const RULE_META = {
-  HIGH_SMS_RATIO:               { label: "Mostly Text Messages",              icon: MessageSquare, color: "#d63031" },
-  MULTI_BANK_AGGREGATION:       { label: "Connected to Too Many Banks",        icon: CreditCard,   color: "#d63031" },
-  UPI_BIND_BURST:               { label: "Bulk Payment App Setup",             icon: Zap,          color: "#e17055" },
-  RAPID_DEVICE_SWAPPING:        { label: "Frequent Phone Switching",           icon: Smartphone,   color: "#3a7ca5" },
-  VOICE_CESSATION:              { label: "Stopped Making Calls",               icon: Phone,        color: "#3a7ca5" },
-  NO_PERSONAL_SOCIAL_FOOTPRINT: { label: "Barely Any Personal Contacts",       icon: Users,        color: "#e17055" },
-  HIGH_RISK_GEOGRAPHIC_CIRCLE:  { label: "Active in Fraud Hotspot Area",       icon: MapPin,       color: "#d63031" },
+  HIGH_SMS_RATIO:               { label: "Mostly Text Messages",              icon: MessageSquare, color: "#ff7675" },
+  MULTI_BANK_AGGREGATION:       { label: "Connected to Too Many Banks",        icon: CreditCard,   color: "#ff7675" },
+  UPI_BIND_BURST:               { label: "Bulk Payment App Setup",             icon: Zap,          color: "#ff9f43" },
+  RAPID_DEVICE_SWAPPING:        { label: "Frequent Phone Switching",           icon: Smartphone,   color: "#74b9ff" },
+  VOICE_CESSATION:              { label: "Stopped Making Calls",               icon: Phone,        color: "#74b9ff" },
+  NO_PERSONAL_SOCIAL_FOOTPRINT: { label: "Barely Any Personal Contacts",       icon: Users,        color: "#ff9f43" },
+  HIGH_RISK_GEOGRAPHIC_CIRCLE:  { label: "Active in Fraud Hotspot Area",       icon: MapPin,       color: "#ff7675" },
 };
 
 const CLASS_INFO = {
-  HIGHLY_SUSPECT_FINANCIAL_MULE: { label: "Financial Fraud Mule",   color: "#d63031" },
-  SUSPECT_OPERATIONAL_SIM:       { label: "Suspicious Operational SIM", color: "#e17055" },
-  ANOMALOUS_USAGE_PATTERN:       { label: "Unusual Pattern",         color: "#fdcb6e" },
-  NORMAL_USER:                   { label: "Normal User",             color: "#00b894" },
+  HIGHLY_SUSPECT_FINANCIAL_MULE: { label: "Financial Fraud Mule",   color: "#ff7675" },
+  SUSPECT_OPERATIONAL_SIM:       { label: "Suspicious Operational SIM", color: "#ff9f43" },
+  ANOMALOUS_USAGE_PATTERN:       { label: "Unusual Pattern",         color: "#ffeaa7" },
+  NORMAL_USER:                   { label: "Normal User",             color: "#55efc4" },
 };
 
 /* ─── Custom tooltips ─────────────────────────────────────────────────────── */
@@ -47,8 +47,8 @@ const RadarTip = ({ active, payload }) => {
   return (
     <div style={{ background: "rgba(255,255,255,0.97)", border: "1px solid rgba(0,0,0,0.09)", borderRadius: 10, padding: "10px 14px", boxShadow: "0 6px 20px rgba(0,0,0,0.1)", fontSize: 12, maxWidth: 200 }}>
       <p style={{ margin: "0 0 4px", fontWeight: 800, color: "var(--color-text)" }}>{d.label}</p>
-      <p style={{ margin: "0 0 2px", color: "#d63031" }}>Suspect: <strong>{d.suspect}%</strong></p>
-      <p style={{ margin: "0 0 6px", color: "#00b894" }}>Normal: <strong>{d.normal}%</strong></p>
+      <p style={{ margin: "0 0 2px", color: "#d63031" }}>Suspect: <strong>{d.suspectText}</strong></p>
+      <p style={{ margin: "0 0 6px", color: "#00b894" }}>Normal: <strong>{d.normalText}</strong></p>
       <p style={{ margin: 0, color: "var(--color-text-subtle)", lineHeight: 1.4, fontSize: 11 }}>{d.hint}</p>
     </div>
   );
@@ -71,7 +71,7 @@ const stagger = { animate: { transition: { staggerChildren: 0.07 } } };
 
 /* ═══════════════════════════════════════════════════════════════════════════
    RISK CENTER
-═══════════════════════════════════════════════════════════════════════════ */
+ ═══════════════════════════════════════════════════════════════════════════ */
 function RiskCenter() {
   const { cdrData, diagnosticReport } = useContext(CDRContext);
   const navigate  = useNavigate();
@@ -84,13 +84,67 @@ function RiskCenter() {
     const fv = diagnosticReport.feature_vector;
     return RADAR_AXES.map(ax => {
       let raw = 0;
-      if (ax.key === "sms_ratio")    raw = fv.sms_ratio_pct ?? 0;
-      if (ax.key === "bank_connect") raw = Math.min(100, ((fv.bank_sender_count ?? 0) / 10) * 100);
-      if (ax.key === "device_swaps") raw = Math.min(100, ((fv.device_swaps_per_month ?? 0) / 3) * 100);
-      if (ax.key === "risk_circle")  raw = fv.high_risk_circle_ratio_pct ?? 0;
-      if (ax.key === "voice_silence")raw = fv.voice_silence_fraction_pct ?? 0;
-      if (ax.key === "upi_burst")    raw = Math.min(100, ((fv.upi_burst_sms_count ?? 0) / 10) * 100);
-      return { label: ax.label, suspect: Math.round(raw), normal: ax.normal, hint: ax.hint };
+      let rawSuspectText = "";
+      let rawNormalText = "";
+      let normalWidth = ax.normal;
+      let suspectWidth = 0;
+      
+      if (ax.key === "sms_ratio") {
+        raw = fv.sms_ratio_pct ?? 0;
+        rawSuspectText = `${Math.round(raw)}%`;
+        rawNormalText = `${ax.normal}%`;
+        normalWidth = ax.normal;
+        suspectWidth = raw;
+      }
+      if (ax.key === "bank_connect") {
+        raw = Math.min(100, ((fv.bank_sender_count ?? 0) / 10) * 100);
+        const count = fv.bank_sender_count ?? 0;
+        rawSuspectText = `${count} ${count === 1 ? "bank" : "banks"}`;
+        rawNormalText = `1 bank`;
+        normalWidth = 10;
+        suspectWidth = Math.min(100, (count / 10) * 100);
+      }
+      if (ax.key === "device_swaps") {
+        raw = Math.min(100, ((fv.device_swaps_per_month ?? 0) / 3) * 100);
+        const count = fv.unique_imei_count ?? 0;
+        rawSuspectText = `${count} ${count === 1 ? "phone" : "phones"}`;
+        rawNormalText = `1 phone`;
+        normalWidth = 33.3;
+        suspectWidth = Math.min(100, (count / 3) * 100);
+      }
+      if (ax.key === "risk_circle") {
+        raw = fv.high_risk_circle_ratio_pct ?? 0;
+        rawSuspectText = `${Math.round(raw)}%`;
+        rawNormalText = `${ax.normal}%`;
+        normalWidth = ax.normal;
+        suspectWidth = raw;
+      }
+      if (ax.key === "voice_silence") {
+        raw = fv.voice_silence_fraction_pct ?? 0;
+        rawSuspectText = `${Math.round(raw)}%`;
+        rawNormalText = `${ax.normal}%`;
+        normalWidth = ax.normal;
+        suspectWidth = raw;
+      }
+      if (ax.key === "upi_burst") {
+        raw = Math.min(100, ((fv.upi_burst_sms_count ?? 0) / 10) * 100);
+        const count = fv.upi_burst_sms_count ?? 0;
+        rawSuspectText = `${count} ${count === 1 ? "setup" : "setups"}`;
+        rawNormalText = `0 setups`;
+        normalWidth = 0;
+        suspectWidth = Math.min(100, (count / 10) * 100);
+      }
+      
+      return { 
+        label: ax.label, 
+        suspect: Math.round(raw), 
+        normal: ax.normal, 
+        hint: ax.hint,
+        suspectText: rawSuspectText,
+        normalText: rawNormalText,
+        normalWidth,
+        suspectWidth
+      };
     });
   }, [diagnosticReport]);
 
@@ -124,7 +178,7 @@ function RiskCenter() {
       <div style={{ maxWidth: 860, margin: "0 auto", paddingTop: 40 }}>
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card empty-state">
           <div className="empty-state-icon" style={{ background: "rgba(225,112,85,0.1)", borderColor: "rgba(225,112,85,0.25)" }}>
-            <AlertTriangle size={30} color="var(--color-gold)" strokeWidth={1.8} />
+            <AlertTriangle size={30} color="var(--color-warning)" strokeWidth={1.8} />
           </div>
           <div className="empty-state-title">No CDR Loaded</div>
           <p className="empty-state-body">Upload a Call Detail Record file first to see the full risk breakdown and visual analysis.</p>
@@ -143,6 +197,14 @@ function RiskCenter() {
 
   return (
     <motion.div className="page-container theme-risk" variants={stagger} initial="initial" animate="animate">
+
+      {/* ── Mock data warning ── */}
+      {diagnosticReport.is_mock_data && (
+        <motion.div variants={fadeUp} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 18px", borderRadius: 10, background: "rgba(253,203,110,0.10)", border: "1.5px solid rgba(253,203,110,0.45)", marginBottom: 8 }}>
+          <AlertTriangle size={16} color="#fdcb6e" />
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#fdcb6e" }}>DEMO MODE — Scores below are from simulated data. Upload a real CDR file before using in an investigation.</span>
+        </motion.div>
+      )}
 
       {/* ── Header ── */}
       <motion.div variants={fadeUp} className="page-header">
@@ -180,63 +242,79 @@ function RiskCenter() {
           </p>
           <ResponsiveContainer width="100%" height={240}>
             <RadarChart data={radarData} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
-              <PolarGrid stroke="rgba(0,0,0,0.08)" />
-              <PolarAngleAxis dataKey="label" tick={{ fontSize: 10, fill: "var(--color-text-muted)", fontWeight: 700 }} />
-              <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 9, fill: "var(--color-text-subtle)" }} tickCount={4} />
+              <PolarGrid stroke="rgba(255, 255, 255, 0.15)" />
+              <PolarAngleAxis dataKey="label" tick={{ fontSize: 10, fill: "#e2e8f0", fontWeight: 700 }} />
+              <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 9, fill: "#cbd5e1" }} tickCount={4} stroke="rgba(255, 255, 255, 0.2)" />
               <Tooltip content={<RadarTip />} />
-              <Radar name="Normal User" dataKey="normal" stroke="#00b894" fill="#00b894" fillOpacity={0.12} strokeWidth={1.5} strokeDasharray="4 3" />
-              <Radar name="Suspect" dataKey="suspect" stroke="#d63031" fill="#d63031" fillOpacity={0.22} strokeWidth={2} />
+              <Radar name="Normal User" dataKey="normal" stroke="#55efc4" fill="#55efc4" fillOpacity={0.12} strokeWidth={1.5} strokeDasharray="4 3" />
+              <Radar name="Suspect" dataKey="suspect" stroke="#ff7675" fill="#ff7675" fillOpacity={0.22} strokeWidth={2} />
             </RadarChart>
           </ResponsiveContainer>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 8 }}>
-            <span style={{ fontSize: 11, display: "flex", alignItems: "center", gap: 6, color: "var(--color-text-muted)" }}>
-              <span style={{ width: 20, height: 2, background: "#d63031", borderRadius: 1 }} />Suspect
+            <span style={{ fontSize: 11, display: "flex", alignItems: "center", gap: 6, color: "#cbd5e1" }}>
+              <span style={{ width: 20, height: 2, background: "#ff7675", borderRadius: 1 }} />Suspect
             </span>
-            <span style={{ fontSize: 11, display: "flex", alignItems: "center", gap: 6, color: "var(--color-text-muted)" }}>
-              <span style={{ width: 20, height: 2, background: "#00b894", borderRadius: 1, borderStyle: "dashed" }} />Normal User
+            <span style={{ fontSize: 11, display: "flex", alignItems: "center", gap: 6, color: "#cbd5e1" }}>
+              <span style={{ width: 20, height: 2, background: "#55efc4", borderRadius: 1, borderStyle: "dashed" }} />Normal User
             </span>
           </div>
         </div>
 
         {/* Dimension details */}
-        <div className="glass-card" style={{ padding: "20px 24px" }}>
+        <div className="glass-card dimension-details-card" style={{ padding: "20px 24px" }}>
           <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
             <Shield size={13} color="#3a7ca5" /> What Each Dimension Means
           </h3>
           <p style={{ fontSize: 11, color: "var(--color-text-subtle)", marginBottom: 16, marginTop: 0 }}>
             Hover rows to understand. Red = worse than normal.
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {radarData.map((d) => {
               const worse = d.suspect > d.normal;
-              const pct = d.suspect;
               return (
                 <div key={d.label}
+                  className="dimension-row"
                   onMouseEnter={() => setTipAxis(d.label)}
                   onMouseLeave={() => setTipAxis(null)}
-                  style={{ cursor: "help" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: worse ? "#d63031" : "#00b894" }}>{d.label}</span>
-                    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                      <span style={{ fontSize: 10, color: "var(--color-text-subtle)" }}>Normal: {d.normal}%</span>
-                      <span style={{ fontSize: 12, fontWeight: 800, fontFamily: "var(--font-mono)", color: worse ? "#d63031" : "#00b894" }}>{d.suspect}%</span>
+                  style={{
+                    background: tipAxis === d.label ? "rgba(255, 255, 255, 0.04)" : "rgba(255, 255, 255, 0.015)",
+                    borderRadius: 10,
+                    padding: "10px 14px",
+                    border: tipAxis === d.label ? "1px solid rgba(255, 255, 255, 0.08)" : "1px solid rgba(255, 255, 255, 0.03)",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 6,
+                    cursor: "default"
+                  }}>
+                  {/* Top: Header */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span className={worse ? "status-bad" : "status-good"} style={{ fontSize: 12, fontWeight: 800 }}>{d.label}</span>
+                    <span style={{ fontSize: 9, color: "rgba(255, 255, 255, 0.4)", fontWeight: 500, textAlign: "right", maxWidth: "60%" }}>{d.hint}</span>
+                  </div>
+
+                  {/* Dual Bars Comparison */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5, marginTop: 2 }}>
+                    {/* Suspect Bar Row */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 9, color: worse ? "#ff7675" : "#55efc4", fontWeight: 700, width: 45, textTransform: "uppercase", letterSpacing: "0.05em" }}>Suspect</span>
+                      <div style={{ flex: 1, height: 10, borderRadius: 5, background: "rgba(255, 255, 255, 0.05)", overflow: "hidden" }}>
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${d.suspectWidth}%` }} transition={{ duration: 0.8, ease: "easeOut" }}
+                          style={{ height: "100%", background: worse ? "linear-gradient(90deg, #ff7675, #d63031)" : "linear-gradient(90deg, #55efc4, #00b894)", opacity: 0.85 }} />
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: worse ? "#ff7675" : "#55efc4", fontFamily: "var(--font-mono)", width: 68, textAlign: "right" }}>{d.suspectText}</span>
+                    </div>
+
+                    {/* Normal Bar Row */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 9, color: "#94a3b8", fontWeight: 700, width: 45, textTransform: "uppercase", letterSpacing: "0.05em" }}>Normal</span>
+                      <div style={{ flex: 1, height: 10, borderRadius: 5, background: "rgba(255, 255, 255, 0.05)", overflow: "hidden" }}>
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${d.normalWidth}%` }} transition={{ duration: 0.8, ease: "easeOut" }}
+                          style={{ height: "100%", background: "#3a7ca5" }} />
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: "#cbd5e1", fontFamily: "var(--font-mono)", width: 68, textAlign: "right" }}>{d.normalText}</span>
                     </div>
                   </div>
-                  <div style={{ height: 5, borderRadius: 3, background: "rgba(0,0,0,0.06)", overflow: "hidden", position: "relative" }}>
-                    {/* Normal baseline */}
-                    <div style={{ position: "absolute", left: `${d.normal}%`, top: 0, bottom: 0, width: 2, background: "#00b894", opacity: 0.6, zIndex: 1 }} />
-                    {/* Suspect bar */}
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, ease: "easeOut" }}
-                      style={{ height: "100%", borderRadius: 3, background: worse ? "#d63031" : "#00b894", opacity: 0.75 }} />
-                  </div>
-                  <AnimatePresence>
-                    {tipAxis === d.label && (
-                      <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
-                        style={{ margin: "4px 0 0", fontSize: 10, color: "var(--color-text-subtle)", lineHeight: 1.5 }}>
-                        {d.hint}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
                 </div>
               );
             })}
@@ -266,19 +344,19 @@ function RiskCenter() {
                   <span style={{ fontSize: 9, fontWeight: 900, color: step.color, fontFamily: "var(--font-mono)" }}>{i + 1}</span>
                 </div>
                 {/* Label */}
-                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text)", minWidth: 220 }}>{step.name}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#ffffff", minWidth: 220 }}>{step.name}</span>
                 {/* Points badge */}
                 <span style={{ fontSize: 11, fontWeight: 800, fontFamily: "var(--font-mono)", color: step.color, background: `${step.color}10`, padding: "2px 8px", borderRadius: 6, border: `1px solid ${step.color}25`, flexShrink: 0 }}>
                   +{step.points} pts
                 </span>
                 {/* Running total bar */}
-                <div style={{ flex: 1, height: 6, background: "rgba(0,0,0,0.05)", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ flex: 1, height: 6, background: "rgba(255, 255, 255, 0.1)", borderRadius: 3, overflow: "hidden" }}>
                   <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, (step.cumulative / 130) * 100)}%` }}
                     transition={{ duration: 0.6, delay: i * 0.08, ease: "easeOut" }}
-                    style={{ height: "100%", background: step.cumulative >= 100 ? "#d63031" : step.cumulative >= 70 ? "#e17055" : "#3a7ca5", borderRadius: 3 }} />
+                    style={{ height: "100%", background: step.cumulative >= 100 ? "#ff7675" : step.cumulative >= 70 ? "#ff9f43" : "#8ab5cf", borderRadius: 3 }} />
                 </div>
                 {/* Running total */}
-                <span style={{ fontSize: 11, fontWeight: 800, fontFamily: "var(--font-mono)", color: "var(--color-text-muted)", flexShrink: 0, minWidth: 50, textAlign: "right" }}>
+                <span style={{ fontSize: 11, fontWeight: 800, fontFamily: "var(--font-mono)", color: "#cbd5e1", flexShrink: 0, minWidth: 50, textAlign: "right" }}>
                   {step.cumulative} / 130
                 </span>
               </motion.div>
@@ -288,10 +366,10 @@ function RiskCenter() {
           {/* Final score summary */}
           <div style={{ marginTop: 20, padding: "14px 18px", borderRadius: 12, background: `${clsInfo.color}07`, border: `1px solid ${clsInfo.color}20`, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div>
-              <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: "var(--color-text)" }}>
+              <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: "#ffffff" }}>
                 {diagnosticReport.triggered_indicators.length} red flags triggered, {totalPoints} total points
               </p>
-              <p style={{ margin: 0, fontSize: 12, color: "var(--color-text-muted)" }}>
+              <p style={{ margin: 0, fontSize: 12, color: "rgba(255, 255, 255, 0.7)" }}>
                 Score thresholds: 0–39 = Normal · 40–69 = Unusual · 70–99 = Suspicious · 100+ = Financial Fraud Mule
               </p>
             </div>
@@ -313,21 +391,21 @@ function RiskCenter() {
           </p>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={baselineData} layout="vertical" margin={{ top: 0, right: 40, left: 10, bottom: 0 }} barGap={4}>
-              <CartesianGrid horizontal={false} stroke="rgba(0,0,0,0.05)" />
-              <XAxis type="number" tick={{ fontSize: 10, fill: "var(--color-text-subtle)" }} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="metric" tick={{ fontSize: 11, fill: "var(--color-text)", fontWeight: 600 }} width={120} axisLine={false} tickLine={false} />
-              <Tooltip content={<BarTip />} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
-              <Bar dataKey="normal" name="Normal User" fill="#00b894" fillOpacity={0.6} radius={[0, 4, 4, 0]} barSize={8} />
+              <CartesianGrid horizontal={false} stroke="rgba(255, 255, 255, 0.08)" />
+              <XAxis type="number" tick={{ fontSize: 10, fill: "#cbd5e1" }} axisLine={false} tickLine={false} />
+              <YAxis type="category" dataKey="metric" tick={{ fontSize: 11, fill: "#ffffff", fontWeight: 600 }} width={120} axisLine={false} tickLine={false} />
+              <Tooltip content={<BarTip />} cursor={{ fill: "rgba(255, 255, 255, 0.03)" }} />
+              <Bar dataKey="normal" name="Normal User" fill="#55efc4" fillOpacity={0.6} radius={[0, 4, 4, 0]} barSize={8} />
               <Bar dataKey="suspect" name="This Suspect" radius={[0, 4, 4, 0]} barSize={8}>
                 {baselineData.map((entry, i) => (
-                  <Cell key={i} fill={entry.suspect > entry.normal * 1.5 ? "#d63031" : entry.suspect > entry.normal ? "#e17055" : "#00b894"} fillOpacity={0.8} />
+                  <Cell key={i} fill={entry.suspect > entry.normal * 1.5 ? "#ff7675" : entry.suspect > entry.normal ? "#ff9f43" : "#55efc4"} fillOpacity={0.8} />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
           <div style={{ display: "flex", gap: 16, marginTop: 12, justifyContent: "center" }}>
-            <span style={{ fontSize: 11, display: "flex", alignItems: "center", gap: 6, color: "var(--color-text-muted)" }}><span style={{ width: 12, height: 8, borderRadius: 2, background: "#00b894", opacity: 0.6 }} />Normal User</span>
-            <span style={{ fontSize: 11, display: "flex", alignItems: "center", gap: 6, color: "var(--color-text-muted)" }}><span style={{ width: 12, height: 8, borderRadius: 2, background: "#d63031", opacity: 0.8 }} />This Suspect</span>
+            <span style={{ fontSize: 11, display: "flex", alignItems: "center", gap: 6, color: "#cbd5e1" }}><span style={{ width: 12, height: 8, borderRadius: 2, background: "#55efc4", opacity: 0.6 }} />Normal User</span>
+            <span style={{ fontSize: 11, display: "flex", alignItems: "center", gap: 6, color: "#cbd5e1" }}><span style={{ width: 12, height: 8, borderRadius: 2, background: "#ff7675", opacity: 0.8 }} />This Suspect</span>
           </div>
         </motion.div>
       )}
@@ -345,37 +423,39 @@ function RiskCenter() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 }}>
           {diagnosticReport.triggered_indicators.map((rule, idx) => {
-            const meta = RULE_META[rule.code] || { label: rule.code, icon: AlertTriangle, color: "#95a5a6" };
+            const meta = RULE_META[rule.code] || { label: rule.code, icon: AlertTriangle, color: "#cbd5e1" };
             const RuleIcon = meta.icon;
             const isCrit = rule.severity === "CRITICAL";
-            const badgeC = isCrit ? "#d63031" : rule.severity === "HIGH" ? "#e17055" : "#3a7ca5";
+            const isHigh = rule.severity === "HIGH";
+            const cardAccentColor = isCrit ? "#d63031" : isHigh ? "#e17055" : "#3a7ca5";
+            
             return (
-              <motion.div key={idx} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.05 }}
-                whileHover={{ y: -3, boxShadow: `0 12px 32px ${meta.color}18` }}
-                style={{ border: `1px solid ${meta.color}20`, borderTop: `3px solid ${meta.color}`, background: "rgba(255,255,255,0.55)", borderRadius: 14, padding: "18px 20px", cursor: "default" }}>
+              <motion.div key={idx} className="rule-card" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.05 }}
+                whileHover={{ y: -3, boxShadow: `0 12px 32px rgba(22, 66, 91, 0.08)` }}
+                style={{ border: `1px solid rgba(22, 66, 91, 0.08)`, borderTop: `3px solid ${cardAccentColor}`, background: "#faf9f6", borderRadius: 14, padding: "18px 20px", cursor: "default" }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 12 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: `${meta.color}10`, border: `1px solid ${meta.color}25`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <RuleIcon size={17} color={meta.color} strokeWidth={2} />
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: `${cardAccentColor}08`, border: `1px solid ${cardAccentColor}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <RuleIcon size={17} color={cardAccentColor} strokeWidth={2} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 800, color: "var(--color-text)", lineHeight: 1.3 }}>{meta.label}</p>
+                    <p className="rule-title" style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 800, color: "#0f2635", lineHeight: 1.3 }}>{meta.label}</p>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.09em", textTransform: "uppercase", padding: "2px 7px", borderRadius: 6, background: `${badgeC}12`, color: badgeC, border: `1px solid ${badgeC}25` }}>
-                        {isCrit ? "Critical" : rule.severity === "HIGH" ? "High" : "Medium"}
+                      <span className="badge" style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.09em", textTransform: "uppercase", padding: "2px 7px", borderRadius: 6, background: `${cardAccentColor}10`, color: cardAccentColor, border: `1px solid ${cardAccentColor}22` }}>
+                        {isCrit ? "Critical" : isHigh ? "High" : "Medium"}
                       </span>
-                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", padding: "2px 7px", borderRadius: 6, background: "rgba(0,0,0,0.04)", color: "var(--color-text-muted)" }}>
+                      <span className="label" style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", padding: "2px 7px", borderRadius: 6, background: "rgba(0, 0, 0, 0.04)", color: "var(--color-text-secondary)" }}>
                         +{rule.points} points
                       </span>
                     </div>
                   </div>
                 </div>
-                <p style={{ margin: "0 0 12px", fontSize: 12, lineHeight: 1.65, color: "var(--color-text-muted)" }}>{rule.detail}</p>
+                <p className="rule-detail" style={{ margin: "0 0 12px", fontSize: 12, lineHeight: 1.65, color: "var(--color-text-muted)" }}>{rule.detail}</p>
                 {/* Visual points bar */}
-                <div style={{ height: 4, background: "rgba(0,0,0,0.05)", borderRadius: 2, overflow: "hidden" }}>
+                <div style={{ height: 4, background: "rgba(0, 0, 0, 0.06)", borderRadius: 2, overflow: "hidden" }}>
                   <motion.div initial={{ width: 0 }} animate={{ width: `${(rule.points / 50) * 100}%` }} transition={{ duration: 0.7, delay: idx * 0.05, ease: "easeOut" }}
-                    style={{ height: "100%", background: meta.color, borderRadius: 2, opacity: 0.75 }} />
+                    style={{ height: "100%", background: cardAccentColor, borderRadius: 2, opacity: 0.85 }} />
                 </div>
-                <p style={{ margin: "5px 0 0", fontSize: 10, color: "var(--color-text-subtle)", textAlign: "right" }}>{rule.points} of max 50 pts</p>
+                <p className="rule-points-label" style={{ margin: "5px 0 0", fontSize: 10, color: "var(--color-text-subtle)", textAlign: "right" }}>{rule.points} of max 50 pts</p>
               </motion.div>
             );
           })}

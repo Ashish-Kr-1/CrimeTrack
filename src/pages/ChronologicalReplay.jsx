@@ -404,7 +404,7 @@ function ChronologicalReplay() {
               Target:{" "}
               <strong
                 style={{
-                  color: "var(--color-text)",
+                  color: "#ffffff",
                   fontFamily: "var(--font-mono)",
                 }}
               >
@@ -677,11 +677,11 @@ function ChronologicalReplay() {
           style={{
             padding: "5px 12px",
             borderRadius: 8,
-            border: viewMode === "fit" ? "1px solid rgba(58,124,165,0.4)" : "1px solid var(--color-border)",
+            border: viewMode === "fit" ? "1px solid rgba(58,124,165,0.4)" : "1px solid rgba(255, 255, 255, 0.08)",
             background: viewMode === "fit"
               ? "rgba(58,124,165,0.12)"
-              : "rgba(255,255,255,0.5)",
-            color: viewMode === "fit" ? "#3a7ca5" : "var(--color-text-muted)",
+              : "rgba(255, 255, 255, 0.05)",
+            color: viewMode === "fit" ? "#3a7ca5" : "rgba(255, 255, 255, 0.6)",
             fontSize: 11,
             fontWeight: 600,
             cursor: "pointer",
@@ -702,9 +702,9 @@ function ChronologicalReplay() {
           style={{
             padding: "5px 12px",
             borderRadius: 8,
-            border: "1px solid var(--color-border)",
-            background: showLog ? "rgba(58,124,165,0.08)" : "rgba(255,255,255,0.5)",
-            color: showLog ? "#3a7ca5" : "var(--color-text-muted)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            background: showLog ? "rgba(58,124,165,0.08)" : "rgba(255, 255, 255, 0.05)",
+            color: showLog ? "#3a7ca5" : "rgba(255, 255, 255, 0.6)",
             fontSize: 11,
             fontWeight: 600,
             cursor: "pointer",
@@ -728,9 +728,9 @@ function ChronologicalReplay() {
           const active = filterType === type;
           return (
             <button key={type ?? "all"} onClick={() => setFilterType(type)}
-              style={{ padding: "5px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", transition: "all 0.15s ease", border: `1px solid ${active ? meta.color : "var(--color-border)"}`, background: active ? `${meta.color}12` : "rgba(255,255,255,0.5)", color: active ? meta.color : "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 5 }}>
+              style={{ padding: "5px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", transition: "all 0.15s ease", border: `1px solid ${active ? meta.color : "rgba(255, 255, 255, 0.08)"}`, background: active ? `${meta.color}12` : "rgba(255, 255, 255, 0.05)", color: active ? meta.color : "rgba(255, 255, 255, 0.6)", display: "flex", alignItems: "center", gap: 5 }}>
               {meta.label}
-              <span style={{ fontSize: 9, fontFamily: "var(--font-mono)", background: active ? `${meta.color}20` : "rgba(0,0,0,0.05)", padding: "1px 5px", borderRadius: 4 }}>{cnt}</span>
+              <span style={{ fontSize: 9, fontFamily: "var(--font-mono)", background: active ? `${meta.color}20` : "rgba(255, 255, 255, 0.08)", padding: "1px 5px", borderRadius: 4 }}>{cnt}</span>
             </button>
           );
         })}

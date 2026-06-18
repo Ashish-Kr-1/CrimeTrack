@@ -378,8 +378,10 @@ export function CDRProvider({ children }) {
         isValidCdr = hasTarget || hasBParty || hasCallType || hasDate;
       }
 
-      // Generates mock data rows dynamically based on the file contents/name if not valid or empty
+      // Generates mock data rows if file is not a valid CDR — sets is_mock_data flag on the report
+      let _isMockData = false;
       if (!isValidCdr || rows.length <= 1) {
+        _isMockData = true;
         const fileName = rows.fileName || "unknown_file.txt";
         let fileHash = 0;
         for (let i = 0; i < fileName.length; i++) {
@@ -937,6 +939,7 @@ export function CDRProvider({ children }) {
       const replayEvents = generateReplayEvents(records);
 
       const report = {
+        is_mock_data: _isMockData,
         target_phone: targetNum,
         active_period: {
           from: formatDate(minDate),

@@ -997,7 +997,7 @@ function Mobility() {
                     fontFamily: kpi.isMonospace ? "monospace" : undefined,
                     fontSize: kpi.isMonospace ? 12 : 20,
                     fontWeight: 800,
-                    color: kpi.isMonospace ? "#e17055" : "var(--color-text)",
+                    color: kpi.isMonospace ? "#e17055" : "#ffffff",
                     overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                   }}>
                     {kpi.value}
@@ -1012,8 +1012,8 @@ function Mobility() {
             <div
               style={{
                 display: "flex", gap: 4, padding: 4,
-                background: "rgba(255,255,255,0.5)", backdropFilter: "blur(10px)",
-                borderRadius: 14, border: "1px solid var(--color-border)",
+                background: "rgba(255,255,255,0.08)", backdropFilter: "blur(10px)",
+                borderRadius: 14, border: "1px solid rgba(255, 255, 255, 0.12)",
                 boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                 width: "fit-content",
               }}
@@ -1035,7 +1035,7 @@ function Mobility() {
                       display: "flex", alignItems: "center", gap: 7,
                       transition: "all 0.18s ease",
                       background: active ? "#00b894" : "transparent",
-                      color: active ? "#fff" : "var(--color-text-muted)",
+                      color: active ? "#fff" : "rgba(255, 255, 255, 0.6)",
                       boxShadow: active ? "0 2px 10px rgba(0,184,148,0.3)" : "none",
                     }}
                   >

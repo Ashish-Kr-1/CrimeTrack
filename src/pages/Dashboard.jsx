@@ -142,13 +142,11 @@ function ActivityCalendar({ events }) {
   return (
     <div style={{ overflowX: "auto" }}>
       {/* Month row */}
-      <div style={{ display: "flex", marginBottom: 4, paddingLeft: 20 }}>
+      <div style={{ position: "relative", height: 16, marginBottom: 4 }}>
         {months.map(m => (
-          <div key={m.label} style={{ position: "relative", minWidth: 0 }}>
-            <span style={{ position: "absolute", left: m.col * 14, fontSize: 9, fontWeight: 700, color: "var(--color-text-subtle)", textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
-              {m.label}
-            </span>
-          </div>
+          <span key={m.label} style={{ position: "absolute", left: 22 + m.col * 14, fontSize: 9, fontWeight: 700, color: "var(--color-text-subtle)", textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
+            {m.label}
+          </span>
         ))}
       </div>
       {/* Day labels + grid */}
@@ -208,21 +206,21 @@ const formatFriendlyDate = (dateStr) => {
   const parts = dateStr.split(" ");
   const datePart = parts[0];
   const timePart = parts[1] || "";
-  
+
   const dateParts = datePart.split("-");
   if (dateParts.length !== 3) return dateStr;
-  
+
   const yr = dateParts[0];
   const moNum = parseInt(dateParts[1], 10);
   const dy = parseInt(dateParts[2], 10);
-  
+
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
   const moName = months[moNum - 1] || dateParts[1];
   const dayStr = String(dy).padStart(2, "0");
-  
+
   let timeStr = "";
   if (timePart) {
     const timeParts = timePart.split(":");
@@ -230,35 +228,35 @@ const formatFriendlyDate = (dateStr) => {
       timeStr = ` ${timeParts[0]}:${timeParts[1]}`;
     }
   }
-  
+
   return `${dayStr} ${moName} ${yr}${timeStr}`;
 };
 
 /* ─── PDF Section 91 CrPC Notice Generator ───────────────────────────────── */
 const generateCrpcNotice = (targetPhone, bankCount, triggeredIndicators) => {
   const doc = new jsPDF();
-  
+
   // Header
   doc.setFont("helvetica", "bold");
   doc.setFontSize(15);
   doc.text("NOTICE UNDER SECTION 91 OF CODE OF CRIMINAL PROCEDURE (CRPC)", 105, 20, { align: "center" });
-  
+
   // Date
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
   doc.text(`DATE: ${new Date().toLocaleDateString()}`, 190, 30, { align: "right" });
-  doc.text("NOTICE ID: FCSA/SEC91/" + Math.floor(Math.random()*90000+10000), 20, 30);
-  
+  doc.text("NOTICE ID: FCSA/SEC91/" + Math.floor(Math.random() * 90000 + 10000), 20, 30);
+
   // Address
   doc.setFont("helvetica", "bold");
   doc.text("TO,", 20, 42);
   doc.setFont("helvetica", "normal");
   doc.text("The Nodal Officer / Cyber Fraud Investigation Division,\nAssociated Banking Entities / UPI Aggregator Gateway Operations,", 20, 48);
-  
+
   // Subject
   doc.setFont("helvetica", "bold");
   doc.text(`SUBJECT: Requisition to freeze accounts linked to suspicious MSISDN: +91 ${targetPhone}`, 20, 62);
-  
+
   // Body text
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10.5);
@@ -277,13 +275,13 @@ Therefore, in exercise of the powers vested under Section 91 of the Code of Crim
 Failure to comply with this notice may attract penal proceedings under Section 175 and 188 of the Indian Penal Code (IPC) for non-compliance with public authority orders.`;
 
   doc.text(bodyText, 20, 72, { maxWidth: 170 });
-  
+
   // Sign-off
   doc.setFont("helvetica", "bold");
   doc.text("Investigating Officer,", 20, 245);
   doc.setFont("helvetica", "normal");
   doc.text("Cyber Crime Cell / Forensics Command\nForensics Cyber Security Agency (FCSA)", 20, 251);
-  
+
   doc.save(`CrPC_Section_91_Notice_${targetPhone}.pdf`);
 };
 
@@ -368,6 +366,25 @@ function Dashboard() {
   return (
     <motion.div className="page-container theme-dashboard" variants={stagger} initial="initial" animate="animate">
 
+      {/* ─── MOCK DATA WARNING ─── */}
+      {diagnosticReport.is_mock_data && (
+        <motion.div variants={fadeUp} style={{
+          display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 20px",
+          borderRadius: 12, background: "rgba(253,203,110,0.10)",
+          border: "1.5px solid rgba(253,203,110,0.45)", marginBottom: 4,
+        }}>
+          <AlertTriangle size={18} color="#fdcb6e" style={{ flexShrink: 0, marginTop: 1 }} />
+          <div>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#fdcb6e", display: "block", marginBottom: 2 }}>
+              DEMO MODE — Simulated Data
+            </span>
+            <span style={{ fontSize: 12, color: "rgba(253,203,110,0.8)", lineHeight: 1.6 }}>
+              The uploaded file was not recognized as a valid CDR. The analysis below is based on auto-generated sample data and <strong>must not be used in real investigations</strong>. Please upload a proper CDR CSV file.
+            </span>
+          </div>
+        </motion.div>
+      )}
+
       {/* ─── SECTION 1 — PLAIN ENGLISH VERDICT BANNER ─── */}
       {(() => {
         const brightColor =
@@ -378,7 +395,7 @@ function Dashboard() {
         return (
           <motion.div variants={fadeUp} style={{
             borderRadius: 16, padding: "20px 24px", marginBottom: 24,
-            background: "#1a2e3f", border: "1px solid rgba(255, 255, 255, 0.12)",
+            background: "#013663ff", border: "1px solid rgba(255, 255, 255, 0.12)",
             boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.2)",
             display: "flex", alignItems: "flex-start", gap: 16,
           }}>
@@ -492,7 +509,7 @@ function Dashboard() {
                 value: diagnosticReport.feature_vector.bank_sender_count,
                 unit: "banks",
                 help: "Number of different banks sending alerts to this SIM",
-                color: "var(--color-gold)",
+                color: "var(--color-warning)",
                 icon: CreditCard,
               },
               {
@@ -500,7 +517,7 @@ function Dashboard() {
                 value: diagnosticReport.feature_vector.upi_burst_sms_count || "0",
                 unit: "UPI apps",
                 help: "Number of payment apps (GPay, PhonePe, Paytm) bulk-activated",
-                color: "var(--color-gold)",
+                color: "var(--color-warning)",
                 icon: Zap,
               },
               {

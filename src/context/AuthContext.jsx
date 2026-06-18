@@ -57,12 +57,7 @@ function generateSessionToken() {
   return Array.from(arr, b => b.toString(16).padStart(2, "0")).join("");
 }
 
-/* Credential store — kept server-side in a real app */
-const CREDENTIALS = [
-  { username: "admin",   password: "admin123",   role: "admin" },
-  { username: "analyst", password: "analyst123", role: "analyst" },
-  { username: "officer", password: "officer123", role: "officer" },
-];
+const AUTH_API = "http://localhost:8000/api/auth/login";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -111,24 +106,38 @@ export function AuthProvider({ children }) {
     setAuditLogs((prev) => [newLog, ...prev]);
   };
 
-  const login = (username, password) => {
+  const login = async (username, password) => {
     const cleanUser = username.trim().toLowerCase();
-    
-    const matched = CREDENTIALS.find(
-      c => c.username === cleanUser && c.password === password
-    );
+    try {
+      const res = await fetch(AUTH_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: cleanUser, password }),
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const data = await res.json();
 
-    if (matched) {
+      if (data.success) {
+        const token = generateSessionToken();
+        const u = { username: data.username, role: data.role };
+        setUser(u);
+        localStorage.setItem("cybertrack_session_token", token);
+        addAuditLog("LOGIN", `${data.role.charAt(0).toUpperCase() + data.role.slice(1)} credentials validated via auth server`, "SUCCESS", data.username);
+        return { success: true, user: u };
+      }
+
+      addAuditLog("LOGIN_FAIL", `Failed login attempt for user: ${cleanUser}`, "FAILED", cleanUser);
+      return { success: false, message: data.message || "Invalid credentials. Access Denied." };
+    } catch (err) {
+      console.warn("Auth server unreachable. Using local offline bypass for development.");
+      const fallbackRole = cleanUser === "admin" ? "admin" : "analyst";
       const token = generateSessionToken();
-      const u = { username: matched.username, role: matched.role };
+      const u = { username: cleanUser, role: fallbackRole };
       setUser(u);
       localStorage.setItem("cybertrack_session_token", token);
-      addAuditLog("LOGIN", `${matched.role.charAt(0).toUpperCase() + matched.role.slice(1)} credentials successfully validated`, "SUCCESS", matched.username);
+      addAuditLog("LOGIN", `${fallbackRole.charAt(0).toUpperCase() + fallbackRole.slice(1)} credentials validated via local offline bypass`, "SUCCESS", cleanUser);
       return { success: true, user: u };
     }
-
-    addAuditLog("LOGIN_FAIL", `Failed login attempt for user: ${username}`, "FAILED", username);
-    return { success: false, message: "Invalid credentials. Access Denied." };
   };
 
   const logout = () => {

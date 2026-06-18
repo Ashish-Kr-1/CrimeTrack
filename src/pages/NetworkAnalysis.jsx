@@ -21,11 +21,11 @@ const UPI_GATEWAY_NUMBERS = new Set([
   "52263", "56161020", "9220592205", "9222692226",
 ]);
 const BANK_KEYWORDS = [
-  "BK","BOI","BOB","BUP","IND","PNB","IOB","UPI","PAYTM",
-  "AXIS","HDFC","ICICI","UNION","ADHAAR","SBI","PSBANK","CKYCR","GRAMIN",
+  "BK", "BOI", "BOB", "BUP", "IND", "PNB", "IOB", "UPI", "PAYTM",
+  "AXIS", "HDFC", "ICICI", "UNION", "ADHAAR", "SBI", "PSBANK", "CKYCR", "GRAMIN",
 ];
-const HIGH_RISK_CIRCLES = new Set(["AIR BHR","VF JHK","JIO BHR","VF BHR","IDEA BHR"]);
-const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const HIGH_RISK_CIRCLES = new Set(["AIR BHR", "VF JHK", "JIO BHR", "VF BHR", "IDEA BHR"]);
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function cleanRaw(v) {
   if (!v) return "";
@@ -61,12 +61,12 @@ function ScoreGauge({ score, color }) {
   const r = 52, circ = 2 * Math.PI * r, dash = (score / 100) * circ;
   return (
     <svg width={130} height={130} viewBox="0 0 130 130">
-      <circle cx={65} cy={65} r={r} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth={10} />
+      <circle cx={65} cy={65} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={10} />
       <circle cx={65} cy={65} r={r} fill="none" stroke={color} strokeWidth={10} strokeLinecap="round"
         strokeDasharray={`${dash} ${circ}`} strokeDashoffset={circ / 4}
         style={{ transition: "stroke-dasharray 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
       <text x={65} y={60} textAnchor="middle" fontSize={26} fontWeight={800} fontFamily="var(--font-mono)" fill={color}>{score}</text>
-      <text x={65} y={80} textAnchor="middle" fontSize={9} fontWeight={700} fill="var(--color-text-subtle)" fontFamily="var(--font-sans)" letterSpacing={1}>CRIME SCORE</text>
+      <text x={65} y={80} textAnchor="middle" fontSize={9} fontWeight={700} fill="rgba(255, 255, 255, 0.4)" fontFamily="var(--font-sans)" letterSpacing={1}>CRIME SCORE</text>
     </svg>
   );
 }
@@ -86,15 +86,15 @@ const BarTip = ({ active, payload, label }) => {
 const PieTip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: "rgba(255,255,255,0.97)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 10, padding: "10px 14px" }}>
-      <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, color: "var(--color-text)" }}>{payload[0].name}</p>
+    <div style={{ background: "rgba(14, 22, 38, 0.95)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: 10, padding: "10px 14px" }}>
+      <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, color: "#ffffff" }}>{payload[0].name}</p>
       <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: payload[0].payload.fill }}>{payload[0].value} events ({payload[0].payload.pct}%)</p>
     </div>
   );
 };
 
 function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
@@ -120,6 +120,7 @@ function getMockOSINTData(phone) {
     circle,
     fraudScore,
     networkType,
+    isMock: true,
     social: {
       whatsapp: { linked: whatsappActive, detail: "Active (Profile photo updated recently)" },
       telegram: { linked: telegramActive, detail: telegramActive ? "Active (Last seen 2h ago · @suspect_node)" : "No association found" },
@@ -196,15 +197,14 @@ function getSTIXPayload(phone, osint) {
   };
 }
 
-function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "dark" }) {
-  const isDark = theme === "dark";
-  const bg = isDark ? "rgba(255,255,255,0.04)" : "var(--color-surface-2)";
-  const border = isDark ? "rgba(255,255,255,0.08)" : "var(--color-border)";
-  const textTitle = isDark ? "#00e5ff" : "var(--color-accent)";
-  const textMuted = isDark ? "rgba(233,241,248,0.5)" : "var(--color-text-secondary)";
-  const textBody = isDark ? "#e9f1f8" : "var(--color-text)";
-  const textSubtle = isDark ? "rgba(233,241,248,0.35)" : "var(--color-text-muted)";
-  const terminalBg = isDark ? "#0b2d35" : "#0f172a";
+function OsintSection({ phone, scanState, onTriggerScan, onExportMisp }) {
+  const bg = "rgba(255, 255, 255, 0.03)";
+  const border = "rgba(255, 255, 255, 0.08)";
+  const textTitle = "#00e5ff";
+  const textMuted = "rgba(255, 255, 255, 0.6)";
+  const textBody = "#ffffff";
+  const textSubtle = "rgba(255, 255, 255, 0.4)";
+  const terminalBg = "#070b13";
 
   const state = scanState || { stage: "idle" };
 
@@ -224,16 +224,16 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
       {state.stage === "idle" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <p style={{ fontSize: 11, lineHeight: 1.6, color: textMuted, margin: 0 }}>
-            Query PhoneInfoga carrier databases and check linked social media profile footprints (WhatsApp, Telegram, Signal, Instagram) to verify identity.
+            Query PhoneInfoga carrier databases and check linked social media footprint (WhatsApp, Telegram, Signal, Instagram) to verify identity.
           </p>
-          <button 
+          <button
             onClick={() => onTriggerScan(phone)}
-            style={{ 
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 6, 
-              padding: "9px 14px", borderRadius: 8, border: "none", 
-              background: isDark ? "linear-gradient(135deg, #00b894, #00e5ff)" : "linear-gradient(135deg, #3a7ca5, #818cf8)", 
-              color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", 
-              boxShadow: "0 2px 10px rgba(0,0,0,0.1)" 
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              padding: "9px 14px", borderRadius: 8, border: "none",
+              background: "linear-gradient(135deg, #00b894, #00e5ff)",
+              color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
             }}
           >
             <Radio size={12} className="animate-pulse" /> Trigger OSINT Footprint Scan
@@ -244,8 +244,8 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
       {state.stage === "scanning" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <motion.div 
-              animate={{ rotate: 360 }} 
+            <motion.div
+              animate={{ rotate: 360 }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
               style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
             >
@@ -253,9 +253,9 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
             </motion.div>
             <span style={{ fontSize: 11, fontWeight: 700, color: textBody }}>Performing real-time OSINT lookup...</span>
           </div>
-          <div style={{ 
-            background: terminalBg, borderRadius: 8, padding: "10px 12px", 
-            fontFamily: "var(--font-mono)", fontSize: 10, color: "#a5f3fc", 
+          <div style={{
+            background: terminalBg, borderRadius: 8, padding: "10px 12px",
+            fontFamily: "var(--font-mono)", fontSize: 10, color: "#a5f3fc",
             maxHeight: 120, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4,
             border: "1px solid rgba(255,255,255,0.05)"
           }}>
@@ -268,13 +268,19 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
 
       {state.stage === "completed" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {state.data?.isMock && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: 7, background: "rgba(253,203,110,0.12)", border: "1px solid rgba(253,203,110,0.4)" }}>
+              <AlertTriangle size={12} color="#fdcb6e" />
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#fdcb6e" }}>SIMULATED DATA — Backend offline. Results are not real OSINT. Do not use in investigations.</span>
+            </div>
+          )}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <div style={{ background: isDark ? "rgba(0,0,0,0.2)" : "#ffffff", border: `1px solid ${border}`, padding: "8px 10px", borderRadius: 8 }}>
+            <div style={{ background: "rgba(0,0,0,0.2)", border: `1px solid ${border}`, padding: "8px 10px", borderRadius: 8 }}>
               <span style={{ fontSize: 8, color: textSubtle, fontWeight: 700, textTransform: "uppercase", display: "block" }}>Carrier (PhoneInfoga)</span>
               <span style={{ fontSize: 11, fontWeight: 700, color: textBody, display: "block", marginTop: 2 }}>{state.data.carrier}</span>
               <span style={{ fontSize: 9, color: textSubtle, display: "block", marginTop: 1 }}>{state.data.circle} · {state.data.networkType}</span>
             </div>
-            <div style={{ background: isDark ? "rgba(0,0,0,0.2)" : "#ffffff", border: `1px solid ${border}`, padding: "8px 10px", borderRadius: 8 }}>
+            <div style={{ background: "rgba(0,0,0,0.2)", border: `1px solid ${border}`, padding: "8px 10px", borderRadius: 8 }}>
               <span style={{ fontSize: 8, color: textSubtle, fontWeight: 700, textTransform: "uppercase", display: "block" }}>Fraud Reputation Score</span>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
                 <div style={{ height: 4, flex: 1, background: "rgba(0,0,0,0.1)", borderRadius: 99, overflow: "hidden" }}>
@@ -300,9 +306,9 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
                 };
                 const col = colors[platform] || { active: "#3a7ca5", bg: "rgba(58,124,165,0.08)" };
                 return (
-                  <div key={platform} style={{ 
-                    display: "flex", alignItems: "flex-start", gap: 8, 
-                    padding: "8px 10px", borderRadius: 8, 
+                  <div key={platform} style={{
+                    display: "flex", alignItems: "flex-start", gap: 8,
+                    padding: "8px 10px", borderRadius: 8,
                     background: net.linked ? col.bg : "transparent",
                     border: `1px solid ${net.linked ? `${col.active}25` : border}`
                   }}>
@@ -322,13 +328,13 @@ function OsintSection({ phone, scanState, onTriggerScan, onExportMisp, theme = "
           </div>
 
           <div style={{ borderTop: `1px solid ${border}`, paddingTop: 10, display: "flex", justifyContent: "flex-end" }}>
-            <button 
+            <button
               onClick={() => onExportMisp(phone, state.data)}
-              style={{ 
-                display: "flex", alignItems: "center", gap: 4, 
-                background: "transparent", border: `1px solid ${isDark ? "#00e5ff50" : "#3a7ca550"}`, 
-                padding: "6px 12px", borderRadius: 6, cursor: "pointer", 
-                fontSize: 10, fontWeight: 700, color: isDark ? "#00e5ff" : "#3a7ca5",
+              style={{
+                display: "flex", alignItems: "center", gap: 4,
+                background: "transparent", border: "1px solid rgba(0, 229, 255, 0.3)",
+                padding: "6px 12px", borderRadius: 6, cursor: "pointer",
+                fontSize: 10, fontWeight: 700, color: "#00e5ff",
                 transition: "all 0.15s ease"
               }}
             >
@@ -345,7 +351,8 @@ function MispExportModal({ phone, osintData, onClose }) {
   const [copied, setCopied] = useState(false);
   const [mispStatus, setMispStatus] = useState("idle"); // "idle" | "syncing" | "success" | "error"
   const [mispMessage, setMispMessage] = useState("");
-  
+  const [mispError, setMispError] = useState("");
+
   const payload = useMemo(() => getSTIXPayload(phone, osintData), [phone, osintData]);
   const payloadStr = useMemo(() => JSON.stringify(payload, null, 2), [payload]);
 
@@ -369,6 +376,7 @@ function MispExportModal({ phone, osintData, onClose }) {
   const handleMispSync = async () => {
     setMispStatus("syncing");
     setMispMessage("");
+    setMispError("");
     try {
       const response = await fetch("http://localhost:8000/api/misp/export", {
         method: "POST",
@@ -380,55 +388,53 @@ function MispExportModal({ phone, osintData, onClose }) {
         setMispStatus("success");
         setMispMessage(data.message);
       } else {
-        throw new Error(data.message || "Failed to sync payload.");
+        setMispStatus("error");
+        setMispError(data.message || "MISP server returned an error.");
       }
     } catch (err) {
-      console.warn("MISP server offline. Falling back to local threat sync simulation.");
-      setTimeout(() => {
-        setMispStatus("success");
-        setMispMessage("Successfully synced to offline Threat Intelligence registry (simulation).");
-      }, 1200);
+      setMispStatus("error");
+      setMispError("MISP server unreachable (http://localhost:8000). Ensure the backend is running and MISP_API_KEY is set in .env.");
     }
   };
 
   return (
-    <div style={{ 
-      position: "fixed", inset: 0, zIndex: 10000, 
-      background: "rgba(8, 34, 41, 0.65)", backdropFilter: "blur(12px)", 
-      display: "flex", alignItems: "center", justifyContent: "center", padding: 24 
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 10000,
+      background: "rgba(7, 11, 19, 0.75)", backdropFilter: "blur(12px)",
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 24
     }} onClick={onClose}>
-      <div 
-        style={{ 
-          width: "100%", maxWidth: 640, background: "#0b2d35", border: "1px solid #1a4d59",
-          borderRadius: 20, boxShadow: "0 24px 64px rgba(0,0,0,0.4)", display: "flex", 
-          flexDirection: "column", overflow: "hidden" 
-        }} 
+      <div
+        style={{
+          width: "100%", maxWidth: 640, background: "rgba(14, 22, 38, 0.98)", border: "1px solid rgba(22, 66, 91, 0.55)",
+          borderRadius: 20, boxShadow: "0 24px 64px rgba(0,0,0,0.4)", display: "flex",
+          flexDirection: "column", overflow: "hidden"
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ padding: "20px 24px", borderBottom: "1px solid #1a4d59", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(22, 66, 91, 0.45)", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <span style={{ fontSize: 9, fontWeight: 800, color: "#00e5ff", letterSpacing: "0.14em", textTransform: "uppercase" }}>MISP Threat Intelligence Export</span>
             <h3 style={{ fontSize: 16, fontWeight: 800, color: "#fff", margin: "4px 0 0" }}>STIX v2.1 Indicator Bundle</h3>
           </div>
-          <button onClick={onClose} style={{ padding: 6, borderRadius: 8, border: "1px solid #1a4d59", background: "rgba(255,255,255,0.05)", cursor: "pointer", color: "rgba(255,255,255,0.6)" }}>
+          <button onClick={onClose} style={{ padding: 6, borderRadius: 8, border: "1px solid rgba(22, 66, 91, 0.45)", background: "rgba(255,255,255,0.05)", cursor: "pointer", color: "rgba(255,255,255,0.6)" }}>
             <X size={14} />
           </button>
         </div>
 
         <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
-          <p style={{ margin: 0, fontSize: 12, color: "#88aeb7", lineHeight: 1.6 }}>
+          <p style={{ margin: 0, fontSize: 12, color: "rgba(255, 255, 255, 0.65)", lineHeight: 1.6 }}>
             The following STIX 2.1 JSON payload represents a standardized Indicator of Compromise (IOC). It binds the telephone number <strong style={{ color: "#fff" }}>{phone}</strong> and its metadata as an observable pattern for ingestion into SIEM tools or MISP sharing communities.
           </p>
-          
+
           <div style={{ position: "relative" }}>
-            <pre style={{ 
-              margin: 0, background: "#061f24", padding: "16px 20px", borderRadius: 10,
+            <pre style={{
+              margin: 0, background: "rgba(7, 11, 19, 0.85)", padding: "16px 20px", borderRadius: 10,
               fontFamily: "var(--font-mono)", fontSize: 10, color: "#a5f3fc",
-              height: 200, overflowY: "auto", border: "1px solid #153c45"
+              height: 200, overflowY: "auto", border: "1px solid rgba(22, 66, 91, 0.45)"
             }}>
               {payloadStr}
             </pre>
-            <button 
+            <button
               onClick={handleCopy}
               style={{
                 position: "absolute", top: 10, right: 10,
@@ -446,34 +452,40 @@ function MispExportModal({ phone, osintData, onClose }) {
           {mispStatus === "success" && (
             <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(0,184,148,0.08)", border: "1px solid rgba(0,184,148,0.22)", display: "flex", alignItems: "center", gap: 8 }}>
               <CheckCircle size={14} color="#00b894" />
-              <span style={{ fontSize: 11, color: "#88aeb7" }}>{mispMessage || "Pushed successfully."}</span>
+              <span style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.65)" }}>{mispMessage || "Pushed successfully."}</span>
+            </div>
+          )}
+          {mispStatus === "error" && (
+            <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(214,48,49,0.08)", border: "1px solid rgba(214,48,49,0.25)", display: "flex", alignItems: "center", gap: 8 }}>
+              <AlertTriangle size={14} color="#d63031" />
+              <span style={{ fontSize: 11, color: "#ff8585" }}>{mispError}</span>
             </div>
           )}
         </div>
 
-        <div style={{ padding: "16px 24px", borderTop: "1px solid #1a4d59", background: "rgba(0,0,0,0.15)", display: "flex", justifyContent: "flex-end", gap: 10 }}>
-          <button onClick={onClose} style={{ padding: "9px 16px", borderRadius: 8, border: "1px solid #1a4d59", background: "transparent", color: "#88aeb7", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+        <div style={{ padding: "16px 24px", borderTop: "1px solid rgba(22, 66, 91, 0.45)", background: "rgba(0,0,0,0.15)", display: "flex", justifyContent: "flex-end", gap: 10 }}>
+          <button onClick={onClose} style={{ padding: "9px 16px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.12)", background: "transparent", color: "rgba(255, 255, 255, 0.7)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
             Close
           </button>
-          <button 
+          <button
             onClick={handleMispSync}
             disabled={mispStatus === "syncing"}
-            style={{ 
+            style={{
               display: "flex", alignItems: "center", gap: 6,
-              padding: "10px 18px", borderRadius: 8, border: "1px solid rgba(0,229,255,0.3)", 
-              background: "rgba(0,229,255,0.06)", color: "#00e5ff", 
+              padding: "10px 18px", borderRadius: 8, border: "1px solid rgba(0,229,255,0.3)",
+              background: "rgba(0,229,255,0.06)", color: "#00e5ff",
               fontSize: 12, fontWeight: 800, cursor: mispStatus === "syncing" ? "not-allowed" : "pointer"
             }}
           >
             <Share2 size={13} /> {mispStatus === "syncing" ? "Syncing..." : "Sync to MISP"}
           </button>
-          <button 
+          <button
             onClick={handleDownload}
-            style={{ 
+            style={{
               display: "flex", alignItems: "center", gap: 6,
-              padding: "10px 18px", borderRadius: 8, border: "none", 
-              background: "linear-gradient(135deg, #00b894, #00e5ff)", color: "#000", 
-              fontSize: 12, fontWeight: 800, cursor: "pointer" 
+              padding: "10px 18px", borderRadius: 8, border: "none",
+              background: "linear-gradient(135deg, #00b894, #00e5ff)", color: "#000",
+              fontSize: 12, fontWeight: 800, cursor: "pointer"
             }}
           >
             <Download size={13} /> Download JSON
@@ -486,7 +498,7 @@ function MispExportModal({ phone, osintData, onClose }) {
 
 /* ── Associate Drawer ── */
 function AssociateDrawer({ intel, onClose, osintScans, triggerOsintScan, onExportMisp }) {
-  const [mapStyle, setMapStyle] = useState("light");
+  const [mapStyle, setMapStyle] = useState("dark");
   const tileUrl = mapStyle === "dark"
     ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
     : mapStyle === "satellite"
@@ -499,23 +511,23 @@ function AssociateDrawer({ intel, onClose, osintScans, triggerOsintScan, onExpor
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)", display: "flex", justifyContent: "flex-end" }}
+      style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", justifyContent: "flex-end" }}
       onClick={onClose}>
       <motion.div initial={{ x: 540 }} animate={{ x: 0 }} exit={{ x: 540 }}
         transition={{ type: "spring", stiffness: 320, damping: 36 }}
         onClick={(e) => e.stopPropagation()}
-        style={{ width: 520, height: "100%", background: "var(--color-bg)", display: "flex", flexDirection: "column", overflowY: "auto", boxShadow: "-8px 0 48px rgba(0,0,0,0.18)" }}>
+        style={{ width: 520, height: "100%", background: "var(--color-bg)", display: "flex", flexDirection: "column", overflowY: "auto", boxShadow: "-8px 0 48px rgba(0,0,0,0.4)" }}>
         {/* Header */}
-        <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--color-border)", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, flexShrink: 0, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+        <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(14, 22, 38, 0.85)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, flexShrink: 0, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
           <div>
-            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-text-subtle)", display: "block", marginBottom: 4 }}>Associate Deep Analysis</span>
-            <h2 style={{ fontSize: 18, fontWeight: 800, fontFamily: "var(--font-mono)", color: "var(--color-text)", margin: 0, letterSpacing: "-0.02em" }}>{intel.phone}</h2>
+            <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.5)", display: "block", marginBottom: 4 }}>Associate Deep Analysis</span>
+            <h2 style={{ fontSize: 18, fontWeight: 800, fontFamily: "var(--font-mono)", color: "#ffffff", margin: 0, letterSpacing: "-0.02em" }}>{intel.phone}</h2>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ padding: "4px 12px", borderRadius: 99, fontSize: 9, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: `${intel.classColor}15`, color: intel.classColor, border: `1px solid ${intel.classColor}35` }}>
               {intel.classification}
             </span>
-            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--color-border)", background: "rgba(255,255,255,0.7)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--color-text-muted)" }}>
+            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255, 255, 255, 0.7)" }}>
               <X size={14} />
             </button>
           </div>
@@ -523,17 +535,17 @@ function AssociateDrawer({ intel, onClose, osintScans, triggerOsintScan, onExpor
         {/* Body */}
         <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: 24 }}>
           {/* Score + stats */}
-          <div style={{ background: "rgba(255,255,255,0.75)", border: "1px solid rgba(255,255,255,0.9)", borderRadius: 16, padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.04)" }}>
+          <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 16, padding: "24px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
               <ScoreGauge score={intel.score} color={intel.classColor} />
               <div style={{ flex: 1, minWidth: 180 }}>
-                <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", marginBottom: 6 }}>Crime Involvement Index</div>
+                <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.5)", marginBottom: 6 }}>Crime Involvement Index</div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: intel.classColor, letterSpacing: "-0.03em", marginBottom: 12 }}>{intel.classification}</div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   {[{ label: "Interactions", value: intel.interactionCount }, { label: "Night Calls", value: intel.nightCallCount }, { label: "Voice", value: intel.voiceCount }, { label: "SMS", value: intel.smsCount }].map(s => (
-                    <div key={s.label} style={{ background: "rgba(0,0,0,0.03)", borderRadius: 8, padding: "8px 10px" }}>
-                       <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>{s.label}</div>
-                       <div style={{ fontSize: 16, fontWeight: 800, fontFamily: "var(--font-mono)", color: "var(--color-text)", marginTop: 2 }}>{s.value}</div>
+                    <div key={s.label} style={{ background: "rgba(255, 255, 255, 0.05)", borderRadius: 8, padding: "8px 10px" }}>
+                      <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.5)" }}>{s.label}</div>
+                      <div style={{ fontSize: 16, fontWeight: 800, fontFamily: "var(--font-mono)", color: "#ffffff", marginTop: 2 }}>{s.value}</div>
                     </div>
                   ))}
                 </div>
@@ -542,43 +554,42 @@ function AssociateDrawer({ intel, onClose, osintScans, triggerOsintScan, onExpor
           </div>
           {/* Factors */}
           <div>
-            <h3 style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", marginBottom: 12 }}>Suspicion Factor Breakdown</h3>
+            <h3 style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-blue-soft)", marginBottom: 12 }}>Suspicion Factor Breakdown</h3>
             {intel.factors.length === 0 ? (
-              <div style={{ padding: "20px", borderRadius: 12, background: "rgba(0,184,148,0.06)", border: "1px solid rgba(0,184,148,0.2)", textAlign: "center", fontSize: 12, color: "var(--color-text-muted)" }}>No significant suspicion indicators detected.</div>
+              <div style={{ padding: "20px", borderRadius: 12, background: "rgba(0,184,148,0.06)", border: "1px solid rgba(0,184,148,0.2)", textAlign: "center", fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>No significant suspicion indicators detected.</div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {intel.factors.map((f, i) => (
-                  <div key={i} style={{ background: "rgba(255,255,255,0.7)", border: `1px solid ${sevColor(f.severity)}20`, borderLeft: `4px solid ${sevColor(f.severity)}`, borderRadius: 10, padding: "12px 16px" }}>
+                  <div key={i} style={{ background: "rgba(255, 255, 255, 0.03)", border: `1px solid ${sevColor(f.severity)}20`, borderLeft: `4px solid ${sevColor(f.severity)}`, borderRadius: 10, padding: "12px 16px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text)" }}>{f.label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#ffffff" }}>{f.label}</span>
                       <span style={{ padding: "2px 8px", borderRadius: 99, fontSize: 8, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", background: `${sevColor(f.severity)}12`, color: sevColor(f.severity), border: `1px solid ${sevColor(f.severity)}30` }}>+{f.pts} pts · {f.severity}</span>
                     </div>
-                    <p style={{ fontSize: 11, color: "var(--color-text-muted)", margin: 0, lineHeight: 1.6 }}>{f.detail}</p>
+                    <p style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.6)", margin: 0, lineHeight: 1.6 }}>{f.detail}</p>
                   </div>
                 ))}
               </div>
             )}
           </div>
           {/* OSINT section */}
-          <OsintSection 
-            phone={intel.phone} 
-            scanState={osintScans?.[intel.phone]} 
-            onTriggerScan={triggerOsintScan} 
-            onExportMisp={onExportMisp} 
-            theme="light" 
+          <OsintSection
+            phone={intel.phone}
+            scanState={osintScans?.[intel.phone]}
+            onTriggerScan={triggerOsintScan}
+            onExportMisp={onExportMisp}
           />
           {/* Map */}
           {intel.locEvents.length > 0 && (
             <div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                <h3 style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", margin: 0 }}>Chrono Location Trail · {intel.locEvents.length} geo-tagged events</h3>
-                <div style={{ display: "flex", gap: 3, background: "rgba(255,255,255,0.7)", border: "1px solid var(--color-border)", borderRadius: 8, padding: 3 }}>
-                  {[["light","Light"],["dark","Dark"],["satellite","Sat"]].map(([id, label]) => (
-                    <button key={id} onClick={() => setMapStyle(id)} style={{ padding: "3px 8px", borderRadius: 5, fontSize: 9, fontWeight: 700, border: "none", cursor: "pointer", transition: "all 0.15s", background: mapStyle === id ? "#3a7ca5" : "transparent", color: mapStyle === id ? "#fff" : "var(--color-text-muted)" }}>{label}</button>
+                <h3 style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.5)", margin: 0 }}>Chrono Location Trail · {intel.locEvents.length} geo-tagged events</h3>
+                <div style={{ display: "flex", gap: 3, background: "rgba(0, 0, 0, 0.2)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 8, padding: 3 }}>
+                  {[["light", "Light"], ["dark", "Dark"], ["satellite", "Sat"]].map(([id, label]) => (
+                    <button key={id} onClick={() => setMapStyle(id)} style={{ padding: "3px 8px", borderRadius: 5, fontSize: 9, fontWeight: 700, border: "none", cursor: "pointer", transition: "all 0.15s", background: mapStyle === id ? "#3a7ca5" : "transparent", color: mapStyle === id ? "#fff" : "rgba(255, 255, 255, 0.5)" }}>{label}</button>
                   ))}
                 </div>
               </div>
-              <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid var(--color-border)", height: 280 }}>
+              <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255, 255, 255, 0.08)", height: 280 }}>
                 <MapContainer center={mapCenter} zoom={9} style={{ height: "100%", width: "100%" }} scrollWheelZoom zoomControl>
                   <TileLayer url={tileUrl} attribution="" />
                   {polylineCoords.length > 1 && <Polyline positions={polylineCoords} pathOptions={{ color: "#3a7ca5", weight: 2.5, opacity: 0.55, dashArray: "6 4" }} />}
@@ -601,21 +612,21 @@ function AssociateDrawer({ intel, onClose, osintScans, triggerOsintScan, onExpor
           )}
           {/* Timeline */}
           <div>
-            <h3 style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", marginBottom: 12 }}>Chronological Log · {intel.timeline.length} events</h3>
-            <div style={{ background: "rgba(255,255,255,0.7)", border: "1px solid var(--color-border)", borderRadius: 14, overflow: "hidden", maxHeight: 360, overflowY: "auto" }}>
+            <h3 style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.5)", marginBottom: 12 }}>Chronological Log · {intel.timeline.length} events</h3>
+            <div style={{ background: "rgba(0, 0, 0, 0.15)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 14, overflow: "hidden", maxHeight: 360, overflowY: "auto" }}>
               {intel.timeline.length === 0 ? (
-                <div style={{ padding: 20, textAlign: "center", fontSize: 12, color: "var(--color-text-muted)" }}>No interaction records found.</div>
+                <div style={{ padding: 20, textAlign: "center", fontSize: 12, color: "rgba(255, 255, 255, 0.5)" }}>No interaction records found.</div>
               ) : intel.timeline.map((evt, i) => (
-                <div key={i} style={{ padding: "10px 16px", borderBottom: i < intel.timeline.length - 1 ? "1px solid var(--color-border-subtle)" : "none", display: "flex", alignItems: "flex-start", gap: 12, background: evt.isAnomaly ? "rgba(214,48,49,0.04)" : "transparent", borderLeft: evt.isAnomaly ? "3px solid #d63031" : "3px solid transparent" }}>
+                <div key={i} style={{ padding: "10px 16px", borderBottom: i < intel.timeline.length - 1 ? "1px solid rgba(255, 255, 255, 0.05)" : "none", display: "flex", alignItems: "flex-start", gap: 12, background: evt.isAnomaly ? "rgba(214,48,49,0.04)" : "transparent", borderLeft: evt.isAnomaly ? "3px solid #d63031" : "3px solid transparent" }}>
                   <span style={{ padding: "2px 7px", borderRadius: 5, fontSize: 8, fontWeight: 700, letterSpacing: "0.06em", flexShrink: 0, marginTop: 2, background: `${evtColor(evt.type)}15`, color: evtColor(evt.type), border: `1px solid ${evtColor(evt.type)}25` }}>{evt.type}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--color-text-muted)" }}>{evt.dateStr} {evt.timeStr}</span>
+                      <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "rgba(255, 255, 255, 0.5)" }}>{evt.dateStr} {evt.timeStr}</span>
                       {evt.isAnomaly && <span style={{ fontSize: 8, fontWeight: 700, color: "#d63031", display: "flex", alignItems: "center", gap: 2 }}><AlertTriangle size={8} /> FLAG</span>}
                     </div>
                     <div style={{ display: "flex", gap: 12, marginTop: 3, flexWrap: "wrap" }}>
-                      {evt.imei && <span style={{ fontSize: 9, color: "var(--color-text-subtle)", fontFamily: "var(--font-mono)" }}>IMEI: {evt.imei}</span>}
-                      {evt.roam && <span style={{ fontSize: 9, color: "var(--color-text-subtle)" }}>{evt.roam}</span>}
+                      {evt.imei && <span style={{ fontSize: 9, color: "rgba(255, 255, 255, 0.4)", fontFamily: "var(--font-mono)" }}>IMEI: {evt.imei}</span>}
+                      {evt.roam && <span style={{ fontSize: 9, color: "rgba(255, 255, 255, 0.4)" }}>{evt.roam}</span>}
                       {evt.dur && evt.type === "VOICE" && <span style={{ fontSize: 9, color: "#3a7ca5", fontFamily: "var(--font-mono)" }}>{evt.dur}s</span>}
                       {evt.coords && <span style={{ fontSize: 9, color: "#00b894", display: "flex", alignItems: "center", gap: 2 }}><MapPin size={8} /> GPS</span>}
                     </div>
@@ -704,7 +715,7 @@ function NetworkAnalysis() {
       console.warn("FastAPI Server OSINT Stream offline. Using fallback simulation.");
       setOsintScans(prev => {
         const current = prev[phone];
-        const fallbackData = getMockOSINTData(phone);
+        const fallbackData = { ...getMockOSINTData(phone), isMock: true };
         return {
           ...prev,
           [phone]: {
@@ -762,7 +773,7 @@ function NetworkAnalysis() {
 
   const totalContacts = Object.keys(contactCounts).length;
   const strongestContact = topContacts[0]?.[0] ?? "Unknown";
-  const strongestCount   = topContacts[0]?.[1] ?? 0;
+  const strongestCount = topContacts[0]?.[1] ?? 0;
 
   /* ── Hour-of-day heatmap ── */
   const hourHeatmap = useMemo(() => {
@@ -814,28 +825,28 @@ function NetworkAnalysis() {
     const bIdx = colIdx.bParty >= 0 ? colIdx.bParty : 3;
     let voice = 0, sms = 0, upi = 0, fin = 0;
     records.forEach(row => {
-      const contact  = cleanRaw(row[bIdx]);
-      const svcType  = colIdx.svcType  >= 0 ? cleanRaw(row[colIdx.svcType])  : "";
+      const contact = cleanRaw(row[bIdx]);
+      const svcType = colIdx.svcType >= 0 ? cleanRaw(row[colIdx.svcType]) : "";
       const callType = colIdx.callType >= 0 ? cleanRaw(row[colIdx.callType]) : "";
-      if (UPI_GATEWAY_NUMBERS.has(contact))                                     { upi++;  return; }
-      if (BANK_KEYWORDS.some(kw => contact.toUpperCase().includes(kw)))         { fin++;  return; }
-      if (svcType === "Voice" || callType === "IN" || callType === "OUT")        voice++;
-      else                                                                        sms++;
+      if (UPI_GATEWAY_NUMBERS.has(contact)) { upi++; return; }
+      if (BANK_KEYWORDS.some(kw => contact.toUpperCase().includes(kw))) { fin++; return; }
+      if (svcType === "Voice" || callType === "IN" || callType === "OUT") voice++;
+      else sms++;
     });
     const total = voice + sms + upi + fin || 1;
     return [
-      { name: "Phone Calls",    value: voice, fill: "#3a7ca5", pct: ((voice/total)*100).toFixed(0) },
-      { name: "Text Messages",  value: sms,   fill: "#0984e3", pct: ((sms/total)*100).toFixed(0)   },
-      { name: "Payment Nodes",  value: upi,   fill: "#d63031", pct: ((upi/total)*100).toFixed(0)   },
-      { name: "Bank Alerts",    value: fin,   fill: "#e17055", pct: ((fin/total)*100).toFixed(0)   },
+      { name: "Phone Calls", value: voice, fill: "#3a7ca5", pct: ((voice / total) * 100).toFixed(0) },
+      { name: "Text Messages", value: sms, fill: "#0984e3", pct: ((sms / total) * 100).toFixed(0) },
+      { name: "Payment Nodes", value: upi, fill: "#d63031", pct: ((upi / total) * 100).toFixed(0) },
+      { name: "Bank Alerts", value: fin, fill: "#e17055", pct: ((fin / total) * 100).toFixed(0) },
     ].filter(d => d.value > 0);
   }, [records, colIdx]);
 
   /* ── Plain-English summary ── */
   const networkSummary = useMemo(() => {
     if (!topContacts.length) return null;
-    const topPct   = ((strongestCount / records.length) * 100).toFixed(0);
-    const critical = topContacts.filter(([,c]) => c >= 30).length;
+    const topPct = ((strongestCount / records.length) * 100).toFixed(0);
+    const critical = topContacts.filter(([, c]) => c >= 30).length;
     const nightRows = records.filter(row => {
       const dt = parseDateTime(
         colIdx.date >= 0 ? cleanRaw(row[colIdx.date]) : "",
@@ -869,29 +880,29 @@ function NetworkAnalysis() {
     }).sort((a, b) => (a.dt && b.dt ? a.dt - b.dt : 0));
     let score = 0; const factors = [];
     const freqRatio = involvedRows.length / total;
-    const absCount  = involvedRows.length;
+    const absCount = involvedRows.length;
 
     // ── 1. Absolute interaction count (independent of CDR size) ──
-    if (absCount >= 50)      { score += 20; factors.push({ label: "Very High Absolute Interactions", detail: `${absCount} direct interactions — far above typical noise contacts (≥50).`, pts: 20, severity: "CRITICAL" }); }
-    else if (absCount >= 30) { score += 15; factors.push({ label: "High Absolute Interactions",      detail: `${absCount} direct interactions — significantly above average.`,            pts: 15, severity: "HIGH" }); }
-    else if (absCount >= 15) { score += 10; factors.push({ label: "Elevated Interaction Count",      detail: `${absCount} direct interactions — noteworthy contact volume.`,               pts: 10, severity: "MEDIUM" }); }
-    else if (absCount >= 5)  { score +=  5; factors.push({ label: "Moderate Interaction Count",      detail: `${absCount} interactions recorded with this number.`,                         pts:  5, severity: "LOW" }); }
+    if (absCount >= 50) { score += 20; factors.push({ label: "Very High Absolute Interactions", detail: `${absCount} direct interactions — far above typical noise contacts (≥50).`, pts: 20, severity: "CRITICAL" }); }
+    else if (absCount >= 30) { score += 15; factors.push({ label: "High Absolute Interactions", detail: `${absCount} direct interactions — significantly above average.`, pts: 15, severity: "HIGH" }); }
+    else if (absCount >= 15) { score += 10; factors.push({ label: "Elevated Interaction Count", detail: `${absCount} direct interactions — noteworthy contact volume.`, pts: 10, severity: "MEDIUM" }); }
+    else if (absCount >= 5) { score += 5; factors.push({ label: "Moderate Interaction Count", detail: `${absCount} interactions recorded with this number.`, pts: 5, severity: "LOW" }); }
 
     // ── 2. Frequency ratio relative to total CDR ──
-    if (freqRatio > 0.20)      { score += 30; factors.push({ label: "Dominant Network Presence",     detail: `${(freqRatio*100).toFixed(1)}% of ALL target CDR events involve this number — extreme concentration.`, pts: 30, severity: "CRITICAL" }); }
-    else if (freqRatio > 0.08) { score += 20; factors.push({ label: "High Contact Frequency Share",  detail: `Appears in ${(freqRatio*100).toFixed(1)}% of all target events — well above normal.`,                  pts: 20, severity: "HIGH" }); }
-    else if (freqRatio > 0.03) { score += 12; factors.push({ label: "Moderate Frequency Share",      detail: `Accounts for ${(freqRatio*100).toFixed(1)}% of target events.`,                                          pts: 12, severity: "MEDIUM" }); }
-    else if (freqRatio > 0.01) { score +=  6; factors.push({ label: "Minor Frequency Share",         detail: `Low but non-trivial ${(freqRatio*100).toFixed(1)}% share of target CDR events.`,                         pts:  6, severity: "LOW" }); }
+    if (freqRatio > 0.20) { score += 30; factors.push({ label: "Dominant Network Presence", detail: `${(freqRatio * 100).toFixed(1)}% of ALL target CDR events involve this number — extreme concentration.`, pts: 30, severity: "CRITICAL" }); }
+    else if (freqRatio > 0.08) { score += 20; factors.push({ label: "High Contact Frequency Share", detail: `Appears in ${(freqRatio * 100).toFixed(1)}% of all target events — well above normal.`, pts: 20, severity: "HIGH" }); }
+    else if (freqRatio > 0.03) { score += 12; factors.push({ label: "Moderate Frequency Share", detail: `Accounts for ${(freqRatio * 100).toFixed(1)}% of target events.`, pts: 12, severity: "MEDIUM" }); }
+    else if (freqRatio > 0.01) { score += 6; factors.push({ label: "Minor Frequency Share", detail: `Low but non-trivial ${(freqRatio * 100).toFixed(1)}% share of target CDR events.`, pts: 6, severity: "LOW" }); }
 
     // ── 3. Night-hour activity ──
     const nightCalls = timeline.filter(e => { if (!e.dt) return false; const h = e.dt.getHours(); return h >= 22 || h < 5; });
-    if (nightCalls.length > 10)     { score += 25; factors.push({ label: "Persistent Odd-Hour Activity", detail: `${nightCalls.length} interactions between 22:00–05:00 — classic burner-SIM pattern.`,  pts: 25, severity: "CRITICAL" }); }
-    else if (nightCalls.length > 3) { score += 15; factors.push({ label: "Irregular Hour Contact",       detail: `${nightCalls.length} late-night interactions detected.`,                                  pts: 15, severity: "HIGH" }); }
-    else if (nightCalls.length > 0) { score +=  5; factors.push({ label: "Minor Odd-Hour Activity",      detail: `${nightCalls.length} off-hour interactions recorded.`,                                    pts:  5, severity: "MEDIUM" }); }
+    if (nightCalls.length > 10) { score += 25; factors.push({ label: "Persistent Odd-Hour Activity", detail: `${nightCalls.length} interactions between 22:00–05:00 — classic burner-SIM pattern.`, pts: 25, severity: "CRITICAL" }); }
+    else if (nightCalls.length > 3) { score += 15; factors.push({ label: "Irregular Hour Contact", detail: `${nightCalls.length} late-night interactions detected.`, pts: 15, severity: "HIGH" }); }
+    else if (nightCalls.length > 0) { score += 5; factors.push({ label: "Minor Odd-Hour Activity", detail: `${nightCalls.length} off-hour interactions recorded.`, pts: 5, severity: "MEDIUM" }); }
 
     // ── 4. Known gateway / financial identifiers ──
-    if (UPI_GATEWAY_NUMBERS.has(deepAnalysisTarget))                                   { score += 30; factors.push({ label: "UPI Gateway Registration Node", detail: "Number identified as a UPI verification gateway — money-mule activation route.", pts: 30, severity: "CRITICAL" }); }
-    if (BANK_KEYWORDS.some(kw => deepAnalysisTarget.toUpperCase().includes(kw)))       { score += 20; factors.push({ label: "Financial Institution Sender",   detail: "Identified as a bank/fintech sender ID — financial probe or OTP relay.",      pts: 20, severity: "HIGH" }); }
+    if (UPI_GATEWAY_NUMBERS.has(deepAnalysisTarget)) { score += 30; factors.push({ label: "UPI Gateway Registration Node", detail: "Number identified as a UPI verification gateway — money-mule activation route.", pts: 30, severity: "CRITICAL" }); }
+    if (BANK_KEYWORDS.some(kw => deepAnalysisTarget.toUpperCase().includes(kw))) { score += 20; factors.push({ label: "Financial Institution Sender", detail: "Identified as a bank/fintech sender ID — financial probe or OTP relay.", pts: 20, severity: "HIGH" }); }
 
     // ── 5. High-risk telecom circle ──
     const riskCircleEvents = timeline.filter(e => e.roam && HIGH_RISK_CIRCLES.has(e.roam));
@@ -899,16 +910,16 @@ function NetworkAnalysis() {
 
     // ── 6. Communication pattern anomalies ──
     const voiceCount = timeline.filter(e => e.type === "VOICE").length;
-    const smsCount   = timeline.filter(e => e.type === "SMS").length;
+    const smsCount = timeline.filter(e => e.type === "SMS").length;
     if (smsCount > 0 && voiceCount === 0 && absCount >= 5) { score += 10; factors.push({ label: "SMS-Only Communication", detail: `All ${smsCount} interactions are SMS with zero voice — typical OTP/mule coordination pattern.`, pts: 10, severity: "MEDIUM" }); }
 
     // ── Normalise to 0-100 (max realistic raw ≈ 100) ──
     const norm = Math.min(Math.round((score / 100) * 100), 100);
     let classification, classColor;
-    if (norm >= 65)      { classification = "HIGH CRIME INVOLVEMENT"; classColor = "#d63031"; }
-    else if (norm >= 40) { classification = "MODERATE SUSPICION";     classColor = "#e17055"; }
-    else if (norm >= 20) { classification = "LOW RISK ASSOCIATE";      classColor = "#fdcb6e"; }
-    else                 { classification = "NOMINAL CONTACT";         classColor = "#00b894"; }
+    if (norm >= 65) { classification = "HIGH CRIME INVOLVEMENT"; classColor = "#d63031"; }
+    else if (norm >= 40) { classification = "MODERATE SUSPICION"; classColor = "#e17055"; }
+    else if (norm >= 20) { classification = "LOW RISK ASSOCIATE"; classColor = "#fdcb6e"; }
+    else { classification = "NOMINAL CONTACT"; classColor = "#00b894"; }
     return { phone: deepAnalysisTarget, interactionCount: involvedRows.length, freqRatio, score: norm, rawScore: score, classification, classColor, factors, timeline, locEvents: timeline.filter(e => e.coords), voiceCount, smsCount, nightCallCount: nightCalls.length };
   }, [deepAnalysisTarget, records, colIdx]);
 
@@ -961,9 +972,9 @@ function NetworkAnalysis() {
   }, [selectedNode]);
 
   const kpis = [
-    { icon: Phone,   label: "Target Suspect",     value: targetNumber,     isMonospace: true, color: "#e17055", bg: "rgba(225,112,85,0.08)" },
-    { icon: Users,   label: "Total Connections",  value: totalContacts,    color: "#3a7ca5",  bg: "rgba(58,124,165,0.08)" },
-    { icon: Star,    label: "Strongest Node",      value: strongestContact, sub: `${strongestCount} interactions`, isMonospace: true, color: "#e17055", bg: "rgba(225,112,85,0.08)", action: () => setDeepAnalysisTarget(strongestContact) },
+    { icon: Phone, label: "Target Suspect", value: targetNumber, isMonospace: true, color: "#e17055", bg: "rgba(225,112,85,0.08)" },
+    { icon: Users, label: "Total Connections", value: totalContacts, color: "#3a7ca5", bg: "rgba(58,124,165,0.08)" },
+    { icon: Star, label: "Strongest Node", value: strongestContact, sub: `${strongestCount} interactions`, isMonospace: true, color: "#e17055", bg: "rgba(225,112,85,0.08)", action: () => setDeepAnalysisTarget(strongestContact) },
   ];
 
   /* ── Heat cell color ── */
@@ -982,12 +993,12 @@ function NetworkAnalysis() {
 
       {/* ── Page header ── */}
       <motion.div variants={fadeUp} className="page-header" style={{ marginBottom: 0 }}>
-        <h1 className="mb-1 text-[30px] font-bold text-text">Network Analysis</h1>
-        <p className="text-sm text-text-muted">Visual mapping of who the suspect talked to, how often, and what that means.</p>
+        <h1 className="mb-1 text-[30px] font-bold text-white">Network Analysis</h1>
+        <p className="text-sm text-slate-400">Visual mapping of who the suspect talked to, how often, and what that means.</p>
       </motion.div>
 
       {records.length === 0 ? (
-        <div className="glass-card" style={{ padding: 40, textAlign: "center", color: "var(--color-text-muted)", fontSize: 13 }}>
+        <div className="glass-card" style={{ padding: 40, textAlign: "center", color: "rgba(255, 255, 255, 0.6)", fontSize: 13 }}>
           No records loaded. Please upload a dataset in the Ingestion Center to map suspect network relations.
         </div>
       ) : (<>
@@ -1001,7 +1012,7 @@ function NetworkAnalysis() {
               <Info size={18} color="#3a7ca5" />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700, color: "#d9dcd6", lineHeight: 1.6 }}>
+              <p style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700, color: "#ffffff", lineHeight: 1.6 }}>
                 This suspect contacted <strong style={{ color: "#3a7ca5" }}>{totalContacts} different people</strong>.
                 Their top contact accounts for <strong style={{ color: networkSummary.topPct > 20 ? "#d63031" : "#e17055" }}>{networkSummary.topPct}% of all activity</strong>
                 {networkSummary.topPct > 20 ? " — far above normal for a typical user" : ""}.
@@ -1010,7 +1021,7 @@ function NetworkAnalysis() {
               </p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {[
-                  { label: `${totalContacts} contacts`,         color: "#3a7ca5" },
+                  { label: `${totalContacts} contacts`, color: "#3a7ca5" },
                   { label: `Top contact: ${networkSummary.topPct}%`, color: +networkSummary.topPct > 20 ? "#d63031" : "#e17055" },
                   { label: `${networkSummary.nightCount} night calls`, color: "#e17055" },
                   { label: `${networkSummary.critical} critical nodes`, color: "#d63031" },
@@ -1032,9 +1043,9 @@ function NetworkAnalysis() {
                 <kpi.icon size={20} color={kpi.color} strokeWidth={2.2} />
               </div>
               <div style={{ minWidth: 0, flex: 1 }}>
-                <span style={{ fontSize: 11, color: "var(--color-text-muted)", display: "block" }}>{kpi.label}</span>
-                <h2 style={{ marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: kpi.isMonospace ? "var(--font-mono)" : "inherit", fontSize: kpi.isMonospace ? 14 : 22, fontWeight: 700, color: kpi.isMonospace ? kpi.color : "var(--color-text)" }}>{kpi.value}</h2>
-                {kpi.sub && <div style={{ marginTop: 2, fontSize: 11, color: "var(--color-text-subtle)" }}>{kpi.sub}</div>}
+                <span style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.55)", display: "block" }}>{kpi.label}</span>
+                <h2 style={{ marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: kpi.isMonospace ? "var(--font-mono)" : "inherit", fontSize: kpi.isMonospace ? 14 : 22, fontWeight: 700, color: kpi.isMonospace ? kpi.color : "#ffffff" }}>{kpi.value}</h2>
+                {kpi.sub && <div style={{ marginTop: 2, fontSize: 11, color: "rgba(255, 255, 255, 0.4)" }}>{kpi.sub}</div>}
               </div>
               {kpi.action && <div style={{ fontSize: 10, fontWeight: 700, color: kpi.color, flexShrink: 0, display: "flex", alignItems: "center", gap: 4 }}><Activity size={11} />Deep Analysis</div>}
             </motion.div>
@@ -1047,15 +1058,15 @@ function NetworkAnalysis() {
         <motion.div variants={fadeUp} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
 
           {/* Horizontal bar chart — top contacts */}
-          <div className="glass-card" style={{ padding: "20px 24px", background: "#082229" }}>
-            <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(233,241,248,0.5)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="glass-card" style={{ padding: "20px 24px", background: "rgba(14, 22, 38, 0.72)" }}>
+            <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
               <TrendingUp size={13} color="#00e5ff" /> Top 10 Most Contacted Numbers
             </h3>
-            <p style={{ fontSize: 11, color: "rgba(233,241,248,0.35)", marginBottom: 16, marginTop: 0 }}>Red = high risk · Cyan = suspicious · Blue = normal</p>
+            <p style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.4)", marginBottom: 16, marginTop: 0 }}>Red = high risk · Cyan = suspicious · Blue = normal</p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={barData} layout="vertical" margin={{ top: 0, right: 28, left: 8, bottom: 0 }} barSize={9}>
-                <XAxis type="number" tick={{ fontSize: 9, fill: "rgba(233,241,248,0.35)" }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "rgba(233,241,248,0.55)", fontFamily: "monospace", fontWeight: 700 }} width={48} axisLine={false} tickLine={false} />
+                <XAxis type="number" tick={{ fontSize: 9, fill: "rgba(255, 255, 255, 0.4)" }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "rgba(255, 255, 255, 0.6)", fontFamily: "monospace", fontWeight: 700 }} width={48} axisLine={false} tickLine={false} />
                 <Tooltip content={<BarTip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
                 <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                   {barData.map((entry, i) => <Cell key={i} fill={entry.color} fillOpacity={0.85} />)}
@@ -1065,11 +1076,11 @@ function NetworkAnalysis() {
           </div>
 
           {/* Donut — contact type breakdown */}
-          <div className="glass-card" style={{ padding: "20px 24px", background: "#082229" }}>
-            <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(233,241,248,0.5)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="glass-card" style={{ padding: "20px 24px", background: "rgba(14, 22, 38, 0.72)" }}>
+            <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
               <MessageSquare size={13} color="#00e5ff" /> Activity Type Breakdown
             </h3>
-            <p style={{ fontSize: 11, color: "rgba(233,241,248,0.35)", marginBottom: 4, marginTop: 0 }}>What kinds of events make up this network</p>
+            <p style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.4)", marginBottom: 4, marginTop: 0 }}>What kinds of events make up this network</p>
             <ResponsiveContainer width="100%" height={180}>
               <PieChart>
                 <Pie data={donutData} cx="50%" cy="50%" innerRadius={46} outerRadius={72} dataKey="value" paddingAngle={3}>
@@ -1080,7 +1091,7 @@ function NetworkAnalysis() {
             </ResponsiveContainer>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px", justifyContent: "center" }}>
               {donutData.map(d => (
-                <span key={d.name} style={{ fontSize: 10, color: "rgba(233,241,248,0.5)", display: "flex", alignItems: "center", gap: 5 }}>
+                <span key={d.name} style={{ fontSize: 10, color: "rgba(255, 255, 255, 0.6)", display: "flex", alignItems: "center", gap: 5 }}>
                   <span style={{ width: 8, height: 8, borderRadius: 2, background: d.fill, flexShrink: 0 }} />
                   {d.name} ({d.pct}%)
                 </span>
@@ -1095,18 +1106,18 @@ function NetworkAnalysis() {
         <div style={{ display: "flex", gap: 28, alignItems: "stretch", flexWrap: "wrap" }}>
           {/* Force graph */}
           <motion.div variants={fadeUp} style={{ flex: "1 1 55%", minWidth: 480, display: "flex", flexDirection: "column" }}>
-            <div className="glass-card" style={{ padding: "20px 24px", background: "#082229", display: "flex", flexDirection: "column", gap: 0 }}>
+            <div className="glass-card" style={{ padding: "20px 24px", background: "rgba(14, 22, 38, 0.72)", display: "flex", flexDirection: "column", gap: 0 }}>
 
               {/* Title row — same pattern as bar chart / donut */}
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 4 }}>
-                <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(233,241,248,0.5)", margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
+                <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
                   <Network size={13} color="#00e5ff" /> Contact Network Canvas
                 </h3>
                 {/* Label toggle */}
                 <div style={{ display: "flex", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, overflow: "hidden", background: "rgba(0,0,0,0.2)", flexShrink: 0 }}>
-                  {[["full","Full No."],["last4","Last 4"]].map(([mode, label]) => (
+                  {[["full", "Full No."], ["last4", "Last 4"]].map(([mode, label]) => (
                     <button key={mode} onClick={() => setLabelMode(mode)}
-                      style={{ padding: "3px 9px", fontSize: 9, fontWeight: 700, border: "none", cursor: "pointer", background: labelMode === mode ? "rgba(0,229,255,0.15)" : "transparent", color: labelMode === mode ? "#00e5ff" : "rgba(233,241,248,0.35)", transition: "all 0.15s" }}>
+                      style={{ padding: "3px 9px", fontSize: 9, fontWeight: 700, border: "none", cursor: "pointer", background: labelMode === mode ? "rgba(0,229,255,0.15)" : "transparent", color: labelMode === mode ? "#00e5ff" : "rgba(255, 255, 255, 0.4)", transition: "all 0.15s" }}>
                       {label}
                     </button>
                   ))}
@@ -1115,18 +1126,18 @@ function NetworkAnalysis() {
 
               {/* Sub-label + legend — same pattern as other charts */}
               <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "4px 16px", marginBottom: 14 }}>
-                <p style={{ fontSize: 11, color: "rgba(233,241,248,0.35)", margin: 0 }}>Click nodes to inspect · drag to rearrange</p>
+                <p style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.4)", margin: 0 }}>Click nodes to inspect · drag to rearrange</p>
                 {[{ color: "#ff6b4a", label: "Critical (≥30)" }, { color: "#00e5ff", label: "Suspicious (15–29)" }, { color: "#124854", label: "Nominal" }].map(l => (
-                  <span key={l.label} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: "rgba(233,241,248,0.4)" }}>
+                  <span key={l.label} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: "rgba(255, 255, 255, 0.5)" }}>
                     <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: l.color, flexShrink: 0 }} />{l.label}
                   </span>
                 ))}
               </div>
 
               {/* Canvas */}
-              <div ref={containerRef} style={{ borderRadius: 10, overflow: "hidden", background: "#082229" }}>
+              <div ref={containerRef} style={{ borderRadius: 10, overflow: "hidden", background: "#070b13" }}>
                 <ForceGraph2D ref={graphRef} graphData={graphData} width={dimensions.width} height={400}
-                  backgroundColor="#082229" nodeCanvasObject={nodeCanvasObject}
+                  backgroundColor="#070b13" nodeCanvasObject={nodeCanvasObject}
                   linkColor={() => "rgba(0,229,255,0.15)"} linkWidth={(l) => 0.6 + l.ratio * 2.4}
                   linkDirectionalParticles={4} linkDirectionalParticleWidth={1.5}
                   linkDirectionalParticleSpeed={(l) => l.ratio * 0.008 + 0.002}
@@ -1134,22 +1145,22 @@ function NetworkAnalysis() {
                   enableZoomInteraction enablePanInteraction
                   onNodeClick={(node) => setSelectedNode(node)}
                   nodeLabel={(node) => node.isTarget
-                    ? `<div style="background:#0b2d35;border:1px solid #153c45;padding:8px 12px;border-radius:6px;font-family:sans-serif;color:#f0f9ff;font-size:12px;"><strong style="color:#ff6b4a;">Target SIM</strong><br/>Phone: <strong>${node.id}</strong></div>`
-                    : `<div style="background:#0b2d35;border:1px solid #153c45;padding:8px 12px;border-radius:6px;font-family:sans-serif;color:#f0f9ff;font-size:12px;"><strong style="color:${node.level==="critical"?"#ff6b4a":node.level==="suspicious"?"#00e5ff":"#88aeb7"}">${node.level.toUpperCase()}</strong><br/>Phone: <strong>${node.id}</strong><br/>Interactions: <strong>${node.count}</strong></div>`
+                    ? `<div style="background:#0e1322;border:1px solid rgba(58,124,165,0.3);padding:8px 12px;border-radius:6px;font-family:sans-serif;color:#f0f9ff;font-size:12px;"><strong style="color:#ff6b4a;">Target SIM</strong><br/>Phone: <strong>${node.id}</strong></div>`
+                    : `<div style="background:#0e1322;border:1px solid rgba(58,124,165,0.3);padding:8px 12px;border-radius:6px;font-family:sans-serif;color:#f0f9ff;font-size:12px;"><strong style="color:${node.level === "critical" ? "#ff6b4a" : node.level === "suspicious" ? "#00e5ff" : "#88aeb7"}">${node.level.toUpperCase()}</strong><br/>Phone: <strong>${node.id}</strong><br/>Interactions: <strong>${node.count}</strong></div>`
                   }
                 />
               </div>
 
               {/* Sliders — same muted label style as chart descriptions */}
               <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
-                <span style={{ fontSize: 11, color: "rgba(233,241,248,0.35)", display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.5)", display: "flex", alignItems: "center", gap: 6 }}>
                   <Sliders size={11} color="rgba(0,229,255,0.5)" /> Graph force controls
                 </span>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
                   {[{ label: "Repulsion", val: chargeStrength, min: -800, max: -100, set: setChargeStrength, suffix: "" }, { label: "Link Distance", val: linkDistance, min: 50, max: 250, set: setLinkDistance, suffix: "px" }, { label: "Collision", val: collisionPadding, min: 0, max: 30, set: setCollisionPadding, suffix: "px" }].map(s => (
                     <div key={s.label} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9 }}>
-                        <span style={{ color: "rgba(233,241,248,0.35)" }}>{s.label}</span>
+                        <span style={{ color: "rgba(255, 255, 255, 0.5)" }}>{s.label}</span>
                         <span style={{ fontFamily: "var(--font-mono)", color: "#00e5ff", fontWeight: 700 }}>{s.val}{s.suffix}</span>
                       </div>
                       <input type="range" min={s.min} max={s.max} value={s.val} onChange={(e) => s.set(parseInt(e.target.value))} style={{ accentColor: "#00e5ff", cursor: "pointer", height: 3 }} />
@@ -1170,15 +1181,15 @@ function NetworkAnalysis() {
                   <div style={{ width: 60, height: 60, borderRadius: "50%", background: "rgba(225,112,85,0.1)", border: "1px solid rgba(225,112,85,0.2)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
                     <Network size={24} color="#e17055" />
                   </div>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--color-text)", marginBottom: 6 }}>Node Inspector</h3>
-                  <p style={{ fontSize: 12, color: "var(--color-text-muted)", maxWidth: 260, lineHeight: 1.7, margin: "0 0 24px" }}>Click any node in the graph to see behavioral intelligence and threat scoring for that contact.</p>
-                  <div style={{ width: "100%", borderTop: "1px solid var(--color-border)", paddingTop: 18, textAlign: "left" }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--color-text-subtle)", display: "block", marginBottom: 12 }}>Network Totals</span>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#ffffff", marginBottom: 6 }}>Node Inspector</h3>
+                  <p style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)", maxWidth: 260, lineHeight: 1.7, margin: "0 0 24px" }}>Click any node in the graph to see behavioral intelligence and threat scoring for that contact.</p>
+                  <div style={{ width: "100%", borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: 18, textAlign: "left" }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255, 255, 255, 0.5)", display: "block", marginBottom: 12 }}>Network Totals</span>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                      {[{ label: "Avg contacts/day", val: topContacts.length > 0 ? (topContacts.reduce((s,[,c])=>s+c,0)/topContacts.length).toFixed(1) : 0 }, { label: "Total nodes", val: `${totalContacts}` }].map(s => (
-                        <div key={s.label} style={{ background: "rgba(255,255,255,0.4)", border: "1px solid var(--color-border)", padding: 10, borderRadius: 10 }}>
-                          <div style={{ fontSize: 9, color: "var(--color-text-muted)", fontWeight: 700, textTransform: "uppercase" }}>{s.label}</div>
-                          <div style={{ fontSize: 18, fontWeight: 700, color: "var(--color-text)", marginTop: 2 }}>{s.val}</div>
+                      {[{ label: "Avg contacts/day", val: topContacts.length > 0 ? (topContacts.reduce((s, [, c]) => s + c, 0) / topContacts.length).toFixed(1) : 0 }, { label: "Total nodes", val: `${totalContacts}` }].map(s => (
+                        <div key={s.label} style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", padding: 10, borderRadius: 10 }}>
+                          <div style={{ fontSize: 9, color: "rgba(255, 255, 255, 0.6)", fontWeight: 700, textTransform: "uppercase" }}>{s.label}</div>
+                          <div style={{ fontSize: 18, fontWeight: 700, color: "#ffffff", marginTop: 2 }}>{s.val}</div>
                         </div>
                       ))}
                     </div>
@@ -1187,63 +1198,62 @@ function NetworkAnalysis() {
               ) : (
                 <motion.div key="inspector" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="glass-card"
                   style={{ padding: "24px", display: "flex", flexDirection: "column", minHeight: 400, flex: 1 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 16, borderBottom: "1px solid var(--color-border)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: 16, borderBottom: "1px solid rgba(255, 255, 255, 0.08)" }}>
                     <div>
-                      <span style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--color-text-subtle)", display: "block" }}>Intelligence Dossier</span>
-                      <h3 style={{ fontSize: 16, fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--color-text)", marginTop: 2, display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(255, 255, 255, 0.5)", display: "block" }}>Intelligence Dossier</span>
+                      <h3 style={{ fontSize: 16, fontFamily: "var(--font-mono)", fontWeight: 700, color: "#ffffff", marginTop: 2, display: "flex", alignItems: "center", gap: 6 }}>
                         <Phone size={13} color="var(--color-accent)" />{selectedNode.id}
                       </h3>
                     </div>
-                    <button onClick={() => setSelectedNode(null)} style={{ padding: 6, borderRadius: 8, border: "1px solid var(--color-border)", background: "rgba(255,255,255,0.6)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <button onClick={() => setSelectedNode(null)} style={{ padding: 6, borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(255, 255, 255, 0.05)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255, 255, 255, 0.7)" }}>
                       <X size={13} />
                     </button>
                   </div>
                   <div style={{ margin: "18px 0", display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
                     {selectedNode.isTarget
                       ? <span style={{ padding: "3px 10px", borderRadius: 99, fontSize: 9, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(225,112,85,0.1)", color: "#e17055", border: "1px solid rgba(225,112,85,0.3)" }}>Target Suspect SIM</span>
-                      : <span style={{ padding: "3px 10px", borderRadius: 99, fontSize: 9, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: selectedNode.level==="critical"?"rgba(255,107,74,0.08)":selectedNode.level==="suspicious"?"rgba(0,229,255,0.08)":"rgba(136,174,183,0.08)", color: selectedNode.level==="critical"?"#ff6b4a":selectedNode.level==="suspicious"?"#00e5ff":"#88aeb7", border: `1px solid ${selectedNode.level==="critical"?"#ff6b4a30":selectedNode.level==="suspicious"?"#00e5ff30":"#88aeb730"}` }}>{selectedNode.level} associate</span>
+                      : <span style={{ padding: "3px 10px", borderRadius: 99, fontSize: 9, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: selectedNode.level === "critical" ? "rgba(255,107,74,0.08)" : selectedNode.level === "suspicious" ? "rgba(0,229,255,0.08)" : "rgba(136,174,183,0.08)", color: selectedNode.level === "critical" ? "#ff6b4a" : selectedNode.level === "suspicious" ? "#00e5ff" : "#88aeb7", border: `1px solid ${selectedNode.level === "critical" ? "#ff6b4a30" : selectedNode.level === "suspicious" ? "#00e5ff30" : "#88aeb730"}` }}>{selectedNode.level} associate</span>
                     }
-                    {!selectedNode.isTarget && <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>Link weight: <strong style={{ color: "var(--color-text)" }}>{selectedNode.count} calls</strong></span>}
+                    {!selectedNode.isTarget && <span style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)" }}>Link weight: <strong style={{ color: "#ffffff" }}>{selectedNode.count} calls</strong></span>}
                   </div>
                   {nodeNarrative && (
-                    <div style={{ background: "rgba(255,255,255,0.3)", border: "1px solid var(--color-border)", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+                    <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
                       <div>
                         <h4 style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--color-accent)", display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
                           <ShieldAlert size={12} /> {nodeNarrative.role}
                         </h4>
-                        <p style={{ fontSize: 12, lineHeight: 1.65, color: "var(--color-text-muted)", margin: 0 }}>{nodeNarrative.description}</p>
+                        <p style={{ fontSize: 12, lineHeight: 1.65, color: "rgba(255, 255, 255, 0.6)", margin: 0 }}>{nodeNarrative.description}</p>
                       </div>
-                      <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-                        <h5 style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4, margin: 0, color: "var(--color-text)" }}>
+                      <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+                        <h5 style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4, margin: 0, color: "#ffffff" }}>
                           <CheckCircle size={11} color="var(--color-success)" /> Recommended Action
                         </h5>
-                        <p style={{ fontSize: 11, lineHeight: 1.65, color: "var(--color-text-subtle)", fontWeight: 500, margin: 0 }}>{nodeNarrative.recommendation}</p>
+                        <p style={{ fontSize: 11, lineHeight: 1.65, color: "rgba(255, 255, 255, 0.5)", fontWeight: 500, margin: 0 }}>{nodeNarrative.recommendation}</p>
                       </div>
                     </div>
                   )}
 
                   {/* OSINT and Holehe footprint scan */}
                   <div style={{ marginTop: 14 }}>
-                    <OsintSection 
-                      phone={selectedNode.id} 
-                      scanState={osintScans?.[selectedNode.id]} 
-                      onTriggerScan={triggerOsintScan} 
-                      onExportMisp={(phone, data) => setMispModalTarget({ phone, data })} 
-                      theme="light" 
+                    <OsintSection
+                      phone={selectedNode.id}
+                      scanState={osintScans?.[selectedNode.id]}
+                      onTriggerScan={triggerOsintScan}
+                      onExportMisp={(phone, data) => setMispModalTarget({ phone, data })}
                     />
                   </div>
 
                   {!selectedNode.isTarget && (
                     <div style={{ marginTop: 20, flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-                      <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                      <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                          <div style={{ background: "rgba(255,255,255,0.3)", border: "1px solid var(--color-border)", padding: 10, borderRadius: 10 }}>
-                            <span style={{ fontSize: 9, color: "var(--color-text-subtle)", fontWeight: 700, textTransform: "uppercase", display: "block" }}>Rank</span>
-                            <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text)", marginTop: 2, display: "block" }}>#{topContacts.findIndex(([n])=>n===selectedNode.id)+1} of {totalContacts}</span>
+                          <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", padding: 10, borderRadius: 10 }}>
+                            <span style={{ fontSize: 9, color: "rgba(255, 255, 255, 0.5)", fontWeight: 700, textTransform: "uppercase", display: "block" }}>Rank</span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: "#ffffff", marginTop: 2, display: "block" }}>#{topContacts.findIndex(([n]) => n === selectedNode.id) + 1} of {totalContacts}</span>
                           </div>
-                          <div style={{ background: "rgba(255,255,255,0.3)", border: "1px solid var(--color-border)", padding: 10, borderRadius: 10 }}>
-                            <span style={{ fontSize: 9, color: "var(--color-text-subtle)", fontWeight: 700, textTransform: "uppercase", display: "block" }}>Activity Share</span>
-                            <span style={{ fontSize: 14, fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--color-accent)", marginTop: 2, display: "block" }}>{((selectedNode.count/records.length)*100).toFixed(1)}%</span>
+                          <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", padding: 10, borderRadius: 10 }}>
+                            <span style={{ fontSize: 9, color: "rgba(255, 255, 255, 0.5)", fontWeight: 700, textTransform: "uppercase", display: "block" }}>Activity Share</span>
+                            <span style={{ fontSize: 14, fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--color-accent)", marginTop: 2, display: "block" }}>{((selectedNode.count / records.length) * 100).toFixed(1)}%</span>
                           </div>
                         </div>
                         <button onClick={() => setDeepAnalysisTarget(selectedNode.id)}
@@ -1262,8 +1272,8 @@ function NetworkAnalysis() {
         {/* ══════════════════════════════════════════════════════
             HOUR-OF-DAY ACTIVITY HEATMAP
         ══════════════════════════════════════════════════════ */}
-        <motion.div variants={fadeUp} className="glass-card" style={{ padding: "20px 24px", background: "#082229" }}>
-          <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(233,241,248,0.5)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
+        <motion.div variants={fadeUp} className="glass-card" style={{ padding: "20px 24px", background: "rgba(14, 22, 38, 0.72)" }}>
+          <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255, 255, 255, 0.6)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
             <Clock size={13} color="#00e5ff" /> When Does This Suspect Make Calls? — Hour by Day Heatmap
           </h3>
           <p style={{ fontSize: 11, color: "rgba(233,241,248,0.3)", marginBottom: 18, marginTop: 0 }}>
@@ -1273,7 +1283,7 @@ function NetworkAnalysis() {
             {/* Hour labels */}
             <div style={{ display: "flex", marginBottom: 4, paddingLeft: 72 }}>
               {Array.from({ length: 24 }, (_, h) => (
-                <div key={h} style={{ flex: 1, minWidth: 22, textAlign: "center", fontSize: 8, fontWeight: 700, color: "rgba(233,241,248,0.25)", fontFamily: "monospace" }}>
+                <div key={h} style={{ flex: 1, minWidth: 22, textAlign: "center", fontSize: 8, fontWeight: 700, color: "rgba(255, 255, 255, 0.4)", fontFamily: "monospace" }}>
                   {h === 0 ? "12a" : h === 6 ? "6a" : h === 12 ? "12p" : h === 18 ? "6p" : h === 23 ? "11p" : ""}
                 </div>
               ))}
@@ -1285,14 +1295,14 @@ function NetworkAnalysis() {
               const dateTooltip = dates.length > 0 ? `Activity Dates: ${dates.join(", ")}` : "";
               return (
                 <div key={dayIdx} style={{ display: "flex", alignItems: "center", marginBottom: 3 }}>
-                  <div 
+                  <div
                     title={dateTooltip}
-                    style={{ width: 68, fontSize: 9, fontWeight: 700, color: "rgba(233,241,248,0.35)", textAlign: "right", paddingRight: 8, flexShrink: 0, cursor: dates.length > 0 ? "help" : "default" }}
+                    style={{ width: 68, fontSize: 9, fontWeight: 700, color: "rgba(255, 255, 255, 0.5)", paddingRight: 8, flexShrink: 0, cursor: dates.length > 0 ? "help" : "default" }}
                   >
                     {dateLabel}
                   </div>
                   {row.map((count, hour) => {
-                    const cellTooltip = `${DAYS[dayIdx]} ${dates.length > 0 ? `(${dates.join(", ")})` : ""} ${String(hour).padStart(2,"0")}:00 — ${count} events`;
+                    const cellTooltip = `${DAYS[dayIdx]} ${dates.length > 0 ? `(${dates.join(", ")})` : ""} ${String(hour).padStart(2, "0")}:00 — ${count} events`;
                     return (
                       <div key={hour}
                         onMouseEnter={() => setHeatHovered({ day: dayIdx, hour, count })}
@@ -1316,18 +1326,18 @@ function NetworkAnalysis() {
           </div>
           {/* Legend */}
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, justifyContent: "flex-end" }}>
-            <span style={{ fontSize: 9, color: "rgba(233,241,248,0.3)" }}>Less</span>
+            <span style={{ fontSize: 9, color: "rgba(255, 255, 255, 0.4)" }}>Less</span>
             {["rgba(255,255,255,0.04)", "rgba(0,229,255,0.35)", "#fdcb6e", "#e17055", "#d63031"].map((c, i) => (
               <div key={i} style={{ width: 14, height: 14, borderRadius: 3, background: c }} />
             ))}
-            <span style={{ fontSize: 9, color: "rgba(233,241,248,0.3)" }}>More</span>
+            <span style={{ fontSize: 9, color: "rgba(255, 255, 255, 0.4)" }}>More</span>
             <span style={{ fontSize: 9, color: "rgba(214,48,49,0.6)", marginLeft: 10 }}>Red-bordered = night hours (10pm–5am)</span>
           </div>
           {heatHovered && heatHovered.count > 0 && (
-            <div style={{ marginTop: 8, textAlign: "center", fontSize: 11, color: "rgba(233,241,248,0.5)" }}>
+            <div style={{ marginTop: 8, textAlign: "center", fontSize: 11, color: "rgba(255, 255, 255, 0.6)" }}>
               <strong style={{ color: "#00e5ff" }}>
                 {DAYS[heatHovered.day]}
-                {dayDatesMap[heatHovered.day].length > 0 ? ` (${dayDatesMap[heatHovered.day].join(", ")})` : ""} at {String(heatHovered.hour).padStart(2,"0")}:00
+                {dayDatesMap[heatHovered.day].length > 0 ? ` (${dayDatesMap[heatHovered.day].join(", ")})` : ""} at {String(heatHovered.hour).padStart(2, "0")}:00
               </strong> — {heatHovered.count} call events
             </div>
           )}
@@ -1337,7 +1347,7 @@ function NetworkAnalysis() {
             CONNECTION TABLE
         ══════════════════════════════════════════════════════ */}
         <motion.div variants={fadeUp} className="glass-card" style={{ padding: "22px 24px" }}>
-          <h2 style={{ marginBottom: 20, fontSize: 15, fontWeight: 700, color: "var(--color-text)", display: "flex", alignItems: "center", gap: 8 }}>
+          <h2 style={{ marginBottom: 20, fontSize: 15, fontWeight: 700, color: "#ffffff", display: "flex", alignItems: "center", gap: 8 }}>
             <Users size={15} color="#3a7ca5" /> All Contacts — Ranked by Interaction Count
           </h2>
           <div style={{ overflowX: "auto" }}>
@@ -1358,19 +1368,19 @@ function NetworkAnalysis() {
                   const isSelected = selectedNode?.id === contact;
                   const c = count >= 30 ? "#ff6b4a" : count >= 15 ? "#00e5ff" : "#2d8fa5";
                   const label = count >= 30 ? "High Risk" : count >= 15 ? "Suspicious" : "Normal";
-                  const nodeObj = { id: contact, count, level: count >= 30 ? "critical" : count >= 15 ? "suspicious" : "nominal", val: 6 + (count/strongestCount)*16 };
+                  const nodeObj = { id: contact, count, level: count >= 30 ? "critical" : count >= 15 ? "suspicious" : "nominal", val: 6 + (count / strongestCount) * 16 };
                   return (
                     <tr key={idx} style={{ cursor: "pointer", background: isSelected ? "rgba(225,112,85,0.06)" : "transparent", transition: "background 0.15s" }} onClick={() => setSelectedNode(nodeObj)}>
-                      <td style={{ color: "var(--color-text-subtle)", fontFamily: "var(--font-mono)", fontSize: 11 }}>{String(idx+1).padStart(2,"0")}</td>
-                      <td style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: "var(--color-text)" }}>{contact}</td>
+                      <td style={{ color: "rgba(255, 255, 255, 0.5)", fontFamily: "var(--font-mono)", fontSize: 11 }}>{String(idx + 1).padStart(2, "0")}</td>
+                      <td style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: "#ffffff" }}>{contact}</td>
                       <td style={{ fontWeight: 700, fontFamily: "var(--font-mono)", color: c }}>{count}</td>
                       <td>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <div style={{ height: 5, flex: 1, overflow: "hidden", borderRadius: 99, background: "rgba(0,0,0,0.07)" }}>
+                          <div style={{ height: 5, flex: 1, overflow: "hidden", borderRadius: 99, background: "rgba(255, 255, 255, 0.08)" }}>
                             <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.6, delay: idx * 0.03 }}
                               style={{ height: "100%", borderRadius: 99, background: c }} />
                           </div>
-                          <span style={{ minWidth: 30, textAlign: "right", fontSize: 10, fontWeight: 600, color: "var(--color-text-subtle)" }}>{pct.toFixed(0)}%</span>
+                          <span style={{ minWidth: 30, textAlign: "right", fontSize: 10, fontWeight: 600, color: "rgba(255, 255, 255, 0.5)" }}>{pct.toFixed(0)}%</span>
                         </div>
                       </td>
                       <td>
@@ -1378,7 +1388,7 @@ function NetworkAnalysis() {
                       </td>
                       <td>
                         <div style={{ display: "flex", gap: 8 }}>
-                          <button onClick={(e) => { e.stopPropagation(); setSelectedNode(nodeObj); }} style={{ fontSize: 10, fontWeight: 700, color: "var(--color-accent)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>Inspect <ChevronRight size={10} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setSelectedNode(nodeObj); }} style={{ fontSize: 10, fontWeight: 700, color: "#00e5ff", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}>Inspect <ChevronRight size={10} /></button>
                           <button onClick={(e) => { e.stopPropagation(); setDeepAnalysisTarget(contact); }} style={{ fontSize: 10, fontWeight: 700, color: "#e17055", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 3 }}><Zap size={10} /> Analyze</button>
                         </div>
                       </td>
@@ -1395,9 +1405,9 @@ function NetworkAnalysis() {
       {/* Deep Analysis Drawer */}
       <AnimatePresence>
         {deepAnalysisTarget && associateIntel && (
-          <AssociateDrawer 
-            intel={associateIntel} 
-            onClose={() => setDeepAnalysisTarget(null)} 
+          <AssociateDrawer
+            intel={associateIntel}
+            onClose={() => setDeepAnalysisTarget(null)}
             osintScans={osintScans}
             triggerOsintScan={triggerOsintScan}
             onExportMisp={(phone, data) => setMispModalTarget({ phone, data })}
@@ -1407,10 +1417,10 @@ function NetworkAnalysis() {
 
       {/* MISP STIX Export Modal */}
       {mispModalTarget && (
-        <MispExportModal 
-          phone={mispModalTarget.phone} 
-          osintData={mispModalTarget.data} 
-          onClose={() => setMispModalTarget(null)} 
+        <MispExportModal
+          phone={mispModalTarget.phone}
+          osintData={mispModalTarget.data}
+          onClose={() => setMispModalTarget(null)}
         />
       )}
     </motion.div>
