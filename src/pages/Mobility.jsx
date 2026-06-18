@@ -64,7 +64,7 @@ function MapStyleSelector({ mapStyle, setMapStyle }) {
             border: "none",
             cursor: "pointer",
             transition: "all 0.15s ease",
-            background: mapStyle === s.id ? "#00b894" : "transparent",
+            background: mapStyle === s.id ? "var(--primary)" : "transparent",
             color: mapStyle === s.id ? "#fff" : "#475569",
           }}
         >
@@ -226,11 +226,11 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
         className="glass-card"
         style={{ flex: "1 1 38%", minWidth: 320, maxWidth: 420, padding: 24, display: "flex", flexDirection: "column", height: 720 }}
       >
-        <h2 style={{ margin: 0, marginBottom: 8, display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 700, color: "var(--color-text)" }}>
-          <Activity size={18} color="#00e5ff" />
-          Cell Transition Hops
+        <h2 style={{ margin: 0, marginBottom: 8, display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 700, color: "#ffffff" }}>
+          <Clock size={16} color="var(--primary)" />
+          Chronological Location Timeline
         </h2>
-        <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginBottom: 16, marginTop: 0 }}>
+        <p style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.6)", marginBottom: 16, marginTop: 0 }}>
           Click a hop below to pan the map. Last 15 movements shown chronologically.
         </p>
         <div style={{ flex: 1, overflowY: "auto", paddingRight: 8, paddingTop: 4 }}>
@@ -254,7 +254,7 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
                 }}
               >
                 {idx !== timelineHops.length - 1 && (
-                  <div style={{ position: "absolute", left: 27, top: 42, bottom: -14, width: 1, background: "rgba(0,184,148,0.2)" }} />
+                  <div style={{ position: "absolute", left: 27, top: 42, bottom: -14, width: 1, background: "var(--primary-transparent-18)" }} />
                 )}
                 <div style={{
                   zIndex: 1,
@@ -268,9 +268,9 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
                   fontSize: 9,
                   fontWeight: 700,
                   fontFamily: "monospace",
-                  background: isSelected ? "#e17055" : "rgba(0,184,148,0.15)",
-                  color: isSelected ? "#fff" : "#00b894",
-                  border: `2px solid ${isSelected ? "#e17055" : "rgba(0,184,148,0.4)"}`,
+                  background: isSelected ? "#e17055" : "var(--primary-transparent-8)",
+                  color: isSelected ? "#fff" : "var(--primary)",
+                  border: `2px solid ${isSelected ? "#e17055" : "var(--primary-transparent-30)"}`,
                   boxShadow: isSelected ? "0 0 10px rgba(225,112,85,0.3)" : "none",
                 }}>
                   {hop.seqNumber}
@@ -286,7 +286,7 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
                       </span>
                     )}
                   </div>
-                  <div style={{ marginTop: 4, fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "var(--color-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <div style={{ marginTop: 4, fontFamily: "monospace", fontSize: 12, fontWeight: 700, color: "#ffffff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     CGI: {hop.cgi}
                   </div>
                   <div style={{ marginTop: 6, fontSize: 10, color: "var(--color-text-subtle)", display: "flex", justifyContent: "space-between" }}>
@@ -307,7 +307,7 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
         <div className="glass-card" style={{ overflow: "hidden", borderRadius: 16 }}>
           {/* Header */}
           <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <h2 style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 700, color: "var(--color-text)" }}>
+            <h2 style={{ margin: 0, display: "flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 700, color: "#ffffff" }}>
               <MapPin size={16} color="#e17055" />
               Georeferencing Path Overlay
             </h2>
@@ -338,15 +338,15 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
                 onClick={() => { if (fenceClosed) { handleClearFence(); } else { setDrawingFence((p) => !p); } }}
                 style={{
                   padding: "4px 12px", borderRadius: 7, fontSize: 10, fontWeight: 700, border: "none", cursor: "pointer",
-                  background: drawingFence ? "rgba(249,202,36,0.2)" : "rgba(0,184,148,0.12)",
-                  color: drawingFence ? "#f9ca24" : "#00b894",
+                  background: drawingFence ? "rgba(249,202,36,0.2)" : "var(--primary-transparent-8)",
+                  color: drawingFence ? "#f9ca24" : "var(--primary)",
                   outline: drawingFence ? "1px solid #f9ca24" : "none",
                 }}
               >
                 {drawingFence ? "Drawing…" : "Draw Geo-fence"}
               </button>
               {activeHop && (
-                <span style={{ fontSize: 10, fontFamily: "monospace", fontWeight: 700, color: "#00b894" }}>
+                <span style={{ fontSize: 10, fontFamily: "monospace", fontWeight: 700, color: "var(--primary)" }}>
                   Active: Hop #{activeHop.seqNumber}
                 </span>
               )}
@@ -370,7 +370,7 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
               <MapContainer center={defaultCenter} zoom={13} scrollWheelZoom style={{ height: "100%", width: "100%" }}>
                 <TileLayer url={getTileUrl(mapStyle)} attribution="" />
                 {polylinePath.length > 1 && (
-                  <Polyline positions={polylinePath} pathOptions={{ color: "#00b894", weight: 3, opacity: 0.6 }} />
+                  <Polyline positions={polylinePath} pathOptions={{ color: "#3a7ca5", weight: 3, opacity: 0.6 }} />
                 )}
                 {parsedHops.map((hop, idx) => {
                   const isSelected = activeHop && activeHop.seqNumber === hop.seqNumber;
@@ -412,16 +412,16 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
             style={{ padding: 20 }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ background: fenceResults.length > 0 ? "rgba(214,48,49,0.1)" : "rgba(0,184,148,0.1)", borderRadius: 8, padding: "4px 10px" }}>
-                <span style={{ fontSize: 20, fontWeight: 800, color: fenceResults.length > 0 ? "#d63031" : "#00b894" }}>
+              <div style={{ background: fenceResults.length > 0 ? "rgba(214,48,49,0.1)" : "var(--primary-transparent-8)", borderRadius: 8, padding: "4px 10px" }}>
+                <span style={{ fontSize: 20, fontWeight: 800, color: fenceResults.length > 0 ? "#d63031" : "var(--primary)" }}>
                   {fenceResults.length}
                 </span>
               </div>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#ffffff" }}>
                   event{fenceResults.length !== 1 ? "s" : ""} inside geo-fence
                 </div>
-                <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>
+                <div style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.6)" }}>
                   {fenceResults.length === 0 ? "No CDR activity detected within the drawn perimeter." : "CDR events detected within the drawn geo-fence perimeter."}
                 </div>
               </div>
@@ -432,7 +432,7 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
                   <thead>
                     <tr style={{ background: "rgba(0,0,0,0.04)" }}>
                       {["Date", "Time", "CGI", "Type", "Service"].map((h) => (
-                        <th key={h} style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "var(--color-text-muted)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
+                        <th key={h} style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "rgba(255, 255, 255, 0.6)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -440,8 +440,8 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
                     {fenceResults.slice(0, 30).map((row, i) => (
                       <tr key={i} style={{ borderTop: "1px solid var(--color-border-subtle)" }}>
                         <td style={{ padding: "5px 10px", color: "var(--color-text-subtle)" }}>{row[6] || "—"}</td>
-                        <td style={{ padding: "5px 10px", fontFamily: "monospace", color: "var(--color-text)" }}>{row[7] || "—"}</td>
-                        <td style={{ padding: "5px 10px", fontFamily: "monospace", fontSize: 10, color: "#00b894" }}>{row[10] || "—"}</td>
+                        <td style={{ padding: "5px 10px", fontFamily: "monospace", color: "#ffffff" }}>{row[7] || "—"}</td>
+                        <td style={{ padding: "5px 10px", fontFamily: "monospace", fontSize: 10, color: "var(--primary)" }}>{row[10] || "—"}</td>
                         <td style={{ padding: "5px 10px", color: "var(--color-text-subtle)" }}>{row[1] || "—"}</td>
                         <td style={{ padding: "5px 10px", color: "var(--color-text-subtle)" }}>{row[14] || "—"}</td>
                       </tr>
@@ -449,7 +449,7 @@ function PathTracker({ parsedHops, timelineHops, polylinePath, defaultCenter, ma
                   </tbody>
                 </table>
                 {fenceResults.length > 30 && (
-                  <div style={{ fontSize: 10, color: "var(--color-text-muted)", padding: "8px 10px" }}>
+                  <div style={{ fontSize: 10, color: "rgba(255, 255, 255, 0.6)", padding: "8px 10px" }}>
                     … and {fenceResults.length - 30} more events not shown.
                   </div>
                 )}
@@ -498,7 +498,7 @@ function DwellHeatmap({ records, mapStyle, setMapStyle }) {
       <div className="glass-card" style={{ overflow: "hidden", borderRadius: 16 }}>
         <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-border)", display: "flex", alignItems: "center", gap: 8 }}>
           <Thermometer size={16} color="#e17055" />
-          <span style={{ fontSize: 15, fontWeight: 700, color: "var(--color-text)" }}>Dwell Heatmap — Location Frequency Overlay</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#ffffff" }}>Dwell Heatmap — Location Frequency Overlay</span>
         </div>
         <div style={{ height: 460, position: "relative" }}>
           <MapStyleSelector mapStyle={mapStyle} setMapStyle={setMapStyle} />
@@ -558,10 +558,10 @@ function DwellHeatmap({ records, mapStyle, setMapStyle }) {
               <Info size={18} color="#e17055" />
             </div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)", marginBottom: 4 }}>Analyst Interpretation</div>
-              <p style={{ fontSize: 12, color: "var(--color-text-muted)", margin: 0, lineHeight: 1.65 }}>
-                Your most visited location had <strong style={{ color: "var(--color-text)" }}>{maxCount} events</strong> — this is likely a home base or operational zone.
-                The suspect spent an estimated <strong style={{ color: "var(--color-text)" }}>~{estimatedDwell(maxCount)} hours</strong> at this location based on call frequency patterns.
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#ffffff", marginBottom: 4 }}>Analyst Interpretation</div>
+              <p style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.7)", margin: 0, lineHeight: 1.65 }}>
+                Your most visited location had <strong style={{ color: "#ffffff" }}>{maxCount} events</strong> — this is likely a home base or operational zone.
+                The suspect spent an estimated <strong style={{ color: "#ffffff" }}>~{estimatedDwell(maxCount)} hours</strong> at this location based on call frequency patterns.
                 {locationData.length > 1 && ` A total of ${locationData.length} unique geographic positions were logged across all CDR records.`}
               </p>
             </div>
@@ -653,7 +653,7 @@ function VelocityAlerts({ records }) {
         {miniCards.map((c, i) => (
           <div key={i} className="glass-card" style={{ padding: "18px 20px", borderLeft: `3px solid ${c.color}` }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: c.color, fontFamily: "monospace" }}>{c.value}</div>
-            <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 4, fontWeight: 600 }}>{c.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.6)", marginTop: 4, fontWeight: 600 }}>{c.label}</div>
           </div>
         ))}
       </div>
@@ -662,8 +662,8 @@ function VelocityAlerts({ records }) {
       {alerts.length === 0 ? (
         <div className="glass-card" style={{ padding: 32, display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
           <CheckCircle size={32} color="#00b894" />
-          <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text)" }}>No Velocity Anomalies Detected</span>
-          <span style={{ fontSize: 12, color: "var(--color-text-muted)", textAlign: "center", maxWidth: 400 }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: "#ffffff" }}>No Velocity Anomalies Detected</span>
+          <span style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.6)", textAlign: "center", maxWidth: 400 }}>
             All consecutive location transitions fall within physically plausible travel speeds. No device cloning indicators found.
           </span>
         </div>
@@ -690,10 +690,10 @@ function VelocityAlerts({ records }) {
                   <div style={{ fontSize: 11, fontWeight: 700, color: alert.color, marginTop: 6 }}>{alert.label}</div>
                 </div>
                 <div style={{ flex: 1, minWidth: 240 }}>
-                  <div style={{ fontSize: 11, color: "var(--color-text-subtle)", fontFamily: "monospace", marginBottom: 4 }}>
-                    FROM <span style={{ color: "var(--color-text)", fontWeight: 700 }}>{alert.fromCgi}</span>
+                  <div style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.5)", fontFamily: "monospace", marginBottom: 4 }}>
+                    FROM <span style={{ color: "#ffffff", fontWeight: 700 }}>{alert.fromCgi}</span>
                     {" → "}
-                    TO <span style={{ color: "var(--color-text)", fontWeight: 700 }}>{alert.toCgi}</span>
+                    TO <span style={{ color: "#ffffff", fontWeight: 700 }}>{alert.toCgi}</span>
                   </div>
                   <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
                     {[
@@ -702,13 +702,13 @@ function VelocityAlerts({ records }) {
                       { label: "Speed", val: `${alert.speed} km/h`, highlight: true },
                     ].map((d) => (
                       <div key={d.label}>
-                        <div style={{ fontSize: 9, color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700 }}>{d.label}</div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: d.highlight ? alert.color : "var(--color-text)", fontFamily: "monospace" }}>{d.val}</div>
+                        <div style={{ fontSize: 9, color: "rgba(255, 255, 255, 0.5)", textTransform: "uppercase", fontWeight: 700 }}>{d.label}</div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: d.highlight ? alert.color : "#ffffff", fontFamily: "monospace" }}>{d.val}</div>
                       </div>
                     ))}
                   </div>
-                  <div style={{ marginTop: 8, fontSize: 10, color: "var(--color-text-subtle)" }}>
-                    {alert.fromTime} <span style={{ color: "var(--color-text-muted)" }}>→</span> {alert.toTime}
+                  <div style={{ marginTop: 8, fontSize: 10, color: "rgba(255, 255, 255, 0.5)" }}>
+                    {alert.fromTime} <span style={{ color: "rgba(255, 255, 255, 0.5)" }}>→</span> {alert.toTime}
                   </div>
                 </div>
               </div>
@@ -724,8 +724,8 @@ function VelocityAlerts({ records }) {
             <Info size={18} color="#2563eb" />
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)", marginBottom: 4 }}>How Velocity Analysis Works</div>
-            <p style={{ fontSize: 12, color: "var(--color-text-muted)", margin: 0, lineHeight: 1.7 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#ffffff", marginBottom: 4 }}>How Velocity Analysis Works</div>
+            <p style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.7)", margin: 0, lineHeight: 1.7 }}>
               If two towers are 500 km apart but the same SIM was used within 5 minutes, that means the physical SIM cannot have moved at that speed.
               This is a strong indicator of <strong style={{ color: "#d63031" }}>device cloning</strong> or{" "}
               <strong style={{ color: "#e17055" }}>SIM sharing across multiple handsets</strong>. Speeds above 1,000 km/h are physically impossible
@@ -782,7 +782,7 @@ function TimeClusters({ records, mapStyle, setMapStyle }) {
       <div className="glass-card" style={{ overflow: "hidden", borderRadius: 16 }}>
         <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-border)", display: "flex", alignItems: "center", gap: 8 }}>
           <Timer size={16} color="#3a7ca5" />
-          <span style={{ fontSize: 15, fontWeight: 700, color: "var(--color-text)" }}>Time-of-Day Activity Clusters</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#ffffff" }}>Time-of-Day Activity Clusters</span>
         </div>
         <div style={{ height: 460, position: "relative" }}>
           <MapStyleSelector mapStyle={mapStyle} setMapStyle={setMapStyle} />
@@ -838,11 +838,11 @@ function TimeClusters({ records, mapStyle, setMapStyle }) {
             <div key={p.label} className="glass-card" style={{ padding: "16px 18px", borderLeft: `3px solid ${p.color}` }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <div style={{ width: 10, height: 10, borderRadius: "50%", background: p.color }} />
-                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text)" }}>{p.label}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#ffffff" }}>{p.label}</span>
               </div>
-              <div style={{ fontSize: 9, color: "var(--color-text-muted)", marginBottom: 6, fontWeight: 600 }}>{p.range}</div>
+              <div style={{ fontSize: 9, color: "rgba(255, 255, 255, 0.6)", marginBottom: 6, fontWeight: 600 }}>{p.range}</div>
               <div style={{ fontSize: 26, fontWeight: 800, color: p.color, fontFamily: "monospace" }}>{count}</div>
-              <div style={{ fontSize: 10, color: "var(--color-text-muted)", marginTop: 2 }}>events · <strong style={{ color: p.color }}>{pct}%</strong> of total</div>
+              <div style={{ fontSize: 10, color: "rgba(255, 255, 255, 0.6)", marginTop: 2 }}>events · <strong style={{ color: p.color }}>{pct}%</strong> of total</div>
               {/* Bar */}
               <div style={{ marginTop: 10, height: 3, borderRadius: 2, background: "rgba(0,0,0,0.07)" }}>
                 <div style={{ height: "100%", borderRadius: 2, background: p.color, width: `${pct}%`, transition: "width 0.5s ease" }} />
@@ -859,8 +859,8 @@ function TimeClusters({ records, mapStyle, setMapStyle }) {
             <AlertTriangle size={18} color="#3a7ca5" />
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text)", marginBottom: 4 }}>Analyst Verdict</div>
-            <p style={{ fontSize: 12, color: "var(--color-text-muted)", margin: 0, lineHeight: 1.7 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#ffffff", marginBottom: 4 }}>Analyst Verdict</div>
+            <p style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.7)", margin: 0, lineHeight: 1.7 }}>
               {nightPct > 30 ? (
                 <>
                   <strong style={{ color: "#d63031" }}>Over {nightPct}% of activity happens at night</strong> — unusual for a normal user and consistent with criminal operation patterns.
@@ -935,9 +935,9 @@ function Mobility() {
   }, [parsedHops]);
 
   const kpis = [
-    { icon: Radio, label: "Unique Towers", value: uniqueTowers, color: "#00b894" },
+    { icon: Radio, label: "Unique Towers", value: uniqueTowers, color: "var(--primary)" },
     { icon: Globe, label: "Primary Cell Tower", value: mostUsedTower, isMonospace: true, color: "#e17055" },
-    { icon: Clock, label: "Last Logged Activity", value: lastActivity, color: "#00b894" },
+    { icon: Clock, label: "Last Logged Activity", value: lastActivity, color: "var(--primary)" },
   ];
 
   const TABS = [
@@ -956,16 +956,16 @@ function Mobility() {
     >
       {/* Header */}
       <motion.div variants={fadeUp} style={{ marginBottom: 0 }}>
-        <h1 style={{ margin: 0, marginBottom: 4, fontSize: 28, fontWeight: 800, color: "var(--color-text)" }}>
+        <h1 style={{ margin: 0, marginBottom: 4, fontSize: 28, fontWeight: 800, color: "#ffffff" }}>
           Mobility Tracker &amp; Georeferencing
         </h1>
-        <p style={{ margin: 0, fontSize: 13, color: "var(--color-text-muted)" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(255, 255, 255, 0.6)" }}>
           Chronological spatial mapping, dwell analysis, velocity forensics, and time-pattern clustering from cellular CDR.
         </p>
       </motion.div>
 
       {records.length === 0 ? (
-        <div className="glass-card" style={{ padding: 40, textAlign: "center", color: "var(--color-text-muted)", fontSize: 13 }}>
+        <div className="glass-card" style={{ padding: 40, textAlign: "center", color: "rgba(255, 255, 255, 0.6)", fontSize: 13 }}>
           No records loaded. Please upload a dataset in the Ingestion Center to trace cellular mobility.
         </div>
       ) : (
@@ -985,13 +985,13 @@ function Mobility() {
                 <div style={{
                   width: 44, height: 44, borderRadius: 12, flexShrink: 0,
                   background: "var(--primary-transparent-18)",
-                  border: "1px solid rgba(0,184,148,0.25)",
+                  border: "1px solid var(--primary-transparent-30)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
                   <kpi.icon size={20} color={kpi.color} strokeWidth={2.2} />
                 </div>
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-muted)" }}>{kpi.label}</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255, 255, 255, 0.6)" }}>{kpi.label}</div>
                   <div style={{
                     marginTop: 2,
                     fontFamily: kpi.isMonospace ? "monospace" : undefined,
@@ -1034,9 +1034,9 @@ function Mobility() {
                       cursor: "pointer",
                       display: "flex", alignItems: "center", gap: 7,
                       transition: "all 0.18s ease",
-                      background: active ? "#00b894" : "transparent",
+                      background: active ? "var(--primary)" : "transparent",
                       color: active ? "#fff" : "rgba(255, 255, 255, 0.6)",
-                      boxShadow: active ? "0 2px 10px rgba(0,184,148,0.3)" : "none",
+                      boxShadow: active ? "0 2px 10px var(--primary-transparent-30)" : "none",
                     }}
                   >
                     <Icon size={13} />
