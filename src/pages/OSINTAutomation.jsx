@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { API_BASE } from "../config";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Cpu, ShieldAlert, Phone, Activity, Wifi, Globe, RefreshCw,
@@ -74,7 +75,7 @@ export default function OSINTAutomation() {
   const checkMispStatus = useCallback(async () => {
     setMispStatus({ status: "checking", version: "", url: "" });
     try {
-      const res = await fetch("http://localhost:8000/api/misp/status");
+      const res = await fetch(`${API_BASE}/api/misp/status`);
       if (res.ok) {
         const data = await res.json();
         setMispStatus(data);
@@ -90,7 +91,7 @@ export default function OSINTAutomation() {
   const checkWassengerStatus = useCallback(async () => {
     setWassengerStatus({ status: "checking", message: "" });
     try {
-      const res = await fetch("http://localhost:8000/api/wassenger/status");
+      const res = await fetch(`${API_BASE}/api/wassenger/status`);
       if (res.ok) {
         const data = await res.json();
         setWassengerStatus(data);
@@ -143,7 +144,7 @@ export default function OSINTAutomation() {
     setMispMessage("");
     setMispError("");
     try {
-      const res = await fetch("http://localhost:8000/api/misp/export", {
+      const res = await fetch(`${API_BASE}/api/misp/export`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: scanState.data.phone, stix: stixPayload })
@@ -176,7 +177,7 @@ export default function OSINTAutomation() {
     setMispError("");
 
     try {
-      const eventSource = new EventSource(`http://localhost:8000/api/osint/scan-stream?target=${encodeURIComponent(cleanPhone)}&auto_splunk=${autoSplunk}&auto_slack=${notifyWebhooks}`);
+      const eventSource = new EventSource(`${API_BASE}/api/osint/scan-stream?target=${encodeURIComponent(cleanPhone)}&auto_splunk=${autoSplunk}&auto_slack=${notifyWebhooks}`);
 
       eventSource.onmessage = (event) => {
         const line = event.data;
@@ -237,7 +238,7 @@ export default function OSINTAutomation() {
   const handleAutoMispExport = async (resultData) => {
     const payload = getSTIXPayload(resultData.phone, resultData);
     try {
-      const res = await fetch("http://localhost:8000/api/misp/export", {
+      const res = await fetch(`${API_BASE}/api/misp/export`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: resultData.phone, stix: payload })

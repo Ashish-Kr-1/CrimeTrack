@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FCSA - AI & Predictive Analytics Forensics Guide</title>
+  
+  <!-- Google Fonts for Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ─── DESIGN SYSTEM TOKENS ─── */
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --primary-dark: #0f172a;
+      --text: #334155;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* ─── GENERAL STYLES ─── */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      color: var(--text);
+      background-color: var(--bg);
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 50px;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+      position: relative;
+    }
+
+    /* ─── ACTION BAR (HIDDEN IN PRINT) ─── */
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+      max-width: 850px;
+      margin: 0 auto 20px;
+      gap: 12px;
+    }
+
+    .btn {
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    /* ─── HEADER SECTION ─── */
+    header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 30px;
+      margin-bottom: 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .header-text h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .header-text p {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--primary-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .metadata {
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .metadata div {
+      margin-bottom: 4px;
+    }
+
+    /* ─── SECTIONS ─── */
+    section {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 12px;
+      margin-top: 20px;
+    }
+
+    p {
+      margin-bottom: 15px;
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ─── LIST ITEMS ─── */
+    ul {
+      list-style-type: none;
+      margin-bottom: 20px;
+    }
+
+    li {
+      margin-bottom: 18px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    li::before {
+      content: "•";
+      color: var(--primary-light);
+      font-weight: bold;
+      font-size: 18px;
+      position: absolute;
+      left: 0;
+      top: -2px;
+    }
+
+    strong {
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+
+    /* ─── PRINT CSS OVERRIDES ─── */
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+      }
+      .container {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .action-bar {
+        display: none;
+      }
+      a {
+        text-decoration: none;
+        color: var(--text-dark);
+      }
+      
+      header {
+        padding-top: 2cm;
+        padding-left: 2cm;
+        padding-right: 2cm;
+      }
+      section {
+        page-break-before: always;
+        padding-top: 2cm;
+        padding-bottom: 2cm;
+        padding-left: 2cm;
+        padding-right: 2cm;
+      }
+      .first-section {
+        page-break-before: avoid !important;
+        padding-top: 10px !important;
+        padding-bottom: 2cm;
+        padding-left: 2cm;
+        padding-right: 2cm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Print Action Button -->
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="window.print()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+      Print / Save as PDF
+    </button>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-text">
+        <h1>FCSA</h1>
+        <p>Forensics Cyber Security Agency</p>
+      </div>
+      <div class="metadata">
+        <div><strong>Doc Ref:</strong> FCSA-GUIDE-AI</div>
+        <div><strong>Security:</strong> Restr. LEO Use</div>
+        <div><strong>Version:</strong> v5.0.2</div>
+      </div>
+    </header>
+
+    <!-- AI Executive Summary -->
+    <section class="first-section">
+      <h2>AI & Predictive Analytics Forensics</h2>
+      <p>
+        To track organized crime cells efficiently, FCSA integrates advanced **Artificial Intelligence (AI)** modules and **Heuristic Checking Rules**. These systems analyze raw carrier records (CDR) to estimate suspect positions, forecast location paths, and automatically flag high-risk fraud signatures.
+      </p>
+    </section>
+
+    <!-- Section 1: Spatial & ML Estimation -->
+    <section>
+      <h2>1. Spatial Location Estimation</h2>
+      <p>Because the suspect’s phone handset is not in custody, the system leverages cell tower telemetry from the CDR:</p>
+
+      <h3>A. CGI Trajectory Replay</h3>
+      <p>
+        FCSA reads the tower IDs (<code>First CGI</code>) and coordinates (<code>First CGI Lat/Long</code>) of every event in the CDR. By chaining these coordinates chronologically, the system reconstructs the suspect’s exact movement path, showing which towers they hopped between.
+      </p>
+
+      <h3>B. Machine Learning Coordinates Prediction</h3>
+      <p>
+        In the Admin Dashboard, the administrator trains a **Recurrent AI Predictor** on historical tower-hopping sequences.
+        By learning the suspect's movement patterns, the model predicts their **Location Drift** and projects their next estimated coordinate grid sector. This allows field teams to deploy assets proactively.
+      </p>
+    </section>
+
+    <!-- Section 2: Core Heuristics and Alarms -->
+    <section>
+      <h2>2. AI Heuristic Indicators (Red Flags)</h2>
+      <p>FCSA’s heuristic rules run instantly upon CDR upload, evaluating data against 7 key investigative patterns:</p>
+
+      <h3>A. Impossible Velocity (SIM Cloning Alert)</h3>
+      <p>
+        Calculates the travel speed between consecutive tower connections. If a suspect's SIM registers in Tower A (Delhi) and then Tower B (Mumbai) within a timeframe indicating a speed of **&gt;1000 km/h**, FCSA flags a **SIM Cloning Alert** (proving SIM box operations or cloned card activity).
+      </p>
+
+      <h3>B. Money Mule Account Signature</h3>
+      <p>
+        Automatically detects when a single SIM registers incoming SMS alerts from **5 or more distinct financial entities** (e.g. HDFC, SBI, ICICI, Axis). A prepaid SIM acting as an alert aggregator is a classic money-laundering mule signal.
+      </p>
+
+      <h3>C. UPI Gateway Registration Bursts</h3>
+      <p>
+        Detects rapid, successive outgoing SMS events to UPI shortcodes (like GPAY/PhonePe gateway codes). This indicates a criminal setup binding multiple bank accounts to a newly swapped device.
+      </p>
+
+      <h3>D. Voice Silence Fraction</h3>
+      <p>
+        Flags numbers where over **80% of activity consists of incoming text alerts** (OTPs) and voice calls have dropped to zero. This is a telltale sign of an operational "burner SIM" bought purely to receive transaction verification codes.
+      </p>
+    </section>
+
+    <!-- Section 3: Hotspot Clustings -->
+    <section>
+      <h2>3. Day vs. Night Spatiotemporal Clustering</h2>
+      <p>
+        By grouping connection timestamps, FCSA segments the suspect's habits:
+      </p>
+      <ul>
+        <li>
+          <strong>Residential Footprint</strong>: Tower hops registered during overnight hours (10:00 PM to 6:00 AM) are clustered to identify where the suspect sleeps.
+        </li>
+        <li>
+          <strong>Operational Footprint</strong>: Daytime connections are mapped to identify their hideouts or fraud centers (e.g. local call centers or cyber hubs).
+        </li>
+      </ul>
+    </section>
+  </div>
+
+</body>
+</html>

@@ -57,7 +57,9 @@ function generateSessionToken() {
   return Array.from(arr, b => b.toString(16).padStart(2, "0")).join("");
 }
 
-const AUTH_API = "http://localhost:8000/api/auth/login";
+import { API_BASE } from "../config";
+
+const AUTH_API = `${API_BASE}/api/auth/login`;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {

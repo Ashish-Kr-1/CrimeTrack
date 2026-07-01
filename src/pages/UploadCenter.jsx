@@ -1,4 +1,5 @@
 import { useState, useContext, useRef, useCallback } from "react";
+import { API_BASE } from "../config";
 import { useNavigate } from "react-router-dom";
 import { CDRContext } from "../context/CDRContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -282,7 +283,7 @@ function UploadCenter() {
   /* ── Export live binary PCAP file ── */
   const handleExportPCAP = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/pcap/export", {
+      const response = await fetch(`${API_BASE}/api/pcap/export`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ records: ipdrRecords })
@@ -326,7 +327,7 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
     setSplunkStatus("exporting");
     const testToken = splunkToken || `HEC-${Math.random().toString(36).substring(2, 10).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
     try {
-      const response = await fetch("http://localhost:8000/api/splunk/stream", {
+      const response = await fetch(`${API_BASE}/api/splunk/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ records: ipdrRecords, token: testToken })

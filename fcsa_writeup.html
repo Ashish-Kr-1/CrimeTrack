@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FCSA - Forensics Cyber Security Agency Master Guide</title>
+  
+  <!-- Google Fonts for Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ─── DESIGN SYSTEM TOKENS ─── */
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --primary-dark: #0f172a;
+      --text: #334155;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* ─── GENERAL STYLES ─── */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      color: var(--text);
+      background-color: var(--bg);
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 50px;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+      position: relative;
+    }
+
+    /* ─── ACTION BAR (HIDDEN IN PRINT) ─── */
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+      max-width: 850px;
+      margin: 0 auto 20px;
+      gap: 12px;
+    }
+
+    .btn {
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    /* ─── HEADER SECTION ─── */
+    header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 30px;
+      margin-bottom: 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .header-text h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .header-text p {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--primary-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .metadata {
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .metadata div {
+      margin-bottom: 4px;
+    }
+
+    .badge-alert {
+      display: inline-block;
+      background-color: rgba(220, 38, 38, 0.08);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 12px 18px;
+      border-radius: 10px;
+      margin-bottom: 35px;
+      width: 100%;
+    }
+
+    /* ─── SECTIONS ─── */
+    section {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+      margin-top: 20px;
+    }
+
+    p {
+      margin-bottom: 15px;
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ─── TABLES ─── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: var(--primary-dark);
+      font-weight: 700;
+      text-align: left;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+    }
+
+    td {
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--text);
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+
+    /* ─── LIST ITEMS ─── */
+    ul {
+      list-style-type: none;
+      margin-bottom: 20px;
+    }
+
+    li {
+      margin-bottom: 14px;
+      padding-left: 20px;
+      position: relative;
+      font-size: 14.5px;
+    }
+
+    li::before {
+      content: "•";
+      color: var(--primary-light);
+      font-weight: bold;
+      font-size: 18px;
+      position: absolute;
+      left: 0;
+      top: -2px;
+    }
+
+    strong {
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+
+    /* ─── CODE ELEMENTS ─── */
+    code {
+      font-family: var(--font-mono);
+      background-color: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--primary-dark);
+    }
+
+    /* ─── PRINT CSS OVERRIDES ─── */
+    @media print {
+      @page {
+        margin: 0; /* Removes browser header (date/time) and footer (URL path) */
+      }
+      body {
+        background-color: white;
+        padding: 0;
+      }
+      .container {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .action-bar {
+        display: none;
+      }
+      a {
+        text-decoration: none;
+        color: var(--text-dark);
+      }
+      
+      /* Multi-page layout spacing fix */
+      header {
+        padding-top: 2cm;
+        padding-left: 2cm;
+        padding-right: 2cm;
+      }
+      .badge-alert {
+        margin-left: 2cm;
+        margin-right: 2cm;
+        width: calc(100% - 4cm);
+      }
+      section {
+        page-break-before: always; /* Each section starts on a fresh page */
+        padding-top: 2cm; /* Creates spacing at the top of pages 2, 3, etc. */
+        padding-bottom: 2cm;
+        padding-left: 2cm;
+        padding-right: 2cm;
+      }
+      .first-section {
+        page-break-before: avoid !important;
+        padding-top: 10px !important;
+        padding-bottom: 2cm;
+        padding-left: 2cm;
+        padding-right: 2cm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Print Action Button -->
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="window.print()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+      Print / Save as PDF
+    </button>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-text">
+        <h1>FCSA</h1>
+        <p>Forensics Cyber Security Agency</p>
+      </div>
+      <div class="metadata">
+        <div><strong>Doc Ref:</strong> FCSA-MASTER-GUIDE</div>
+        <div><strong>Security:</strong> Restr. LEO Use</div>
+        <div><strong>Version:</strong> v5.2.0</div>
+      </div>
+    </header>
+
+    <!-- Core Constraint Notice -->
+    <div class="badge-alert">
+      <strong>Core Design Assumption:</strong> FCSA is engineered to investigate suspects when you do NOT have their physical phone in custody. All tracking, location estimation, and network profiling are calculated using network-side carrier Call Detail Records (CDR) alone.
+    </div>
+
+    <!-- Section 1: User Roles and separation -->
+    <section class="first-section">
+      <h2>1. System User Roles & Separation of Duties</h2>
+      <p>FCSA segregates system administration from active investigations to maintain audit compliance and casework integrity.</p>
+      
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 30%">User Role</th>
+            <th>Primary Responsibilities</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Admin (System Administrator)</strong></td>
+            <td>
+              • <strong>Carrier Normalizer</strong>: Configures operator templates so Jio, Airtel, Vi, and BSNL CDR formats map automatically.<br>
+              • <strong>AI Engine Trainer</strong>: Calibrates and trains the ML coordinate prediction weights for suspect location forecasting.<br>
+              • <strong>Security Auditor</strong>: Inspects system-wide tamper-proof access logs to audit analyst casework.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Analyst (Cyber Cell Investigator)</strong></td>
+            <td>
+              • <strong>Log Ingester</strong>: Uploads cell tower logs (CDR) into cases.<br>
+              • <strong>Spatiotemporal Analyzer</strong>: Traces target tower-hopping trails, active hours, and hotspots on interactive maps.<br>
+              • <strong>OSINT Investigator</strong>: Runs automated queries for WhatsApp, Signal, and historical threat databases.<br>
+              • <strong>Case Exporter</strong>: Drafts legal orders and generates unified case dossier summaries.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 2: Feature Access Mapping -->
+    <section>
+      <h2>2. Feature Access Mapping (Both Users)</h2>
+      <p>The system limits access to specific workspaces depending on the logged-in user profile, maintaining clear boundaries between maintenance and operations:</p>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>Workspace Section</th>
+            <th style="width: 35%; text-align: center;">Admin Panel Access</th>
+            <th style="width: 35%; text-align: center;">Analyst Panel Access</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Normalization Settings & Carrier Templates</strong></td>
+            <td style="text-align: center; color: var(--success); font-weight: bold;">✔ Full Access</td>
+            <td style="text-align: center; color: var(--danger); font-weight: bold;">❌ Blocked</td>
+          </tr>
+          <tr>
+            <td><strong>ML Model Configurations & Hyperparameter Tuning</strong></td>
+            <td style="text-align: center; color: var(--success); font-weight: bold;">✔ Full Access</td>
+            <td style="text-align: center; color: var(--danger); font-weight: bold;">❌ Blocked</td>
+          </tr>
+          <tr>
+            <td><strong>Compliance Audit Logging Ledger</strong></td>
+            <td style="text-align: center; color: var(--success); font-weight: bold;">✔ Read-Only Audit</td>
+            <td style="text-align: center; color: var(--danger); font-weight: bold;">❌ Blocked</td>
+          </tr>
+          <tr>
+            <td><strong>CDR Upload & Normalization Ingest</strong></td>
+            <td style="text-align: center; color: var(--danger); font-weight: bold;">❌ Blocked</td>
+            <td style="text-align: center; color: var(--success); font-weight: bold;">✔ Full Access</td>
+          </tr>
+          <tr>
+            <td><strong>Geo-Intelligence & Timelines Replay Maps</strong></td>
+            <td style="text-align: center; color: var(--danger); font-weight: bold;">❌ Blocked</td>
+            <td style="text-align: center; color: var(--success); font-weight: bold;">✔ Full Access</td>
+          </tr>
+          <tr>
+            <td><strong>Network Link Association Graph</strong></td>
+            <td style="text-align: center; color: var(--danger); font-weight: bold;">❌ Blocked</td>
+            <td style="text-align: center; color: var(--success); font-weight: bold;">✔ Full Access</td>
+          </tr>
+          <tr>
+            <td><strong>OSINT Check & Threat Intel Sync</strong></td>
+            <td style="text-align: center; color: var(--danger); font-weight: bold;">❌ Blocked</td>
+            <td style="text-align: center; color: var(--success); font-weight: bold;">✔ Full Access</td>
+          </tr>
+          <tr>
+            <td><strong>Legal notice & PDF Exporter</strong></td>
+            <td style="text-align: center; color: var(--danger); font-weight: bold;">❌ Blocked</td>
+            <td style="text-align: center; color: var(--success); font-weight: bold;">✔ Full Access</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 3: Analyst Dashboard Workspaces -->
+    <section>
+      <h2>3. Analyst Dashboard Workspaces & Features</h2>
+      <p>The Analyst Panel is divided into dedicated workspaces, mapping every phase of a telecommunications investigation:</p>
+      
+      <ul>
+        <li>
+          <strong>Upload Center</strong>: The entry point for case evidence. Investigators upload raw carrier CSV files here. The system standardizes columns, checks file integrity, and passes data to the normalization mapper.
+        </li>
+        <li>
+          <strong>Dashboard</strong>: Displays an executive overview of the case. It contains target threat classification labels (e.g. <em>Highly Suspect Mule</em> vs. <em>Normal User</em>), risk meters, and charts summarizing call vs. SMS volume.
+        </li>
+        <li>
+          <strong>Chrono Replay</strong>: Features an interactive Leaflet map that replays the suspect's movements chronologically. Investigators can control playback speed to track geographic tower hops over time.
+        </li>
+        <li>
+          <strong>Risk Center</strong>: Focuses on indicators of compromise. It lists the raw behavioral rules, flags critical alarms (e.g. multi-bank mappings), and scores target threat indexes.
+        </li>
+        <li>
+          <strong>Mobility Tracker</strong>: Analyzes spatiotemporal habits. It separates cell connections by hours to identify residential tower areas (active overnight) vs. daylight hiding spots.
+        </li>
+        <li>
+          <strong>Geo Intelligence</strong>: Displays spatial heatmaps and lists target roaming networks. It highlights and flags known high-risk cyber circles.
+        </li>
+        <li>
+          <strong>Network Analysis</strong>: Builds a dynamic 2D link node diagram connecting target numbers, contacted parties, active cell towers, recipient bank codes, and handset IMEIs to expose criminal groups.
+        </li>
+        <li>
+          <strong>Active Cases</strong>: Lists all ongoing cell investigations, letting analysts switch cases and edit target dossiers.
+        </li>
+        <li>
+          <strong>OSINT & Automation</strong>: Displays live API results, threat feeds matching target records, and status reports for external alerts.
+        </li>
+      </ul>
+    </section>
+
+    <!-- Section 4: Detailed explanation of Cyber features -->
+    <section>
+      <h2>4. Detailed Explanation of Cyber Features</h2>
+      <p>FCSA automates 7 core cyber forensics features directly from the suspect's phone number, searching external public data networks and local platforms:</p>
+      
+      <ul>
+        <li>
+          <strong>1. OSINT (Open Source Intelligence)</strong>: Queries multiple public directory databases using the target's phone number to harvest digital footprints and identify links to external web profiles.
+        </li>
+        <li>
+          <strong>2. Wassenger (WhatsApp Integration)</strong>: Queries the Wassenger API to check if the suspect number is registered on WhatsApp. It identifies whether the profile is <strong>Personal</strong> or <strong>Business</strong>, maps their unique WhatsApp ID (WID), and checks status timestamps.
+        </li>
+        <li>
+          <strong>3. Signal (Encrypted Messenger Check)</strong>: Queries Signal Messenger registries to see if the suspect line has been registered for encrypted messaging, which is common among advanced threat actors to hide communications.
+        </li>
+        <li>
+          <strong>4. Carrier Info (Operator Verification)</strong>: Retrieves real-time, official details about the telecom provider (Jio, Airtel, Vi) and geographic circle/region from international registry systems, verifying the true operator footprint of the target.
+        </li>
+        <li>
+          <strong>5. MISP (Malware Information Sharing Platform)</strong>: Connects directly to the local <strong>MISP</strong> repository. It cross-references the suspect's number against historical databases of blacklisted phone numbers used in phishing, financial extortion, and online scams. If a match is found, FCSA flags a <strong>Critical Threat</strong> alarm.
+        </li>
+        <li>
+          <strong>6. Splunk (SIEM Log Analytics)</strong>: Integrates with <strong>Splunk</strong> by piping investigation events, case updates, and threat metrics directly into SIEM indexes for permanent, compliant audit logging.
+        </li>
+        <li>
+          <strong>7. Slack (Real-time Alerts)</strong>: Uses automated webhooks to instantly push notifications to the Cyber Cell’s active operations channel on <strong>Slack</strong> whenever a suspect with a high-threat score is identified.
+        </li>
+      </ul>
+    </section>
+
+    <!-- Section 5: Detailed explanation of AI features -->
+    <section>
+      <h2>5. Detailed Explanation of AI Features</h2>
+      <p>To track organized crime cells efficiently, FCSA integrates advanced machine learning models and heuristic indicators:</p>
+      
+      <ul>
+        <li>
+          <strong>Cell Tower (CGI) Trajectory Estimation</strong>: Extracts the operator's tower identifiers (<code>First CGI</code>) and physical coordinates (<code>First CGI Lat/Long</code>) from the CDR. By chaining these coordinates chronologically, the system reconstructs the suspect’s exact movement path, showing which towers they hopped between over time.
+        </li>
+        <li>
+          <strong>ML Location Forecasting</strong>: An AI predictor (trained on historical tower-hopping sequences in the Admin Dashboard) calculates the suspect's location drift and projects their next estimated coordinate grid sector, allowing proactive search grid positioning.
+        </li>
+        <li>
+          <strong>Impossible Velocity Warnings (SIM Cloning)</strong>: Calculates the travel speed between consecutive tower connections. If a suspect's SIM registers in Tower A (Delhi) and then Tower B (Mumbai) within a timeframe indicating a speed of <strong>&gt;1000 km/h</strong>, FCSA flags a <strong>SIM Cloning Alert</strong> (proving SIM box operations or cloned card activity).
+        </li>
+        <li>
+          <strong>Money Mule Heuristics</strong>: Automatically flags money-laundering cards. It alerts when a prepaid SIM acts as an alert aggregator receiving SMS alerts from <strong>5 or more distinct financial entities</strong> (SBI, HDFC, etc.) or shows high-frequency bursts of outgoing SMS to UPI registration codes (like GPAY/PhonePe activation gateways).
+        </li>
+        <li>
+          <strong>Spatiotemporal Hotspot Clustering</strong>: Groups connections by timestamp to separate the suspect's habits. Tower hops registered overnight (10:00 PM to 6:00 AM) are clustered to identify the suspect's <strong>Residential Footprint</strong>, while daytime hops map their **Operational Hideouts**.
+        </li>
+      </ul>
+    </section>
+
+    <!-- Section 6: Report generator -->
+    <section>
+      <h2>6. Legal Request & Report Generator</h2>
+      <p>FCSA speeds up legal paperwork and case reporting by automating document exports:</p>
+      
+      <ul>
+        <li>
+          <strong>Section 91 CrPC Notice Drafts</strong>: Instantly generates formal police letters based on the suspect's activity:
+          <br>• <em>Freeze bank accounts</em> linked to the suspect's money-mule activity.
+          <br>• <em>Block the phone hardware (IMEIs)</em> across all national networks using the CEIR registry.
+          <br>• <em>Request UPI logs</em> from the National Payments Corporation of India (NPCI) to trace money transfers.
+        </li>
+        <li>
+          <strong>One-Click PDF Dossier Exporter</strong>: Compiles all maps, timeline routes, threat indicators, audit logs, and legal notices into a courtroom-ready PDF document to present to senior officers or the judge.
+        </li>
+      </ul>
+    </section>
+  </div>
+
+</body>
+</html>

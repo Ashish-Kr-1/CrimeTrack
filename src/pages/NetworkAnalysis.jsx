@@ -1,4 +1,5 @@
 import { useContext, useMemo, useRef, useCallback, useState, useEffect } from "react";
+import { API_BASE } from "../config";
 import { CDRContext } from "../context/CDRContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -378,7 +379,7 @@ function MispExportModal({ phone, osintData, onClose }) {
     setMispMessage("");
     setMispError("");
     try {
-      const response = await fetch("http://localhost:8000/api/misp/export", {
+      const response = await fetch(`${API_BASE}/api/misp/export`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, stix: payload })
@@ -393,7 +394,7 @@ function MispExportModal({ phone, osintData, onClose }) {
       }
     } catch (err) {
       setMispStatus("error");
-      setMispError("MISP server unreachable (http://localhost:8000). Ensure the backend is running and MISP_API_KEY is set in .env.");
+      setMispError(`MISP server unreachable (${API_BASE}). Ensure the backend is running and MISP_API_KEY is set in .env.`);
     }
   };
 
@@ -678,7 +679,7 @@ function NetworkAnalysis() {
     }));
 
     const cleanPhone = phone.replace(/\D/g, "");
-    const eventSource = new EventSource(`http://localhost:8000/api/osint/scan-stream?target=${encodeURIComponent(cleanPhone)}`);
+    const eventSource = new EventSource(`${API_BASE}/api/osint/scan-stream?target=${encodeURIComponent(cleanPhone)}`);
 
     eventSource.onmessage = (event) => {
       const logText = event.data;
