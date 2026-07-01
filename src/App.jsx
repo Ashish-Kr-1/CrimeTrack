@@ -11,6 +11,7 @@ import NetworkAnalysis from "./pages/NetworkAnalysis";
 import ChronologicalReplay from "./pages/ChronologicalReplay";
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import OSINTAutomation from "./pages/OSINTAutomation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "./context/AuthContext";
@@ -117,6 +118,7 @@ function App() {
               <Route path="/geo"    element={<GeoIntelligence />} />
               <Route path="/network" element={<NetworkAnalysis />} />
               <Route path="/replay" element={<ChronologicalReplay />} />
+              <Route path="/automation" element={<OSINTAutomation />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </motion.div>

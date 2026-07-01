@@ -5,7 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 import {
   UploadCloud, LayoutDashboard, AlertTriangle,
   Clock, MapPin, Network, FolderOpen, Wifi, ChevronRight,
-  Clapperboard, LogOut, X,
+  Clapperboard, LogOut, X, Cpu
 } from "lucide-react";
 
 const NAV = [
@@ -17,6 +17,7 @@ const NAV = [
   { to: "/geo",      icon: MapPin,         label: "Geo Intelligence", badge: null },
   { to: "/network",  icon: Network,        label: "Network Analysis", badge: null },
   { to: "/cases",    icon: FolderOpen,     label: "Active Cases",     badge: null },
+  { to: "/automation",icon: Cpu,           label: "OSINT & Automation", badge: "LIVE" },
 ];
 
 /* FCSA Fingerprint-Shield SVG logo */

@@ -1237,78 +1237,7 @@ function ChronologicalReplay() {
                   </span>
                 </div>
 
-                {/* Cellebrite Forensics Ingest Panel */}
-                <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--color-border)", background: "rgba(255,255,255,0.15)" }}>
-                  {!cellebriteIngested ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                        <ShieldAlert size={14} color="#3a7ca5" style={{ marginTop: 2, flexShrink: 0 }} />
-                        <div style={{ flex: 1 }}>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text)", display: "block" }}>Cellebrite GPS Alignment</span>
-                          <span style={{ fontSize: 9, color: "var(--color-text-subtle)", lineHeight: 1.4, display: "block", marginTop: 2 }}>
-                            Correlate local filesystem geotags against telecom tower CGI triangulation logs.
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {cellebriteUploading ? (
-                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                          <span style={{ fontSize: 9, fontWeight: 700, color: "#3a7ca5", display: "flex", alignItems: "center", gap: 4 }}>
-                            <RefreshCw size={10} className="animate-spin" /> Correlating spatiotemporal coordinates...
-                          </span>
-                          <div style={{ height: 3, background: "rgba(0,0,0,0.06)", borderRadius: 99, overflow: "hidden" }}>
-                            <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 1.2 }} style={{ height: "100%", background: "#3a7ca5" }} />
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => cellebriteInputRef.current?.click()}
-                            style={{
-                              width: "100%", padding: "7px 10px", borderRadius: 8, border: "1px dashed rgba(58,124,165,0.4)",
-                              background: "rgba(58,124,165,0.05)", color: "#3a7ca5", fontSize: 10, fontWeight: 700,
-                              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-                              transition: "all 0.15s ease"
-                            }}
-                          >
-                            <Radio size={11} /> Ingest Cellebrite Report
-                          </button>
-                          <input 
-                            type="file" 
-                            ref={cellebriteInputRef} 
-                            onChange={handleCellebriteFile} 
-                            style={{ display: "none" }} 
-                            accept=".xml,.json,.csv,.txt" 
-                          />
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      <div style={{ display: "flex", justifyItems: "center", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: 10, fontWeight: 800, color: "#00b894", display: "flex", alignItems: "center", gap: 4, maxWidth: "80%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          <CheckCircle size={11} color="#00b894" /> CORRELATED: {cellebriteFileName}
-                        </span>
-                        <button 
-                          onClick={() => setCellebriteIngested(false)}
-                          style={{ background: "none", border: "none", color: "var(--color-text-subtle)", fontSize: 8, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}
-                        >
-                          Reset
-                        </button>
-                      </div>
-                      
-                      <div style={{ background: "rgba(214,48,49,0.05)", border: "1px solid rgba(214,48,49,0.18)", borderRadius: 8, padding: "8px 10px", display: "flex", gap: 8, alignItems: "flex-start" }}>
-                        <AlertTriangle size={12} color="#d63031" style={{ flexShrink: 0, marginTop: 1 }} />
-                        <div>
-                          <span style={{ fontSize: 9, fontWeight: 700, color: "#d63031", display: "block" }}>GPS Spoofing Alarm</span>
-                          <span style={{ fontSize: 9, color: "var(--color-text-muted)", lineHeight: 1.4, display: "block", marginTop: 2 }}>
-                            Detected <strong>{spoofedEvents.length} coordinate{spoofedEvents.length !== 1 ? "s" : ""}</strong> with spatial offsets exceeding the 10 km CGI triangulation threshold.
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+
 
                 {/* Log Items */}
                 <div

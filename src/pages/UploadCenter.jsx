@@ -31,21 +31,7 @@ const STEPS = [
   { id: "done",    label: "Analysis complete — loading dashboard", icon: CheckCircle2 },
 ];
 
-const IPDR_STEPS = [
-  { id: "read",    label: "Reading IPDR log file",         icon: FileText },
-  { id: "headers",  label: "Detecting network IP headers",  icon: Table2 },
-  { id: "vpn",   label: "Analyzing VPN/VoIP gateways",   icon: Shield },
-  { id: "audit", label: "Generating traffic audit report", icon: Cpu },
-  { id: "done",    label: "IPDR network trace complete",   icon: CheckCircle2 },
-];
 
-const MOCK_IPDR_RECORDS = [
-  { time: "22:30:11", src: "192.168.1.102", dst: "185.220.101.5", proto: "TCP", port: 443, svc: "Tor Exit Node", threat: "CRITICAL", desc: "Active connection to Tor network proxy" },
-  { time: "22:30:15", src: "192.168.1.102", dst: "104.244.42.1", proto: "TCP", port: 443, svc: "Social Media (X)", threat: "LOW", desc: "Standard HTTPS traffic to social media network" },
-  { time: "22:31:02", src: "192.168.1.102", dst: "45.33.2.142", proto: "OpenVPN", port: 1194, svc: "VPN Proxy", threat: "HIGH", desc: "Commercial NordVPN proxy tunnel initialized" },
-  { time: "22:32:45", src: "192.168.1.102", dst: "195.12.50.8", proto: "UDP", port: 5060, svc: "SIP VoIP Gateway", threat: "HIGH", desc: "SIP session to overseas VoIP trunk gateway" },
-  { time: "22:35:12", src: "192.168.1.102", dst: "142.250.190.46", proto: "TCP", port: 443, svc: "Google API", threat: "NOMINAL", desc: "Normal HTTPS web socket traffic" }
-];
 
 const fadeUp = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0, transition: { duration: 0.32 } } };
 const stagger = { animate: { transition: { staggerChildren: 0.07 } } };
@@ -67,9 +53,9 @@ function UploadCenter() {
   const navigate       = useNavigate();
   const fileInputRef   = useRef(null);
 
-  /* ── Stages: idle → preview → processing → ipdr_audit ── */
+  /* ── Stages: idle → preview → processing ── */
   const [stage,        setStage]        = useState("idle");
-  const [uploadType,   setUploadType]   = useState("CDR");     // "CDR" or "IPDR"
+  const uploadType                      = "CDR";
   const [isDragging,   setIsDragging]   = useState(false);
   const [pendingFile,  setPendingFile]  = useState(null);     // raw File object
   const [previewRows,  setPreviewRows]  = useState([]);       // first 8 rows
@@ -79,8 +65,6 @@ function UploadCenter() {
   const [processStep,  setProcessStep]  = useState(-1);
   const [splunkStatus, setSplunkStatus] = useState(null);     // null, "exporting", "success"
   const [splunkToken,  setSplunkToken]  = useState("");
-  const [ipdrRecords,  setIpdrRecords]  = useState(MOCK_IPDR_RECORDS);
-  const [criticalCount, setCriticalCount] = useState(3);
 
   const [uploads, setUploads] = useState([
     { fileName: "cdr_9520995378_1.csv",      type: "CDR Dataset",  status: "Completed", rows: "4,812",  date: "2026-06-07 12:44:11" },
@@ -98,8 +82,6 @@ function UploadCenter() {
     setProcessStep(-1);
     setSplunkStatus(null);
     setSplunkToken("");
-    setIpdrRecords(MOCK_IPDR_RECORDS);
-    setCriticalCount(3);
   };
 
   /* ── File selected → immediately start processing ── */
@@ -374,56 +356,12 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
           <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(37,99,235,0.1)", border: "1px solid rgba(37,99,235,0.22)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <UploadCloud size={18} color="var(--color-accent)" strokeWidth={2} />
           </div>
-          <h1 className="page-title">{uploadType === "CDR" ? "Upload CDR File" : "Ingest IPDR Network Traffic"}</h1>
+          <h1 className="page-title">Upload CDR File</h1>
         </div>
         <p className="page-subtitle">
-          {uploadType === "CDR" 
-            ? "Upload a phone's Call Detail Record (CDR) from your telecom operator. The system will automatically analyse it for suspicious patterns — no technical knowledge needed."
-            : "Ingest Internet Protocol Detail Records (IPDR) from network dumps. Trace VoIP trunk proxies, VPN tunnels, and audit payloads for SIEM alignment."
-          }
+          Upload a phone's Call Detail Record (CDR) from your telecom operator. The system will automatically analyse it for suspicious patterns — no technical knowledge needed.
         </p>
       </motion.div>
-
-      {/* ── Ingestion Type Selector (Visible only in Idle) ── */}
-      {/* ── Ingestion Type Selector (Visible only in Idle) ── */}
-      {stage === "idle" && (
-        <motion.div variants={fadeUp} style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-          {[
-            { id: "CDR", label: "Telecom CDR Ingest", icon: Table2, desc: "Airtel / Jio / BSNL Call Logs" },
-            { id: "IPDR", label: "IPDR Traffic Audit", icon: Shield, desc: "Wireshark / Zeek Packet Logs" }
-          ].map((type) => {
-            const Icon = type.icon;
-            const active = uploadType === type.id;
-            return (
-              <button
-                key={type.id}
-                onClick={() => setUploadType(type.id)}
-                style={{
-                  flex: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  padding: "14px 20px",
-                  borderRadius: 14,
-                  border: active ? "1.5px solid #818cf8" : "1px solid rgba(255, 255, 255, 0.08)",
-                  background: active 
-                    ? "linear-gradient(135deg, rgba(129, 140, 248, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%)" 
-                    : "rgba(255, 255, 255, 0.03)",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 0.18s ease"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                  <Icon size={14} color={active ? "#818cf8" : "rgba(255,255,255,0.4)"} />
-                  <span style={{ fontSize: 13, fontWeight: 800, color: active ? "#ffffff" : "rgba(255,255,255,0.6)" }}>{type.label}</span>
-                </div>
-                <span style={{ fontSize: 10, color: active ? "#c0b9cc" : "rgba(255,255,255,0.35)" }}>{type.desc}</span>
-              </button>
-            );
-          })}
-        </motion.div>
-      )}
 
       <AnimatePresence mode="wait">
 
@@ -570,166 +508,7 @@ Trace Integrity SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b
         {/* ══════════════════════════════════════════════════════
             STAGE: IPDR AUDIT CENTER
         ══════════════════════════════════════════════════════ */}
-        {stage === "ipdr_audit" && (
-          <motion.div key="ipdr_audit" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            
-            {/* Action Bar */}
-            <div style={{ display: "flex", alignItems: "center", justifyItems: "center", gap: 14, padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.9)", backdropFilter: "blur(12px)", flexWrap: "wrap" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(58,124,165,0.08)", border: "1px solid rgba(58,124,165,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <Shield size={20} color="#3a7ca5" strokeWidth={1.8} />
-              </div>
-              <div style={{ flex: 1, minWidth: 200 }}>
-                <p style={{ margin: "0 0 3px", fontSize: 14, fontWeight: 800, color: "var(--color-text)" }}>Zeek/Wireshark IPDR Network Traffic Log</p>
-                <p style={{ margin: 0, fontSize: 12, color: "var(--color-text-muted)" }}>
-                  Ingested file: <strong>{pendingFile?.name}</strong> · Total connections parsed: <strong>{ipdrRecords.length}</strong>
-                </p>
-              </div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={reset} style={{ padding: "9px 16px", borderRadius: 10, fontSize: 12, fontWeight: 700, background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.08)", color: "var(--color-text-muted)", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-                  <X size={13} /> Close Audit
-                </button>
-              </div>
-            </div>
 
-            {/* KPI Cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
-              {[
-                { label: "IPDR Packets", value: ipdrRecords.length.toString(), icon: Database, color: "#3a7ca5", desc: "Total network packet headers analysed" },
-                { label: "Critical Anomalies", value: criticalCount.toString(), icon: AlertTriangle, color: "#d63031", desc: "Tor exit nodes & commercial VPNs detected" },
-                { label: "Trace Integrity", value: "99.84%", icon: Shield, color: "#00b894", desc: "Digital verification signature matches" }
-              ].map((kpi) => {
-                const Icon = kpi.icon;
-                return (
-                  <div key={kpi.label} className="glass-card" style={{ padding: "16px 20px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>{kpi.label}</span>
-                      <Icon size={14} color={kpi.color} />
-                    </div>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                      <span style={{ fontSize: 24, fontWeight: 900, fontFamily: "var(--font-mono)", color: "var(--color-text)" }}>{kpi.value}</span>
-                    </div>
-                    <p style={{ margin: "4px 0 0", fontSize: 10, color: "var(--color-text-subtle)", lineHeight: 1.4 }}>{kpi.desc}</p>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Threat Alerts Card */}
-            <div className="glass-card" style={{ padding: "20px 24px" }}>
-              <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#d63031", marginBottom: 14, display: "flex", alignItems: "center", gap: 8, margin: "0 0 10px" }}>
-                <AlertTriangle size={14} color="#d63031" /> Critical Network Threat Indicators
-              </h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <div style={{ display: "flex", gap: 12, padding: "12px 16px", borderRadius: 10, background: "rgba(214,48,49,0.06)", border: "1px solid rgba(214,48,49,0.18)" }}>
-                  <Globe size={16} color="#d63031" style={{ flexShrink: 0, marginTop: 1 }} />
-                  <div>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: "var(--color-text)" }}>Active Tor Proxy Connection Detected</span>
-                    <p style={{ margin: "3px 0 0", fontSize: 11, color: "var(--color-text-muted)", lineHeight: 1.5 }}>
-                      Suspect node initiated encrypted TCP handshake on Port 443 with a blacklisted Tor exit relay (<span style={{ fontFamily: "var(--font-mono)", color: "#d63031", fontWeight: 700 }}>185.220.101.5</span>). Indicates an attempt to spoof IP address identity.
-                    </p>
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: 12, padding: "12px 16px", borderRadius: 10, background: "rgba(225,112,85,0.06)", border: "1px solid rgba(225,112,85,0.18)" }}>
-                  <Terminal size={16} color="#e17055" style={{ flexShrink: 0, marginTop: 1 }} />
-                  <div>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: "var(--color-text)" }}>SIP VoIP Trunk Call Tunneling</span>
-                    <p style={{ margin: "3px 0 0", fontSize: 11, color: "var(--color-text-muted)", lineHeight: 1.5 }}>
-                      UDP SIP trunk initialized on Port 5060 connecting to overseas VoIP gateway <span style={{ fontFamily: "var(--font-mono)", color: "#e17055", fontWeight: 700 }}>195.12.50.8</span>. Common signature used for overseas spoof call spoofing routing.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Ingestion audit log table */}
-            <div className="glass-card" style={{ padding: "20px 24px" }}>
-              <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 12, display: "flex", alignItems: "center", gap: 8, margin: "0 0 10px" }}>
-                <Terminal size={13} color="#3a7ca5" /> Parsed IPDR Records (Wireshark/Zeek Schema)
-              </h3>
-              <div style={{ overflowX: "auto", borderRadius: 10, border: "1px solid var(--color-border)" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
-                  <thead>
-                    <tr style={{ background: "rgba(58,124,165,0.04)", borderBottom: "1px solid var(--color-border)" }}>
-                      {["Time", "Source IP", "Destination IP", "Protocol", "Port", "Identified Service", "Severity Indicator"].map((h) => (
-                        <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontWeight: 800, fontSize: 10, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--color-text-muted)" }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ipdrRecords.map((rec, ri) => {
-                      const isCritical = rec.threat === "CRITICAL";
-                      const isHigh = rec.threat === "HIGH";
-                      const threatColor = isCritical ? "#d63031" : isHigh ? "#e17055" : "#00b894";
-                      return (
-                        <tr key={ri} style={{ borderBottom: "1px solid rgba(0,0,0,0.03)", background: ri % 2 === 0 ? "transparent" : "rgba(0,0,0,0.01)" }}>
-                          <td style={{ padding: "10px 12px", fontFamily: "var(--font-mono)", color: "var(--color-text-subtle)" }}>{rec.time}</td>
-                          <td style={{ padding: "10px 12px", fontFamily: "var(--font-mono)", fontWeight: 700 }}>{rec.src}</td>
-                          <td style={{ padding: "10px 12px", fontFamily: "var(--font-mono)", fontWeight: 700, color: threatColor }}>{rec.dst}</td>
-                          <td style={{ padding: "10px 12px", fontFamily: "var(--font-mono)", color: "var(--color-text-muted)" }}>{rec.proto}</td>
-                          <td style={{ padding: "10px 12px", fontFamily: "var(--font-mono)", color: "var(--color-text-muted)" }}>{rec.port}</td>
-                          <td style={{ padding: "10px 12px", fontWeight: 700, color: "var(--color-text)" }}>{rec.svc}</td>
-                          <td style={{ padding: "10px 12px" }}>
-                            <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 6, color: threatColor, background: `${threatColor}12`, border: `1px solid ${threatColor}25`, textTransform: "uppercase" }}>{rec.threat}</span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Exporters / SIEM Integrator controls */}
-            <div className="glass-card" style={{ padding: "20px 24px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-                <div>
-                  <h4 style={{ fontSize: 13, fontWeight: 800, color: "var(--color-text)", margin: "0 0 2px" }}>Threat Intelligence & SIEM Exporters</h4>
-                  <p style={{ margin: 0, fontSize: 11, color: "var(--color-text-subtle)" }}>Stream parsed IPDR trace records directly into Splunk dashboards or download packet trace files.</p>
-                </div>
-                <div style={{ display: "flex", gap: 10 }}>
-                  {/* Export PCAP Button */}
-                  <button onClick={handleExportPCAP}
-                    style={{ padding: "11px 18px", borderRadius: 10, border: "1px solid var(--color-border)", background: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, color: "var(--color-text-muted)", transition: "all 0.15s ease" }}>
-                    <Download size={13} />
-                    Download PCAP Trace
-                  </button>
-                  {/* Send to Splunk Button */}
-                  <button onClick={handleSendToSplunk} disabled={splunkStatus !== null}
-                    style={{ padding: "12px 20px", borderRadius: 10, border: "none", background: splunkStatus === "success" ? "#00b894" : "linear-gradient(135deg, #2563eb, #1d4ed8)", color: "#fff", fontSize: 12, fontWeight: 800, cursor: splunkStatus !== null ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 4px 14px rgba(37,99,235,0.25)", transition: "all 0.15s ease" }}>
-                    {splunkStatus === "exporting" ? (
-                      <>
-                        <Loader size={13} className="animate-spin" />
-                        STREAMING TO SPLUNK HEC...
-                      </>
-                    ) : splunkStatus === "success" ? (
-                      <>
-                        <CheckCircle2 size={13} />
-                        SPLUNK INGESTED
-                      </>
-                    ) : (
-                      <>
-                        <Share2 size={13} />
-                        SEND TO SPLUNK SIEM
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {splunkStatus === "success" && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
-                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 8, background: "rgba(0,184,148,0.06)", border: "1px solid rgba(0,184,148,0.18)", marginTop: 14 }}>
-                  <CheckCircle2 size={14} color="#00b894" />
-                  <span style={{ fontSize: 11, color: "var(--color-text-muted)", fontFamily: "var(--font-mono)" }}>
-                    Splunk HTTP Event Collector (HEC) Ingest Confirmed. Token: <strong style={{ color: "#00b894" }}>{splunkToken}</strong> · Index: <strong style={{ color: "var(--color-text)" }}>cyber_cdr</strong>
-                  </span>
-                </motion.div>
-              )}
-            </div>
-
-          </motion.div>
-        )}
 
       </AnimatePresence>
 

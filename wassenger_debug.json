@@ -1,0 +1,257 @@
+[
+  {
+    "id": "6a43431bb70dfb1de8ceec09",
+    "phone": "+916204838766",
+    "alias": "FCSA",
+    "wid": "916204838766@c.us",
+    "connector": "web",
+    "status": "operative",
+    "session": {
+      "status": "online",
+      "operative": true,
+      "uptime": 79,
+      "lastSyncAt": "2026-06-30T08:25:08.089Z",
+      "appVersion": "3.0.0",
+      "linkedDevices": 3,
+      "error": false
+    },
+    "queue": {
+      "status": "active",
+      "total": 500,
+      "size": 0,
+      "scheduled": 0,
+      "available": 500,
+      "force": false
+    },
+    "settings": {
+      "deliverySpeed": 0,
+      "autoRemove": {
+        "enabled": true,
+        "max": 600,
+        "whitelist": []
+      },
+      "retentionPolicy": "plan_defaults",
+      "rebootPolicy": "disabled",
+      "operativeHours": {
+        "enable": false,
+        "policies": []
+      }
+    },
+    "info": {
+      "updatedAt": "2026-06-30T08:25:08.089Z",
+      "language": "en-US",
+      "name": "Saloni",
+      "deviceless": true,
+      "protocolVersion": null,
+      "isBusiness": false,
+      "hasCatalog": false,
+      "battery": 100,
+      "waVersion": "3.0.0",
+      "platform": {
+        "name": "Deviceless",
+        "version": "3.0.0"
+      },
+      "privacy": {
+        "about": "none",
+        "calls": "known",
+        "groupAdd": "all",
+        "lastSeen": "none",
+        "online": "match_last_seen",
+        "profilePicture": "all",
+        "readReceipts": "none"
+      }
+    },
+    "createdAt": "2026-06-30T05:44:03.893Z",
+    "profile": {
+      "name": "Saloni",
+      "lastSyncAt": "2026-06-30T08:23:38.665Z",
+      "imagePath": "/v1/devices/6a43431bb70dfb1de8ceec09/profile/image"
+    },
+    "labels": [],
+    "metrics": {
+      "updatedAt": "2026-06-30T08:25:08.094Z",
+      "agents": 0,
+      "openChats": 508,
+      "contacts": 6788,
+      "groupChats": 168,
+      "groupChatsActive": 127,
+      "groupChatsInactive": 10,
+      "channels": 3,
+      "channelsOwned": 0,
+      "channelsFollowing": 3,
+      "archivedChats": 2,
+      "unreadChats": 88,
+      "unreadGroupChats": 55,
+      "unreadMessages": 2305,
+      "unreadGroupMessages": 2219,
+      "lastChatId": null,
+      "lastChatUnread": 0,
+      "lastMessageId": null,
+      "lastMessageAt": null,
+      "lastMessageType": null,
+      "lastMessageBody": null,
+      "lastRepliedChatId": null,
+      "lastRepliedMessageId": null,
+      "lastRepliedMessageAt": null,
+      "lastRepliedMessageType": null,
+      "lastRepliedMessageBody": null,
+      "lastGroupChatId": "120363359201218349@g.us",
+      "lastGroupMessageAt": "2026-06-30T08:20:23.000Z",
+      "lastGroupMessageType": "chat",
+      "lastGroupMessageBody": "Nhi hota",
+      "lastGroupMessageAuthor": "5089636937803@lid",
+      "lastRepliedGroupChatId": "120363424825686478@g.us",
+      "lastRepliedGroupMessageAt": "2026-06-30T05:33:38.000Z",
+      "lastRepliedGroupMessageType": "chat",
+      "lastRepliedGroupMessageBody": "*Kapdo ke saath*"
+    },
+    "billing": {
+      "subscription": {
+        "status": "active",
+        "billingStatus": "trialing",
+        "plan": "io-enterprise",
+        "planCode": "io-enterprise",
+        "product": "io",
+        "agents": 0,
+        "price": 99.9,
+        "startedAt": "2026-06-30T05:44:01.000Z",
+        "startsAt": "2026-06-30T05:44:01.000Z",
+        "endsAt": "2026-07-07T05:44:01.000Z",
+        "changedAt": "2026-06-30T04:16:27.477Z",
+        "isTrial": true,
+        "trialEndsAt": "2026-07-07T05:44:01.000Z",
+        "usage": {
+          "textMessages": 0,
+          "mediaMessages": 0,
+          "failedMessages": 0,
+          "filesSize": 0,
+          "numberChecks": 8,
+          "catalogQueries": 0,
+          "campaigns": 0
+        },
+        "invoicePaymentURL": "https://invoice.stripe.com/i/acct_1GY9TvCnKoiZhLbM/live_YWNjdF8xR1k5VHZDbktvaVpoTGJNLF9VblZUdmxxdlY2V0tYaU9SeXFJdTF3cFFrZUU5UkNiLDE3MzM0ODMyMQ0200jYpJxZRc?s=ap"
+      }
+    },
+    "agents": [],
+    "webhooks": [],
+    "groupChats": {
+      "lastSyncAt": "2026-06-30T08:24:47.736Z",
+      "count": 168,
+      "links": {
+        "groups": "/v1/devices/6a43431bb70dfb1de8ceec09/groups"
+      }
+    },
+    "links": {
+      "device": {
+        "method": "GET",
+        "url": "https://api.wassenger.com/v1/devices/6a43431bb70dfb1de8ceec09"
+      },
+      "sync": {
+        "method": "GET",
+        "url": "https://api.wassenger.com/v1/devices/6a43431bb70dfb1de8ceec09/sync"
+      },
+      "health": {
+        "method": "GET",
+        "url": "https://api.wassenger.com/v1/devices/6a43431bb70dfb1de8ceec09/health"
+      },
+      "profileImage": {
+        "method": "GET",
+        "url": "https://api.wassenger.com/v1/devices/6a43431bb70dfb1de8ceec09/profile/image"
+      },
+      "messages": {
+        "method": "GET",
+        "url": "https://api.wassenger.com/v1/messages?devices=6a43431bb70dfb1de8ceec09"
+      },
+      "quickReplies": {
+        "method": "GET",
+        "url": "https://api.wassenger.com/v1/devices/6a43431bb70dfb1de8ceec09/quickReplies"
+      },
+      "scan": {
+        "method": "GET",
+        "url": "https://api.wassenger.com/v1/devices/6a43431bb70dfb1de8ceec09/scan"
+      },
+      "groups": {
+        "method": "GET",
+        "url": "https://api.wassenger.com/v1/devices/6a43431bb70dfb1de8ceec09/groups"
+      },
+      "agents": {
+        "method": "GET",
+        "url": "https://api.wassenger.com/v1/devices/6a43431bb70dfb1de8ceec09/agents"
+      }
+    },
+    "stats": {
+      "total": {
+        "sent": 0,
+        "failed": 0,
+        "media": 0,
+        "totalUpstreamSize": 0,
+        "totalDeliveryTime": 0,
+        "totalUpstreamSpeed": 0
+      },
+      "minutes": {
+        "sent": 0,
+        "failed": 0,
+        "media": 0,
+        "totalUpstreamSize": 0,
+        "totalDeliveryTime": 0,
+        "totalUpstreamSpeed": 0
+      },
+      "quarter": {
+        "sent": 0,
+        "failed": 0,
+        "media": 0,
+        "totalUpstreamSize": 0,
+        "totalDeliveryTime": 0,
+        "totalUpstreamSpeed": 0
+      },
+      "hour": {
+        "sent": 0,
+        "failed": 0,
+        "media": 0,
+        "totalUpstreamSize": 0,
+        "totalDeliveryTime": 0,
+        "totalUpstreamSpeed": 0
+      },
+      "day": {
+        "sent": 0,
+        "failed": 0,
+        "media": 0,
+        "totalUpstreamSize": 0,
+        "totalDeliveryTime": 0,
+        "totalUpstreamSpeed": 0
+      },
+      "week": {
+        "sent": 0,
+        "failed": 0,
+        "media": 0,
+        "totalUpstreamSize": 0,
+        "totalDeliveryTime": 0,
+        "totalUpstreamSpeed": 0
+      },
+      "month": {
+        "sent": 0,
+        "failed": 0,
+        "media": 0,
+        "totalUpstreamSize": 0,
+        "totalDeliveryTime": 0,
+        "totalUpstreamSpeed": 0
+      },
+      "year": {
+        "sent": 0,
+        "failed": 0,
+        "media": 0,
+        "totalUpstreamSize": 0,
+        "totalDeliveryTime": 0,
+        "totalUpstreamSpeed": 0
+      }
+    },
+    "logs": [
+      {
+        "level": "info",
+        "event": "session:status:update",
+        "message": "Session status changed from \"offline\" to \"online\"",
+        "createdAt": "2026-06-30T06:04:41.186Z"
+      }
+    ]
+  }
+]

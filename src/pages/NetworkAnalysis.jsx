@@ -712,20 +712,18 @@ function NetworkAnalysis() {
     };
 
     eventSource.onerror = (err) => {
-      console.warn("FastAPI Server OSINT Stream offline. Using fallback simulation.");
+      console.warn("FastAPI Server OSINT Stream offline.");
       setOsintScans(prev => {
         const current = prev[phone];
-        const fallbackData = { ...getMockOSINTData(phone), isMock: true };
         return {
           ...prev,
           [phone]: {
             stage: "completed",
-            data: fallbackData,
+            data: null,
             logs: [
               ...(current ? current.logs : []),
-              `[${new Date().toLocaleTimeString()}] [!] FastAPI backend offline (http://localhost:8000). Active scraping bypassed.`,
-              `[${new Date().toLocaleTimeString()}] [+] Fallback data compiled for Target carrier footprint: ${fallbackData.carrier}`,
-              `[${new Date().toLocaleTimeString()}] [+] Active social links resolved: WhatsApp (Linked), Telegram (${fallbackData.social.telegram.linked ? "Linked" : "No association"}), Instagram (${fallbackData.social.instagram.linked ? "Linked" : "No association"}).`
+              `[${new Date().toLocaleTimeString()}] [!] FastAPI backend connection error. Active scanning failed.`,
+              `[${new Date().toLocaleTimeString()}] [!] Simulated data is disabled. Lookup failed.`
             ]
           }
         };
@@ -1256,15 +1254,7 @@ function NetworkAnalysis() {
                     </div>
                   )}
 
-                  {/* OSINT and Holehe footprint scan */}
-                  <div style={{ marginTop: 14 }}>
-                    <OsintSection
-                      phone={selectedNode.id}
-                      scanState={osintScans?.[selectedNode.id]}
-                      onTriggerScan={triggerOsintScan}
-                      onExportMisp={(phone, data) => setMispModalTarget({ phone, data })}
-                    />
-                  </div>
+
 
                   {!selectedNode.isTarget && (
                     <div style={{ marginTop: 20, flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
