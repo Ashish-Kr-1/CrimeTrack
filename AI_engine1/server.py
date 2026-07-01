@@ -27,14 +27,14 @@ if os.path.exists(ENV_PATH):
 try:
     import holehe
 except ImportError:
-    print("[CrimeTrack Startup] holehe dependency is missing. Installing...")
+    print("[FCSA Startup] holehe dependency is missing. Installing...")
     try:
         subprocess.check_call([sys.executable, "-m", "pip", "install", "holehe"])
-        print("[CrimeTrack Startup] holehe installed successfully.")
+        print("[FCSA Startup] holehe installed successfully.")
     except Exception as e:
-        print(f"[CrimeTrack Startup] Failed to install holehe: {str(e)}")
+        print(f"[FCSA Startup] Failed to install holehe: {str(e)}")
 
-app = FastAPI(title="CrimeTrack Cyber Forensics Backend", version="1.0")
+app = FastAPI(title="FCSA Cyber Forensics Backend", version="1.0")
 
 # Setup CORS for Vite React app on port 5173
 app.add_middleware(
@@ -51,7 +51,7 @@ SIGNAL_API_URL = os.getenv("SIGNAL_API_URL")
 
 @app.get("/")
 def read_root():
-    return {"status": "online", "message": "CrimeTrack Core API Server is active."}
+    return {"status": "online", "message": "FCSA Core API Server is active."}
 
 # ─────────────────────────────────────────────────────────
 #  0. AUTH — credentials stored in .env, never in source
@@ -98,7 +98,7 @@ def get_country_code(phone: str):
 async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: bool = False):
     clean_target = target.replace("+", "").replace(" ", "").strip()
     
-    yield "data: [+] Initializing CrimeTrack OSINT footprint scanner...\n\n"
+    yield "data: [+] Initializing FCSA OSINT footprint scanner...\n\n"
     await asyncio.sleep(0.1)
     
     carrier = "Unknown Carrier"
@@ -286,7 +286,7 @@ async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: b
             # Print the formatted payload to local console for verification during presentation
             print("\n=== [DEMO SPLUNK HEC EVENT STREAM] ===")
             print(json.dumps({
-                "source": "CrimeTrack-OSINT",
+                "source": "FCSA-OSINT",
                 "sourcetype": "_json",
                 "phone": target,
                 "carrier": carrier,
@@ -306,7 +306,7 @@ async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: b
                     
                     event_payload = {
                         "event": {
-                            "source": "CrimeTrack-OSINT",
+                            "source": "FCSA-OSINT",
                             "sourcetype": "_json",
                             "phone": target,
                             "carrier": carrier,
@@ -337,14 +337,14 @@ async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: b
         if not slack_url or "YOUR/WEBHOOK/URL" in slack_url:
             # Print the formatted alert to local console for verification during presentation
             print("\n=== [DEMO SLACK WEBHOOK NOTIFICATION] ===")
-            print(f"To channel: Forensics-Alerts\nText:\n🚨 CrimeTrack Threat Alert 🚨\n*Suspect Number*: {target}\n*Carrier*: {carrier}\n*Region*: {circle}\n*Threat Rating*: {min(fraud_score, 100)}%\n*WhatsApp*: {'Active' if whatsapp_linked else 'Inactive'}\n*Signal*: {'Active' if signal_linked else 'Inactive'}\n*MISP Match*: {'Yes' if misp_flagged else 'No'}")
+            print(f"To channel: Forensics-Alerts\nText:\n🚨 FCSA Threat Alert 🚨\n*Suspect Number*: {target}\n*Carrier*: {carrier}\n*Region*: {circle}\n*Threat Rating*: {min(fraud_score, 100)}%\n*WhatsApp*: {'Active' if whatsapp_linked else 'Inactive'}\n*Signal*: {'Active' if signal_linked else 'Inactive'}\n*MISP Match*: {'Yes' if misp_flagged else 'No'}")
             print("==========================================\n")
             yield "data: [AUTOMATION] [✔] Triggered Slack notification webhook successfully (Local Sandbox Mode).\n\n"
         else:
             if slack_url:
                 try:
                     slack_payload = {
-                        "text": f"🚨 *CrimeTrack Threat Alert* 🚨\n*Suspect Number*: `{target}`\n*Carrier*: `{carrier}`\n*Region*: `{circle}`\n*Threat Rating*: `{min(fraud_score, 100)}%`\n*WhatsApp*: `{'Active' if whatsapp_linked else 'Inactive'}`\n*Signal*: `{'Active' if signal_linked else 'Inactive'}`\n*MISP Match*: `{'Yes' if misp_flagged else 'No'}`"
+                        "text": f"🚨 *FCSA Threat Alert* 🚨\n*Suspect Number*: `{target}`\n*Carrier*: `{carrier}`\n*Region*: `{circle}`\n*Threat Rating*: `{min(fraud_score, 100)}%`\n*WhatsApp*: `{'Active' if whatsapp_linked else 'Inactive'}`\n*Signal*: `{'Active' if signal_linked else 'Inactive'}`\n*MISP Match*: `{'Yes' if misp_flagged else 'No'}`"
                     }
                     res = requests.post(slack_url, json=slack_payload, timeout=5.0)
                     if res.status_code == 200 or res.text == "ok":
@@ -502,7 +502,7 @@ async def export_to_misp(payload: dict):
         
         # Build event using the official MISPEvent object structure for multi-version support
         event = MISPEvent()
-        event.info = f"CrimeTrack Flagged Suspect: {payload.get('phone', 'Unknown target')}"
+        event.info = f"FCSA Flagged Suspect: {payload.get('phone', 'Unknown target')}"
         event.threat_level_id = 3
         event.distribution = 0
         

@@ -741,7 +741,7 @@ export default function OSINTAutomation() {
                 {JSON.stringify({
                   time: new Date().toISOString().split('T')[0] + 'T' + new Date().toLocaleTimeString(),
                   event: {
-                    source: "CrimeTrack-OSINT",
+                    source: "FCSA-OSINT",
                     sourcetype: "_json",
                     phone: scanState.data.phone,
                     carrier: scanState.data.carrier,
