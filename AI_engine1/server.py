@@ -178,7 +178,7 @@ async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: b
             phone_e164 = f"+{clean_target}" if not clean_target.startswith("+") else clean_target
             # Query signal-cli-rest-api via GET /v1/search?numbers={number} with 45.0s timeout
             url = f"{SIGNAL_API_URL.rstrip('/')}/v1/search"
-            res = requests.get(url, params={"numbers": phone_e164}, timeout=45.0)
+            res = requests.get(url, params={"numbers": phone_e164}, headers={"Bypass-Tunnel-Reminder": "true"}, timeout=45.0)
             if res.status_code == 200:
                 data = res.json()
                 is_reg = False
@@ -233,6 +233,7 @@ async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: b
         try:
             from pymisp import ExpandedPyMISP
             misp = ExpandedPyMISP(misp_url, misp_key, ssl=False, debug=False, timeout=10.0)
+            misp.requests_session.headers.update({"Bypass-Tunnel-Reminder": "true"})
             phone_e164 = f"+{clean_target}" if not clean_target.startswith("+") else clean_target
             
             # Search for attributes with this phone number value
@@ -300,7 +301,7 @@ async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: b
             if splunk_url:
                 try:
                     url = f"{splunk_url.rstrip('/')}/services/collector/event"
-                    headers = {}
+                    headers = {"Bypass-Tunnel-Reminder": "true"}
                     if splunk_token:
                         headers["Authorization"] = f"Splunk {splunk_token}"
                     
@@ -499,6 +500,7 @@ async def export_to_misp(payload: dict):
     try:
         from pymisp import ExpandedPyMISP, MISPEvent
         misp = ExpandedPyMISP(misp_url, misp_key, ssl=False, debug=False, timeout=15.0)
+        misp.requests_session.headers.update({"Bypass-Tunnel-Reminder": "true"})
         
         # Build event using the official MISPEvent object structure for multi-version support
         event = MISPEvent()
@@ -547,7 +549,7 @@ def misp_status():
     try:
         # Perform a raw fast HTTP request instead of the heavy PyMISP client handshake
         url = f"{misp_url.rstrip('/')}/servers/getPyMISPVersion.json"
-        headers = {"Authorization": misp_key, "Accept": "application/json"}
+        headers = {"Authorization": misp_key, "Accept": "application/json", "Bypass-Tunnel-Reminder": "true"}
         res = requests.get(url, headers=headers, verify=False, timeout=2.5)
         if res.status_code == 200:
             data = res.json()
