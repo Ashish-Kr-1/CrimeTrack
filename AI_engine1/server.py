@@ -178,7 +178,7 @@ async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: b
             phone_e164 = f"+{clean_target}" if not clean_target.startswith("+") else clean_target
             # Query signal-cli-rest-api via GET /v1/search?numbers={number} with 45.0s timeout
             url = f"{SIGNAL_API_URL.rstrip('/')}/v1/search"
-            res = requests.get(url, params={"numbers": phone_e164}, headers={"Bypass-Tunnel-Reminder": "true"}, timeout=45.0)
+            res = requests.get(url, params={"numbers": phone_e164}, headers={"Bypass-Tunnel-Reminder": "true"}, timeout=120.0)
             if res.status_code == 200:
                 data = res.json()
                 is_reg = False
@@ -318,7 +318,7 @@ async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: b
                             "misp_flagged": misp_flagged
                         }
                     }
-                    res = requests.post(url, json=event_payload, headers=headers, timeout=5.0, verify=False)
+                    res = requests.post(url, json=event_payload, headers=headers, timeout=15.0, verify=False)
                     if res.status_code in [200, 201]:
                         yield "data: [AUTOMATION] [✔] Streamed telemetry event to Splunk HEC successfully.\n\n"
                     else:
