@@ -187,8 +187,8 @@ export default function OSINTAutomation() {
             setScanState(prev => {
               const updatedLogs = [...prev.logs, `[${new Date().toLocaleTimeString()}] [+] Scan completed. Parsing structured indicators...`];
               
-              // Trigger Auto-export to MISP if enabled and high risk
-              if (autoMisp && resultData.fraudScore >= 50) {
+              // Trigger Auto-export to MISP if enabled
+              if (autoMisp) {
                 setTimeout(() => {
                   handleAutoMispExport(resultData);
                 }, 800);

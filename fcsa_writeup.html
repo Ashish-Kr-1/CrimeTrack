@@ -206,7 +206,7 @@
     }
 
     li {
-      margin-bottom: 14px;
+      margin-bottom: 18px;
       padding-left: 20px;
       position: relative;
       font-size: 14.5px;
@@ -237,10 +237,9 @@
       color: var(--primary-dark);
     }
 
-    /* ─── PRINT CSS OVERRIDES ─── */
     @media print {
       @page {
-        margin: 0; /* Removes browser header (date/time) and footer (URL path) */
+        margin: 0; /* Setting margin to 0 removes browser default headers, footers, dates, and links */
       }
       body {
         background-color: white;
@@ -249,8 +248,10 @@
       .container {
         border: none;
         box-shadow: none;
-        padding: 0;
+        padding: 2cm; /* Applies a consistent 2cm margin around the content on every page */
         max-width: 100%;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
       }
       .action-bar {
         display: none;
@@ -260,30 +261,22 @@
         color: var(--text-dark);
       }
       
-      /* Multi-page layout spacing fix */
+      /* Spacing is handled globally by the container's cloned padding */
       header {
-        padding-top: 2cm;
-        padding-left: 2cm;
-        padding-right: 2cm;
+        padding: 0;
       }
       .badge-alert {
-        margin-left: 2cm;
-        margin-right: 2cm;
-        width: calc(100% - 4cm);
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
       }
       section {
         page-break-before: always; /* Each section starts on a fresh page */
-        padding-top: 2cm; /* Creates spacing at the top of pages 2, 3, etc. */
-        padding-bottom: 2cm;
-        padding-left: 2cm;
-        padding-right: 2cm;
+        padding: 0;
       }
       .first-section {
         page-break-before: avoid !important;
-        padding-top: 10px !important;
-        padding-bottom: 2cm;
-        padding-left: 2cm;
-        padding-right: 2cm;
+        padding: 0 !important;
       }
     }
   </style>
@@ -308,7 +301,7 @@
       <div class="metadata">
         <div><strong>Doc Ref:</strong> FCSA-MASTER-GUIDE</div>
         <div><strong>Security:</strong> Restr. LEO Use</div>
-        <div><strong>Version:</strong> v5.2.0</div>
+        <div><strong>Version:</strong> v5.4.0</div>
       </div>
     </header>
 
@@ -341,7 +334,7 @@
           <tr>
             <td><strong>Analyst (Cyber Cell Investigator)</strong></td>
             <td>
-              • <strong>Log Ingester</strong>: Uploads cell tower logs (CDR) into cases.<br>
+              • <strong>Log Ingester</strong>: Uploads cell tower logs (CDR) into active cases.<br>
               • <strong>Spatiotemporal Analyzer</strong>: Traces target tower-hopping trails, active hours, and hotspots on interactive maps.<br>
               • <strong>OSINT Investigator</strong>: Runs automated queries for WhatsApp, Signal, and historical threat databases.<br>
               • <strong>Case Exporter</strong>: Drafts legal orders and generates unified case dossier summaries.
@@ -412,35 +405,44 @@
     <!-- Section 3: Analyst Dashboard Workspaces -->
     <section>
       <h2>3. Analyst Dashboard Workspaces & Features</h2>
-      <p>The Analyst Panel is divided into dedicated workspaces, mapping every phase of a telecommunications investigation:</p>
+      <p>The Analyst Panel provides a full set of digital workspaces, covering every stage of a telecommunications investigation in plain, easy-to-understand steps:</p>
       
       <ul>
         <li>
-          <strong>Upload Center</strong>: The entry point for case evidence. Investigators upload raw carrier CSV files here. The system standardizes columns, checks file integrity, and passes data to the normalization mapper.
+          <strong>Upload Center (Data Import)</strong>: 
+          This is where you upload raw Excel or CSV call logs (CDRs) received from telecom companies. Because different operators (Jio, Airtel, Vi, etc.) use different names for their columns, this center automatically standardizes the columns. It maps fields like "calling number," "dialed number," and "tower location" into a single uniform format, saving investigators from manual clean-up work.
         </li>
         <li>
-          <strong>Dashboard</strong>: Displays an executive overview of the case. It contains target threat classification labels (e.g. <em>Highly Suspect Mule</em> vs. <em>Normal User</em>), risk meters, and charts summarizing call vs. SMS volume.
+          <strong>Dashboard (Overview Screen)</strong>: 
+          Provides a quick summary of the case. It automatically calculates an overall "Suspicion Score" for the suspect, labels their threat profile (e.g., flagging if they behave like a "Money Mule" account), and shows simple graphs of call and SMS volumes so you can spot unusual activity spikes.
         </li>
         <li>
-          <strong>Chrono Replay</strong>: Features an interactive Leaflet map that replays the suspect's movements chronologically. Investigators can control playback speed to track geographic tower hops over time.
+          <strong>Chrono Replay (Movement Map)</strong>: 
+          An interactive map that visually replays the suspect's movements step-by-step. Investigators can hit a "Play" button, adjust playback speeds, and watch the target move between cell towers over time, showing exactly where they traveled and who they called at each location.
         </li>
         <li>
-          <strong>Risk Center</strong>: Focuses on indicators of compromise. It lists the raw behavioral rules, flags critical alarms (e.g. multi-bank mappings), and scores target threat indexes.
+          <strong>Risk Center (Rule Violations)</strong>: 
+          A detailed ledger of security checks. It lists exactly which forensic rules the target has triggered—such as receiving OTP alerts from multiple banks or suddenly stopping all voice calls—explaining the specific behaviors that flagged them as suspicious.
         </li>
         <li>
-          <strong>Mobility Tracker</strong>: Analyzes spatiotemporal habits. It separates cell connections by hours to identify residential tower areas (active overnight) vs. daylight hiding spots.
+          <strong>Mobility Tracker (Habits Analyzer)</strong>: 
+          Groups call data by time of day to profile the target's daily routine. It identifies their "Home Base" by clustering towers they connect to overnight (10:00 PM to 6:00 AM) and flags their "Operational Hideouts" by tracking daytime tower connections.
         </li>
         <li>
-          <strong>Geo Intelligence</strong>: Displays spatial heatmaps and lists target roaming networks. It highlights and flags known high-risk cyber circles.
+          <strong>Geo Intelligence (Location Heatmaps)</strong>: 
+          Displays maps showing where the suspect spends the most time. It automatically checks if the suspect has roamed across states or spent time in known cybercrime circle hotspots (like Jamtara), alerting investigators to high-risk locations.
         </li>
         <li>
-          <strong>Network Analysis</strong>: Builds a dynamic 2D link node diagram connecting target numbers, contacted parties, active cell towers, recipient bank codes, and handset IMEIs to expose criminal groups.
+          <strong>Network Analysis (Ringleader Link Graph)</strong>: 
+          Builds a visual connection chart linking the suspect's phone number to contacted numbers, handset hardware IDs (IMEIs), linked bank accounts, and cell towers. This makes it easy to trace co-conspirators and identify the leader of a network.
         </li>
         <li>
-          <strong>Active Cases</strong>: Lists all ongoing cell investigations, letting analysts switch cases and edit target dossiers.
+          <strong>Active Cases (Case Manager)</strong>: 
+          A digital filing cabinet. It allows analysts to organize multiple active cases, keep logs, save targets' contact files, and switch between investigations easily.
         </li>
         <li>
-          <strong>OSINT & Automation</strong>: Displays live API results, threat feeds matching target records, and status reports for external alerts.
+          <strong>OSINT & Automation (Live Checks Control)</strong>: 
+          A central dashboard where you can check the connection status of external databases (like WhatsApp and MISP) and toggle automatic alerts on or off.
         </li>
       </ul>
     </section>
@@ -452,25 +454,32 @@
       
       <ul>
         <li>
-          <strong>1. OSINT (Open Source Intelligence)</strong>: Queries multiple public directory databases using the target's phone number to harvest digital footprints and identify links to external web profiles.
+          <strong>1. OSINT (Open Source Intelligence)</strong>: 
+          Scans public internet records and directories using the suspect's phone number to harvest digital footprints. It searches for links to external social media profiles, email addresses, and online names associated with the target.
         </li>
         <li>
-          <strong>2. Wassenger (WhatsApp Integration)</strong>: Queries the Wassenger API to check if the suspect number is registered on WhatsApp. It identifies whether the profile is <strong>Personal</strong> or <strong>Business</strong>, maps their unique WhatsApp ID (WID), and checks status timestamps.
+          <strong>2. Wassenger (WhatsApp Status Tracker)</strong>: 
+          Queries WhatsApp systems to see if the suspect's number is registered. It identifies if the account is a Personal or Business profile, retrieves their profile photo, and registers their active status.
         </li>
         <li>
-          <strong>3. Signal (Encrypted Messenger Check)</strong>: Queries Signal Messenger registries to see if the suspect line has been registered for encrypted messaging, which is common among advanced threat actors to hide communications.
+          <strong>3. Signal (Encrypted App Check)</strong>: 
+          Checks if the suspect has registered their number on Signal Messenger. Because secure encrypted apps are often used by advanced threat actors to hide their messages, finding an active Signal account helps profile the suspect's tech-savviness.
         </li>
         <li>
-          <strong>4. Carrier Info (Operator Verification)</strong>: Retrieves real-time, official details about the telecom provider (Jio, Airtel, Vi) and geographic circle/region from international registry systems, verifying the true operator footprint of the target.
+          <strong>4. Carrier Info (Operator & Circle Details)</strong>: 
+          Verifies the SIM card's network provider (Jio, Airtel, Vi) and identifies the geographic region (telecom circle) where the SIM card was originally activated, ensuring the carrier information is correct.
         </li>
         <li>
-          <strong>5. MISP (Malware Information Sharing Platform)</strong>: Connects directly to the local <strong>MISP</strong> repository. It cross-references the suspect's number against historical databases of blacklisted phone numbers used in phishing, financial extortion, and online scams. If a match is found, FCSA flags a <strong>Critical Threat</strong> alarm.
+          <strong>5. MISP (Blacklist Lookup)</strong>: 
+          Cross-references the suspect's number against a database of blacklisted numbers reported in past lottery scams, phishing campaigns, and bank frauds, immediately flagging historical offenders.
         </li>
         <li>
-          <strong>6. Splunk (SIEM Log Analytics)</strong>: Integrates with <strong>Splunk</strong> by piping investigation events, case updates, and threat metrics directly into SIEM indexes for permanent, compliant audit logging.
+          <strong>6. Splunk (Activity Auditing)</strong>: 
+          Automatically records every search, click, and export made by the investigator on the system. This creates a secure, permanent audit trail to ensure legal compliance.
         </li>
         <li>
-          <strong>7. Slack (Real-time Alerts)</strong>: Uses automated webhooks to instantly push notifications to the Cyber Cell’s active operations channel on <strong>Slack</strong> whenever a suspect with a high-threat score is identified.
+          <strong>7. Slack (Instant Warnings)</strong>: 
+          Sends immediate notification cards to the Cyber Cell's Slack channels when a target's suspicion score crosses a critical danger threshold, alerting field agents instantly.
         </li>
       </ul>
     </section>
@@ -482,19 +491,24 @@
       
       <ul>
         <li>
-          <strong>Cell Tower (CGI) Trajectory Estimation</strong>: Extracts the operator's tower identifiers (<code>First CGI</code>) and physical coordinates (<code>First CGI Lat/Long</code>) from the CDR. By chaining these coordinates chronologically, the system reconstructs the suspect’s exact movement path, showing which towers they hopped between over time.
+          <strong>Cell Tower CGI Trajectory Mapping</strong>: 
+          Extracts latitude and longitude coordinates from tower logs to draw a visual travel route of the suspect's journey chronologically on the map.
         </li>
         <li>
-          <strong>ML Location Forecasting</strong>: An AI predictor (trained on historical tower-hopping sequences in the Admin Dashboard) calculates the suspect's location drift and projects their next estimated coordinate grid sector, allowing proactive search grid positioning.
+          <strong>ML Location Forecasting</strong>: 
+          An AI assistant that studies the suspect's past movements to predict their next likely location sector. This helps law enforcement position physical teams in advance.
         </li>
         <li>
-          <strong>Impossible Velocity Warnings (SIM Cloning)</strong>: Calculates the travel speed between consecutive tower connections. If a suspect's SIM registers in Tower A (Delhi) and then Tower B (Mumbai) within a timeframe indicating a speed of <strong>&gt;1000 km/h</strong>, FCSA flags a <strong>SIM Cloning Alert</strong> (proving SIM box operations or cloned card activity).
+          <strong>Impossible Velocity (SIM Cloning Alert)</strong>: 
+          Calculates the physical travel speed between consecutive calls. If a suspect's SIM connects to a tower in Delhi and then to a tower in Mumbai just 10 minutes later, the system flags a "SIM Cloning Warning" because traveling that fast is physically impossible.
         </li>
         <li>
-          <strong>Money Mule Heuristics</strong>: Automatically flags money-laundering cards. It alerts when a prepaid SIM acts as an alert aggregator receiving SMS alerts from <strong>5 or more distinct financial entities</strong> (SBI, HDFC, etc.) or shows high-frequency bursts of outgoing SMS to UPI registration codes (like GPAY/PhonePe activation gateways).
+          <strong>Money Mule Heuristics</strong>: 
+          Automatically flags bank-fraud cards. It raises an alarm if a SIM card acts as an alert aggregator receiving SMS notifications from 5 or more different banks (indicating they are managing multiple stolen accounts) or spams UPI registration gateways.
         </li>
         <li>
-          <strong>Spatiotemporal Hotspot Clustering</strong>: Groups connections by timestamp to separate the suspect's habits. Tower hops registered overnight (10:00 PM to 6:00 AM) are clustered to identify the suspect's <strong>Residential Footprint</strong>, while daytime hops map their **Operational Hideouts**.
+          <strong>Spatiotemporal Hotspot Clustering</strong>: 
+          An algorithm that groups location coordinates by time. It automatically identifies the suspect's home (where they spend nights) and hideouts (where they spend afternoons) by calculating the center-points of call locations.
         </li>
       </ul>
     </section>
@@ -506,13 +520,12 @@
       
       <ul>
         <li>
-          <strong>Section 91 CrPC Notice Drafts</strong>: Instantly generates formal police letters based on the suspect's activity:
-          <br>• <em>Freeze bank accounts</em> linked to the suspect's money-mule activity.
-          <br>• <em>Block the phone hardware (IMEIs)</em> across all national networks using the CEIR registry.
-          <br>• <em>Request UPI logs</em> from the National Payments Corporation of India (NPCI) to trace money transfers.
+          <strong>Section 91 CrPC Notice Drafts</strong>: 
+          Automatically drafts standard police legal request letters based on the suspect's logs, including requests to freeze bank accounts, block hardware IMEIs on national networks, or request UPI transfer logs from payment companies.
         </li>
         <li>
-          <strong>One-Click PDF Dossier Exporter</strong>: Compiles all maps, timeline routes, threat indicators, audit logs, and legal notices into a courtroom-ready PDF document to present to senior officers or the judge.
+          <strong>One-Click PDF Dossier Exporter</strong>: 
+          Compiles all maps, location heatmaps, timelines, threat rules, audit logs, and drafted legal notices into a single, clean PDF report ready to present in court or to senior officers.
         </li>
       </ul>
     </section>

@@ -39,8 +39,8 @@ app = FastAPI(title="FCSA Cyber Forensics Backend", version="1.0")
 # Setup CORS for Vite React app on port 5173
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -177,8 +177,8 @@ async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: b
         try:
             phone_e164 = f"+{clean_target}" if not clean_target.startswith("+") else clean_target
             # Query signal-cli-rest-api via GET /v1/search?numbers={number} with 45.0s timeout
-            url = f"{SIGNAL_API_URL.rstrip('/')}/v1/search?numbers={phone_e164}"
-            res = requests.get(url, timeout=10.0)
+            url = f"{SIGNAL_API_URL.rstrip('/')}/v1/search"
+            res = requests.get(url, params={"numbers": phone_e164}, timeout=45.0)
             if res.status_code == 200:
                 data = res.json()
                 is_reg = False
@@ -196,7 +196,7 @@ async def run_osint_stream(target: str, auto_splunk: bool = False, auto_slack: b
             else:
                 # Fallback to GET /v1/search/{number} if query parameter numbers is not supported
                 fallback_url = f"{SIGNAL_API_URL.rstrip('/')}/v1/search/{phone_e164}"
-                fallback_res = requests.get(fallback_url, timeout=10.0)
+                fallback_res = requests.get(fallback_url, timeout=45.0)
                 if fallback_res.status_code == 200:
                     data = fallback_res.json()
                     is_reg = False
@@ -563,9 +563,8 @@ def check_wassenger_status():
     if not WASSENGER_API_KEY:
         return {"status": "missing", "message": "WASSENGER_API_KEY is missing from .env"}
     try:
-        url = "https://api.wassenger.com/v1/devices"
-        headers = {"Token": WASSENGER_API_KEY}
-        res = requests.get(url, headers=headers, timeout=5.0)
+        url = f"https://api.wassenger.com/v1/devices?token={WASSENGER_API_KEY}"
+        res = requests.get(url, timeout=5.0)
         if res.status_code == 200:
             devices = res.json()
             if isinstance(devices, list) and len(devices) > 0:
@@ -589,4 +588,4 @@ def check_wassenger_status():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

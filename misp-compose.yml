@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  misp_db:
+    image: mariadb:10.5
+    container_name: misp_db
+    environment:
+      - MYSQL_DATABASE=misp
+      - MYSQL_USER=misp
+      - MYSQL_PASSWORD=misp
+      - MYSQL_ROOT_PASSWORD=misp
+    volumes:
+      - misp_db_data:/var/lib/mysql
+    restart: always
+
+  misp_redis:
+    image: redis:6.2-alpine
+    container_name: misp_redis
+    restart: always
+
+  misp_core:
+    image: coolacid/misp-docker:core-latest
+    container_name: misp_core
+    depends_on:
+      - misp_db
+      - misp_redis
+    ports:
+      - "8443:443"
+      - "8085:80"
+      - "8083:8080"
+    environment:
+      - CRON_USER_ID=1
+      - MYSQL_HOST=misp_db
+      - MYSQL_DATABASE=misp
+      - MYSQL_USER=misp
+      - MYSQL_PASSWORD=misp
+      - REDIS_FQDN=misp_redis
+    volumes:
+      - misp_core_data:/var/www/MISP
+      - misp_certs:/etc/nginx/certs
+    restart: always
+
+volumes:
+  misp_db_data:
+  misp_core_data:
+  misp_certs:
